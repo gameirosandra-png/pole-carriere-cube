@@ -6,6 +6,8 @@ import { messageShortlist, lienMailto } from "./shortlist";
 import { relancesAuto } from "./relances";
 import { formatChrono, QUESTIONS_ENTRAINEMENT, tirerQuestions } from "./convaincre";
 import { dureeEstimeeMs, scoreVoix } from "../narration";
+import { appliquerQuestionnaire, pointsAttention, poserQuestion, questionsEnAttente, repondreQuestion, resumeQuestionnaire } from "./questionnaire";
+import { scorer } from "../matching";
 
 const TODAY = "2026-10-22";
 const demo = creerDonneesDemo(TODAY);
@@ -109,5 +111,65 @@ describe("narration de la démo", () => {
   it("estime la durée de lecture", () => {
     expect(dureeEstimeeMs("un deux")).toBe(5000);
     expect(dureeEstimeeMs(Array(26).fill("mot").join(" "))).toBe(10000);
+  });
+});
+
+describe("questionnaire « Faisons connaissance »", () => {
+  const mehdi = parId("a16");
+
+  it("remplit la fiche, le pitch et l'atelier salaire", () => {
+    const a = appliquerQuestionnaire(
+      mehdi,
+      {
+        parcoursAvant: "5 ans dans la vente",
+        anneesExperience: 5,
+        posteVise: "Automatisation no-code",
+        contrat: "freelance",
+        zone: "regions",
+        inquietudes: ["salaire", "confiance"],
+        motivation: "pour des PME qui perdent du temps sur la saisie.",
+      },
+      TODAY,
+    );
+    expect(a.questionnaire?.rempliLe).toBe(TODAY);
+    expect(a.accompagnement?.salaire?.contrat).toBe("freelance");
+    expect(a.accompagnement?.salaire?.zone).toBe("regions");
+    expect(a.accompagnement?.salaire?.poste).toBe("automatisation");
+    expect(a.accompagnement?.convaincre?.motivation).toBe("pour des PME qui perdent du temps sur la saisie.");
+    expect(a.notes[0].texte.includes("Questionnaire")).toBe(true);
+    expect(pointsAttention(a.questionnaire).map((p) => p.seance).join(",")).toBe("negociation,");
+  });
+
+  it("ne remplace pas ce que l'équipe a saisi par une réponse vide", () => {
+    const hugo2 = appliquerQuestionnaire(hugo, { posteVise: "  ", motivation: "" }, TODAY);
+    expect(hugo2.posteVise).toBe("Product Builder");
+    expect(hugo2.accompagnement?.convaincre?.motivation).toBe(hugo.accompagnement?.convaincre?.motivation);
+    expect(hugo2.notes.length).toBe(hugo.notes.length); // déjà rempli : pas de nouvelle note
+  });
+
+  it("résume les réponses pour la fiche", () => {
+    const r = resumeQuestionnaire(parId("a14").questionnaire!);
+    expect(r.find((l) => l.libelle === "Cherche")?.valeur).toBe("Alternance · en régions · hybride");
+  });
+
+  it("baisse le score des offres hors du contrat souhaité", () => {
+    const lucas = parId("a14");
+    const alternance = scorer(lucas, { id: "o", titre: "Product Builder", contrat: "Alternance", ouverte: true, candidats: [] });
+    const cdi = scorer(lucas, { id: "o", titre: "Product Builder", contrat: "CDI", ouverte: true, candidats: [] });
+    expect(alternance.raisons.includes("Contrat souhaité")).toBe(true);
+    expect(cdi.raisons.includes("Préfère l'alternance")).toBe(true);
+    expect(alternance.score > cdi.score).toBe(true);
+  });
+});
+
+describe("boîte à questions", () => {
+  it("pose, liste et répond", () => {
+    const attente = questionsEnAttente(demo.apprenants);
+    expect(attente.map((x) => x.question.id).join(",")).toBe("qp1,qp2");
+    const lucas = repondreQuestion(parId("a14"), "qp1", " Oui, le replay sera dans ton espace. ", TODAY);
+    expect(lucas.questions?.[0].reponse).toBe("Oui, le replay sera dans ton espace.");
+    const avec = poserQuestion(parId("a16"), "Une question ?", "x", TODAY);
+    expect(avec.questions?.length).toBe(1);
+    expect(avec.dernierContact).toBe(TODAY);
   });
 });

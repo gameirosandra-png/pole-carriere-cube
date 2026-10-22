@@ -12,6 +12,7 @@ import { genererPitch } from "../accompagnement/convaincre";
 import { calculerPretention, formatMontant } from "../accompagnement/salaire";
 import { Progression } from "./Progression";
 import { Entrainement } from "./Entrainement";
+import { BoiteQuestions, QuestionnaireApprenant } from "./QuestionnaireApprenant";
 
 interface Props {
   apprenants: Apprenant[];
@@ -156,6 +157,8 @@ function PageApprenant({
         </div>
       </dl>
 
+      <QuestionnaireApprenant apprenant={a} maj={maj} />
+
       <div className="espace">
         <div className="espace-carte">
           <h2>Ton parcours en 7 séances</h2>
@@ -228,6 +231,7 @@ function PageApprenant({
               )}
             </form>
           )}
+          <BoiteQuestions apprenant={a} maj={maj} />
           <div className="espace-carte">
             <h2>Offres qu'on t'a proposées</h2>
             {offres.length === 0 ? (

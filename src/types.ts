@@ -88,6 +88,34 @@ export interface Accompagnement {
   historique?: PointProgression[];
 }
 
+/* ---------- Questionnaire « Faisons connaissance » et questions au pôle ---------- */
+
+export type Inquietude = "cv" | "portfolio" | "pitch" | "entretien" | "salaire" | "reseau" | "confiance";
+
+export interface Questionnaire {
+  /** Date à laquelle l'apprenant l'a rempli (ou mis à jour). */
+  rempliLe: string;
+  parcoursAvant?: string;
+  anneesExperience?: number;
+  posteVise?: string;
+  secteurs?: string;
+  contrat?: "cdi" | "alternance" | "freelance" | "ouvert";
+  zone?: "idf" | "regions";
+  teletravail?: "sur-site" | "hybride" | "complet";
+  disponibleLe?: string; // ISO
+  pointsForts?: string;
+  inquietudes?: Inquietude[];
+  motivation?: string;
+}
+
+export interface QuestionPole {
+  id: string;
+  date: string; // ISO
+  texte: string;
+  reponse?: string;
+  reponduLe?: string;
+}
+
 export interface Apprenant {
   id: string;
   prenom: string;
@@ -105,6 +133,8 @@ export interface Apprenant {
   parcoursAvant?: string;
   anneesExperience?: number;
   accompagnement?: Accompagnement;
+  questionnaire?: Questionnaire;
+  questions?: QuestionPole[];
   notes: Note[];
 }
 

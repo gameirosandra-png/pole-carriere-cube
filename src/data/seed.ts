@@ -364,6 +364,54 @@ export function creerDonneesDemo(today = aujourdhui()): Donnees {
     },
   };
 
+  // Questionnaire « Faisons connaissance », rempli avant la séance 1.
+  const questionnaires: Record<string, Apprenant["questionnaire"]> = {
+    a10: {
+      rempliLe: j(-44),
+      parcoursAvant: "8 ans dans la grande distribution, dont 3 comme chef de rayon",
+      anneesExperience: 8,
+      posteVise: "Product Builder",
+      secteurs: "retail, logistique",
+      contrat: "cdi",
+      zone: "idf",
+      teletravail: "hybride",
+      pointsForts: "Le terrain, l'animation d'équipe, le sens du client",
+      inquietudes: ["entretien", "salaire"],
+      motivation: "dans le retail, pour outiller les équipes terrain que je connais bien.",
+    },
+    a14: {
+      rempliLe: j(-10),
+      parcoursAvant: "7 ans dans l'enseignement",
+      anneesExperience: 7,
+      posteVise: "Product Builder",
+      secteurs: "edtech, formation",
+      contrat: "alternance",
+      zone: "regions",
+      teletravail: "hybride",
+      disponibleLe: finC,
+      pointsForts: "La pédagogie : expliquer simplement des choses compliquées",
+      inquietudes: ["confiance", "reseau", "salaire"],
+      motivation: "dans l'edtech, pour créer les outils dont j'aurais rêvé quand j'enseignais.",
+    },
+  };
+
+  // Boîte à questions : ce que les apprenants ont demandé au pôle.
+  const questionsPole: Record<string, Apprenant["questions"]> = {
+    a4: [
+      {
+        id: "qp3",
+        date: j(-9),
+        texte: "Faut-il mettre mes projets de formation en haut du CV ?",
+        reponse: "Oui : 2 ou 3 projets en haut, avant l'expérience, avec le lien vers ton portfolio.",
+        reponduLe: j(-8),
+      },
+    ],
+    a14: [{ id: "qp1", date: j(-2), texte: "L'atelier LinkedIn sera-t-il enregistré ? Je travaille ce soir-là." }],
+    a15: [
+      { id: "qp2", date: j(-1), texte: "Peut-on viser un poste de Product Owner sans expérience tech avant la formation ?" },
+    ],
+  };
+
   const enrichir = (a: Apprenant): Apprenant => {
     // Les apprenants insérés ont un parcours complet, bouclé avant leur embauche.
     const faites = a.dateInsertion ? TOUTES : (etapes[a.id] ?? []);
@@ -371,7 +419,12 @@ export function creerDonneesDemo(today = aujourdhui()): Donnees {
     return {
       ...a,
       ...profils[a.id],
-      accompagnement: accompagnements[a.id],
+      accompagnement:
+        a.id === "a14"
+          ? { convaincre: { motivation: questionnaires.a14?.motivation } }
+          : accompagnements[a.id],
+      questionnaire: questionnaires[a.id],
+      questions: questionsPole[a.id],
       dossier: Object.fromEntries(faites.map((e, i) => [e, ajouterJours(debut, i * 5)])),
     };
   };

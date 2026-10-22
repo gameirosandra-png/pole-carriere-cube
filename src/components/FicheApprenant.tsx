@@ -14,6 +14,7 @@ import { AtelierSalaire } from "./ateliers/AtelierSalaire";
 import { AtelierConvaincre } from "./ateliers/AtelierConvaincre";
 import { OngletFicheCandidat } from "./FicheCandidat";
 import { Progression } from "./Progression";
+import { ProfilApprenant, QuestionsApprenant } from "./ProfilApprenant";
 import { enregistrerPoint } from "../accompagnement/progression";
 
 type Onglet = "suivi" | "cv" | "portfolio" | "salaire" | "convaincre" | "candidat";
@@ -186,6 +187,9 @@ export function FicheApprenant({ apprenant: a, entreprises, maj, supprimer, supp
             )}
           </div>
 
+          <h3 className="fiche-titre">Ce qu'il ou elle nous a dit</h3>
+          <ProfilApprenant apprenant={a} />
+
           <h3 className="fiche-titre">Prochaine action</h3>
           <div className="grille-champs">
             <label className="champ">
@@ -254,6 +258,12 @@ export function FicheApprenant({ apprenant: a, entreprises, maj, supprimer, supp
               ))}
             </ul>
           )}
+
+          <h3 className="fiche-titre">
+            Questions posées au pôle
+            {(a.questions ?? []).some((q) => !q.reponse) && <span className="compteur">à répondre</span>}
+          </h3>
+          <QuestionsApprenant apprenant={a} maj={maj} />
 
           <h3 className="fiche-titre">Notes de suivi</h3>
           <div className="note-saisie">

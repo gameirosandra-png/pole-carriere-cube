@@ -69,6 +69,20 @@ export function scorer(a: Apprenant, offre: Offre): Suggestion {
     raisons.push(offre.contrat === "Alternance" ? "En formation : idéal en alternance" : "Encore en formation");
   }
 
+  // Contrat souhaité (questionnaire) : une offre hors de ses souhaits passe après.
+  const souhait = a.questionnaire?.contrat;
+  if (souhait && souhait !== "ouvert") {
+    const compatible =
+      (souhait === "cdi" && (offre.contrat === "CDI" || offre.contrat === "CDD")) ||
+      (souhait === "alternance" && offre.contrat === "Alternance") ||
+      (souhait === "freelance" && offre.contrat === "Freelance");
+    if (compatible) raisons.push("Contrat souhaité");
+    else {
+      scoreDispo = Math.min(scoreDispo, 5);
+      raisons.push(`Préfère ${souhait === "cdi" ? "un CDI" : souhait === "alternance" ? "l'alternance" : "le freelance"}`);
+    }
+  }
+
   return { apprenant: a, score: scoreDossier + scorePoste + scoreDispo, raisons };
 }
 

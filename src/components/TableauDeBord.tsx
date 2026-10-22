@@ -7,6 +7,7 @@ import { Funnel } from "./Funnel";
 import { BoutonRecap } from "./BoutonRecap";
 import { CetteSemaine } from "./CetteSemaine";
 import { RelancesAuto } from "./RelancesAuto";
+import { QuestionsATraiter } from "./QuestionsATraiter";
 import { gainMoyenCV } from "../accompagnement/progression";
 
 interface Props {
@@ -174,6 +175,8 @@ export function TableauDeBord({ apprenants, ateliers, ouvrir, lancerVisite, lanc
           </ul>
         )}
       </section>
+
+      <QuestionsATraiter apprenants={apprenants} ouvrir={ouvrir} />
 
       <section className="section-dossiers" aria-labelledby="titre-dossiers">
         <h2 className="titre-section" id="titre-dossiers">

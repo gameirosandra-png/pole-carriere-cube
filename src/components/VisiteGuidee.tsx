@@ -63,7 +63,7 @@ export const ETAPES_VISITE: Etape[] = [
     cible: ".espace-page",
     titre: "L'apprenant acteur de son parcours",
     texte:
-      "Chaque apprenant a son espace : ses séances, sa prochaine étape, ses offres. Ce qu'il coche met à jour le suivi de l'équipe.",
+      "Chaque apprenant a son espace : un questionnaire pour faire connaissance, ses séances, ses offres, et une boîte à questions. Tout alimente le suivi de l'équipe.",
   },
   {
     vue: "rapport",

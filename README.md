@@ -37,19 +37,21 @@ Et pour aller jusqu'à l'emploi :
 - **Progression** : les scores CV et entretien sont relevés à chaque séance ; une courbe montre l'avant / après, et le tableau de bord affiche le gain moyen.
 - **Mode entraînement** : questions d'entretien tirées au hasard ou pitch, chrono de 2 minutes, en plein écran.
 - **Relances automatiques** : rappels d'atelier (48 h avant) et messages aux apprenants sans contact depuis 14 jours, écrits par l'app et envoyés via Make en un clic.
+- **Questionnaire « Faisons connaissance »** : rempli par l'apprenant avant la séance 1 (parcours, poste et secteurs visés, contrat, mobilité, inquiétudes, motivation). Les réponses remplissent la fiche, le pitch et l'atelier salaire, affinent le matching (contrat souhaité) et font remonter les points d'attention dans la fiche et le brief de rendez-vous.
+- **Boîte à questions** : l'apprenant pose une question au pôle depuis son espace ; elle apparaît dans « Questions des apprenants » au tableau de bord, l'équipe répond depuis la fiche, et la réponse s'affiche chez l'apprenant.
 - **Boîte à outils de l'apprenant** : dans son espace, il retrouve son CV à corriger, son pitch, sa prétention et sa progression.
 
 ## Ce que fait le MVP
 
 | Écran | Pour qui | Ce qu'on y fait |
 | --- | --- | --- |
-| Tableau de bord | Équipe | La semaine du pôle (rendez-vous, ateliers, retards), les relances automatiques prêtes à partir, puis chaque promo d'un coup d'œil, le taux d'insertion à 6 mois, le délai moyen, l'effet de l'accompagnement (gain moyen de score CV), l'entonnoir d'insertion avec son point de décrochage, les apprenants à relancer, et l'avancement des dossiers étape par étape. Exporter les indicateurs en CSV. |
+| Tableau de bord | Équipe | La semaine du pôle (rendez-vous, ateliers, retards), les relances automatiques prêtes à partir, les questions des apprenants en attente, puis chaque promo d'un coup d'œil, le taux d'insertion à 6 mois, le délai moyen, l'effet de l'accompagnement (gain moyen de score CV), l'entonnoir d'insertion avec son point de décrochage, les apprenants à relancer, et l'avancement des dossiers étape par étape. Exporter les indicateurs en CSV. |
 | Apprenants | Équipe | Rechercher, filtrer (dont « prêts à proposer »), voir l'avancement de chaque dossier, ajouter un apprenant, exporter la liste en CSV (ouvrable dans Excel). |
-| Fiche apprenant | Équipe | 6 onglets : Suivi (avec la courbe de progression), CV, Portfolio, Salaire, Convaincre (avec le mode entraînement), Fiche candidat. Changer le statut, valider les séances, planifier la prochaine action, noter les échanges, voir les offres proposées, supprimer la fiche. |
+| Fiche apprenant | Équipe | 6 onglets : Suivi (ce que l'apprenant a dit dans le questionnaire, ses questions, la courbe de progression), CV, Portfolio, Salaire, Convaincre (avec le mode entraînement), Fiche candidat. Changer le statut, valider les séances, planifier la prochaine action, noter les échanges, voir les offres proposées, supprimer la fiche. |
 | Entreprises & offres | Équipe | Suivre les partenaires et leurs offres. **Suggérer des candidats** : les 3 meilleurs profils par offre, avec un score expliqué. Proposer, retirer, supprimer (avec annulation). **Envoyer la shortlist** à l'entreprise par e-mail. |
 | Ateliers | Équipe | Planifier les ateliers collectifs, inscrire, inviter les apprenants qui en ont besoin. |
 | Rapport | Direction | Rapport d'insertion d'une page par promo, prêt à imprimer ou à enregistrer en PDF. |
-| Espace apprenant | Apprenant | Son tableau de bord (parcours, prochaine étape, offres), ses séances, sa boîte à outils (CV, pitch, prétention, progression, entraînement à l'oral), et un formulaire pour dire où il en est. Sa fiche se met à jour sans relance manuelle. |
+| Espace apprenant | Apprenant | Son tableau de bord (parcours, prochaine étape, offres), son questionnaire « Faisons connaissance », ses séances, une boîte à questions, sa boîte à outils (CV, pitch, prétention, progression, entraînement à l'oral), et un formulaire pour dire où il en est. Sa fiche se met à jour sans relance manuelle. |
 
 Au premier passage, une **visite guidée** de 8 étapes présente l'app. La **démo auto** (2 minutes) déroule seule l'histoire d'un apprenant, de la semaine du pôle jusqu'à l'entreprise, **commentée à voix haute** : voix neuronale du navigateur par défaut, ou voix générée par IA si les fichiers audio sont déposés (voir [docs/voix-demo.md](docs/voix-demo.md)). La démo avance au rythme de la voix ; on peut la couper ou mettre en pause.
 
@@ -124,7 +126,7 @@ src/
   dossier.ts          checklist du dossier et KPI de préparation (testés)
   matching.ts         suggestion de candidats pour une offre (testé)
   accompagnement/     ateliers CV, portfolio, salaire (référentiel sourcé), pitch, ateliers collectifs,
-                      progression, fiche candidat, shortlist, relances, entraînement (testés)
+                      progression, fiche candidat, shortlist, relances, entraînement, questionnaire (testés)
   rapport.ts          entonnoir d'insertion et statistiques par promo (testés)
   narration.ts        voix de la démo : fichiers IA, sinon meilleure voix française du navigateur
   brief.ts            préparation de rendez-vous : données pour l'IA, brief de secours (testés)
