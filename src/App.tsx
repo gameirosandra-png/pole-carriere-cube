@@ -1,20 +1,22 @@
 import { useCallback, useState } from "react";
-import { useDonnees } from "./lib";
+import { useDonnees } from "./store";
 import { TableauDeBord } from "./components/TableauDeBord";
 import { Apprenants } from "./components/Apprenants";
 import { Entreprises } from "./components/Entreprises";
+import { EspaceApprenant } from "./components/EspaceApprenant";
 import { FicheApprenant } from "./components/FicheApprenant";
 
-type Vue = "tdb" | "apprenants" | "entreprises";
+type Vue = "tdb" | "apprenants" | "entreprises" | "espace";
 
 const VUES: { id: Vue; libelle: string }[] = [
   { id: "tdb", libelle: "Tableau de bord" },
   { id: "apprenants", libelle: "Apprenants" },
   { id: "entreprises", libelle: "Entreprises & offres" },
+  { id: "espace", libelle: "Espace apprenant" },
 ];
 
 export default function App() {
-  const { donnees, setDonnees, majApprenant, reinitialiser } = useDonnees();
+  const { donnees, setDonnees, majApprenant, ajouterApprenant, supprimerApprenant, reinitialiser } = useDonnees();
   const [vue, setVue] = useState<Vue>("tdb");
   const [ficheId, setFicheId] = useState<string | null>(null);
 
@@ -48,13 +50,21 @@ export default function App() {
           <button className="bouton-texte" onClick={() => confirm("Revenir aux données de démo ?") && reinitialiser()}>
             Réinitialiser la démo
           </button>
+          <a className="bouton-texte" href="https://github.com/gameirosandra-png/pole-carriere-cube">
+            Voir le code sur GitHub
+          </a>
         </div>
       </aside>
 
       <main className="contenu">
         {vue === "tdb" && <TableauDeBord apprenants={donnees.apprenants} ouvrir={setFicheId} />}
-        {vue === "apprenants" && <Apprenants apprenants={donnees.apprenants} ouvrir={setFicheId} />}
+        {vue === "apprenants" && (
+          <Apprenants apprenants={donnees.apprenants} ouvrir={setFicheId} ajouter={ajouterApprenant} />
+        )}
         {vue === "entreprises" && <Entreprises donnees={donnees} setDonnees={setDonnees} ouvrir={setFicheId} />}
+        {vue === "espace" && (
+          <EspaceApprenant apprenants={donnees.apprenants} entreprises={donnees.entreprises} maj={majApprenant} />
+        )}
       </main>
 
       {ouverte && (
@@ -62,6 +72,10 @@ export default function App() {
           apprenant={ouverte}
           entreprises={donnees.entreprises}
           maj={(f) => majApprenant(ouverte.id, f)}
+          supprimer={() => {
+            supprimerApprenant(ouverte.id);
+            setFicheId(null);
+          }}
           fermer={fermer}
         />
       )}

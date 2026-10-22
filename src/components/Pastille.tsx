@@ -1,5 +1,5 @@
 import type { Statut } from "../types";
-import { libelleStatut } from "../lib";
+import { libelleStatut } from "../regles";
 
 /** Pastille de statut : la couleur porte le sens, le libellé reste toujours visible. */
 export function Pastille({ statut }: { statut: Statut }) {

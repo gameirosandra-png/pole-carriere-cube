@@ -1,34 +1,23 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import type { Apprenant, Entreprise, Statut } from "../types";
-import { STATUTS, aujourdhui, estInsere, formatDate, nouvelId, raisonRelance } from "../lib";
+import { STATUTS, changerStatut, estInsere, raisonRelance } from "../regles";
+import { aujourdhui, formatDate } from "../dates";
+import { nouvelId } from "../store";
 import { Pastille } from "./Pastille";
+import { Panneau } from "./Panneau";
 
 interface Props {
   apprenant: Apprenant;
   entreprises: Entreprise[];
   maj: (f: (a: Apprenant) => Apprenant) => void;
+  supprimer: () => void;
   fermer: () => void;
 }
 
-export function FicheApprenant({ apprenant: a, entreprises, maj, fermer }: Props) {
+export function FicheApprenant({ apprenant: a, entreprises, maj, supprimer, fermer }: Props) {
   const [note, setNote] = useState("");
-  const panneau = useRef<HTMLDivElement>(null);
 
-  // Échap ferme la fiche ; le focus entre dans le panneau à l'ouverture.
-  useEffect(() => {
-    panneau.current?.focus();
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && fermer();
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [fermer]);
-
-  const changerStatut = (statut: Statut) =>
-    maj((x) => ({
-      ...x,
-      statut,
-      // L'insertion est datée automatiquement au premier passage en poste / freelance.
-      dateInsertion: statut === "poste" || statut === "freelance" ? x.dateInsertion ?? aujourdhui() : undefined,
-    }));
+  const majStatut = (statut: Statut) => maj((x) => changerStatut(x, statut));
 
   const ajouterNote = () => {
     const texte = note.trim();
@@ -48,16 +37,7 @@ export function FicheApprenant({ apprenant: a, entreprises, maj, fermer }: Props
   const relance = raisonRelance(a);
 
   return (
-    <div className="voile" onClick={fermer}>
-      <div
-        className="fiche"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="fiche-nom"
-        tabIndex={-1}
-        ref={panneau}
-        onClick={(e) => e.stopPropagation()}
-      >
+    <Panneau titreId="fiche-nom" fermer={fermer}>
         <header className="fiche-entete">
           <div>
             <h2 id="fiche-nom">
@@ -80,7 +60,7 @@ export function FicheApprenant({ apprenant: a, entreprises, maj, fermer }: Props
         <div className="grille-champs">
           <label className="champ">
             <span>Statut</span>
-            <select value={a.statut} onChange={(e) => changerStatut(e.target.value as Statut)}>
+            <select value={a.statut} onChange={(e) => majStatut(e.target.value as Statut)}>
               {STATUTS.map((s) => (
                 <option key={s.id} value={s.id}>
                   {s.libelle}
@@ -198,7 +178,17 @@ export function FicheApprenant({ apprenant: a, entreprises, maj, fermer }: Props
             ))}
           </ol>
         )}
-      </div>
-    </div>
+
+        <div className="zone-suppression">
+          <button
+            className="bouton-danger"
+            onClick={() => {
+              if (confirm(`Supprimer définitivement la fiche de ${a.prenom} ${a.nom} ?`)) supprimer();
+            }}
+          >
+            Supprimer la fiche
+          </button>
+        </div>
+    </Panneau>
   );
 }

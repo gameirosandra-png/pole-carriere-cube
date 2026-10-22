@@ -1,5 +1,7 @@
 import type { Apprenant } from "../types";
-import { STATUTS, calculerIndicateurs, formatDate, libelleStatut, raisonRelance } from "../lib";
+import { STATUTS, calculerIndicateurs, libelleStatut, raisonRelance } from "../regles";
+import { aujourdhui, formatDate } from "../dates";
+import { csvIndicateurs, telechargerCsv } from "../csv";
 
 interface Props {
   apprenants: Apprenant[];
@@ -7,22 +9,37 @@ interface Props {
 }
 
 export function TableauDeBord({ apprenants, ouvrir }: Props) {
-  const ind = calculerIndicateurs(apprenants);
+  const today = aujourdhui();
+  const ind = calculerIndicateurs(apprenants, today);
 
-  // Regroupe les apprenants par promo, dans l'ordre d'apparition.
-  const promos = [...new Set(apprenants.map((a) => a.promo))].map((promo) => ({
-    promo,
-    membres: apprenants
-      .filter((a) => a.promo === promo)
-      .sort((x, y) => ordre(x) - ordre(y)),
-  }));
+  // Regroupe les apprenants par promo, de la plus ancienne à la plus récente.
+  const premiereFin = (promo: string) =>
+    apprenants.filter((a) => a.promo === promo).reduce((min, a) => (a.finFormation < min ? a.finFormation : min), "9999");
+  const promos = [...new Set(apprenants.map((a) => a.promo))]
+    .sort((x, y) => premiereFin(x).localeCompare(premiereFin(y)))
+    .map((promo) => ({
+      promo,
+      membres: apprenants.filter((a) => a.promo === promo).sort((x, y) => ordre(x) - ordre(y)),
+    }));
 
   return (
     <section aria-labelledby="titre-tdb">
-      <header className="entete-page">
-        <h1 id="titre-tdb">Où en sont les apprenants</h1>
-        <p className="sous-titre">Chaque carré est une personne. Cliquez dessus pour ouvrir sa fiche.</p>
+      <header className="entete-page entete-avec-actions">
+        <div>
+          <h1 id="titre-tdb">Où en sont les apprenants</h1>
+          <p className="sous-titre">Chaque carré est une personne. Cliquez dessus pour ouvrir sa fiche.</p>
+        </div>
+        <button
+          className="bouton bouton-discret"
+          onClick={() => telechargerCsv(`indicateurs-insertion-${today}.csv`, csvIndicateurs(ind, today))}
+        >
+          Exporter les indicateurs
+        </button>
       </header>
+
+      {apprenants.length === 0 && (
+        <p className="vide">Aucun apprenant pour l'instant. Ajoutez-en depuis l'onglet Apprenants.</p>
+      )}
 
       <div className="promos">
         {promos.map(({ promo, membres }) => (
@@ -80,7 +97,7 @@ export function TableauDeBord({ apprenants, ouvrir }: Props) {
         <div className={ind.aRelancer.length ? "chiffre-alerte" : ""}>
           <dt>À relancer</dt>
           <dd>{ind.aRelancer.length}</dd>
-          <small>action en retard ou silence &gt; 14 j</small>
+          <small>action en retard ou silence de plus de 14&nbsp;jours</small>
         </div>
       </dl>
 

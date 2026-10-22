@@ -1,18 +1,23 @@
 import { useMemo, useState } from "react";
 import type { Apprenant, Statut } from "../types";
-import { STATUTS, formatDate, raisonRelance } from "../lib";
+import { STATUTS, raisonRelance } from "../regles";
+import { aujourdhui, formatDate } from "../dates";
+import { csvApprenants, telechargerCsv } from "../csv";
 import { Pastille } from "./Pastille";
+import { NouvelApprenant } from "./NouvelApprenant";
 
 interface Props {
   apprenants: Apprenant[];
   ouvrir: (id: string) => void;
+  ajouter: (a: Apprenant) => void;
 }
 
-export function Apprenants({ apprenants, ouvrir }: Props) {
+export function Apprenants({ apprenants, ouvrir, ajouter }: Props) {
   const [recherche, setRecherche] = useState("");
   const [statut, setStatut] = useState<Statut | "tous">("tous");
   const [promo, setPromo] = useState("toutes");
   const [seulementRelances, setSeulementRelances] = useState(false);
+  const [formulaireOuvert, setFormulaireOuvert] = useState(false);
 
   const promos = useMemo(() => [...new Set(apprenants.map((a) => a.promo))], [apprenants]);
 
@@ -28,12 +33,30 @@ export function Apprenants({ apprenants, ouvrir }: Props) {
 
   return (
     <section aria-labelledby="titre-apprenants">
-      <header className="entete-page">
-        <h1 id="titre-apprenants">Apprenants</h1>
-        <p className="sous-titre">
-          {liste.length} sur {apprenants.length} affichés
-        </p>
+      <header className="entete-page entete-avec-actions">
+        <div>
+          <h1 id="titre-apprenants">Apprenants</h1>
+          <p className="sous-titre">
+            {liste.length} sur {apprenants.length} affichés
+          </p>
+        </div>
+        <div className="actions">
+          <button
+            className="bouton bouton-discret"
+            onClick={() => telechargerCsv(`apprenants-${aujourdhui()}.csv`, csvApprenants(liste))}
+            disabled={liste.length === 0}
+          >
+            Exporter en CSV
+          </button>
+          <button className="bouton" onClick={() => setFormulaireOuvert(true)}>
+            Ajouter un apprenant
+          </button>
+        </div>
       </header>
+
+      {formulaireOuvert && (
+        <NouvelApprenant promos={promos} ajouter={ajouter} fermer={() => setFormulaireOuvert(false)} />
+      )}
 
       <div className="filtres">
         <label className="champ champ-large">

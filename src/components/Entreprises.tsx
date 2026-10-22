@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { Apprenant, Donnees, Entreprise, TypeContrat } from "../types";
-import { estInsere, nouvelId } from "../lib";
+import { estInsere } from "../regles";
+import { nouvelId } from "../store";
 
 interface Props {
   donnees: Donnees;
