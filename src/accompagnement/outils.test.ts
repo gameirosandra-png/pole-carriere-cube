@@ -5,6 +5,7 @@ import { ficheCandidat, lienFiche, lireFicheDepuisHash } from "./ficheCandidat";
 import { messageShortlist, lienMailto } from "./shortlist";
 import { relancesAuto } from "./relances";
 import { formatChrono, QUESTIONS_ENTRAINEMENT, tirerQuestions } from "./convaincre";
+import { dureeEstimeeMs, scoreVoix } from "../narration";
 
 const TODAY = "2026-10-22";
 const demo = creerDonneesDemo(TODAY);
@@ -89,5 +90,24 @@ describe("entraînement", () => {
     expect(q.every((x) => QUESTIONS_ENTRAINEMENT.includes(x))).toBe(true);
     expect(formatChrono(120)).toBe("2:00");
     expect(formatChrono(65)).toBe("1:05");
+  });
+});
+
+describe("narration de la démo", () => {
+  it("préfère une voix française neuronale", () => {
+    const voix = [
+      { name: "Google US English", lang: "en-US" },
+      { name: "Amélie", lang: "fr-CA" },
+      { name: "Microsoft Denise Online (Natural) - French (France)", lang: "fr-FR" },
+      { name: "Google français", lang: "fr-FR" },
+    ];
+    const triees = [...voix].sort((a, b) => scoreVoix(b) - scoreVoix(a));
+    expect(triees[0].name.startsWith("Microsoft Denise")).toBe(true);
+    expect(scoreVoix(voix[0])).toBe(-1);
+  });
+
+  it("estime la durée de lecture", () => {
+    expect(dureeEstimeeMs("un deux")).toBe(5000);
+    expect(dureeEstimeeMs(Array(26).fill("mot").join(" "))).toBe(10000);
   });
 });

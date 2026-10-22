@@ -9,6 +9,7 @@ import { Rapport } from "./components/Rapport";
 import { VisiteGuidee, type VueVisite } from "./components/VisiteGuidee";
 import { ModeEquipe } from "./components/ModeEquipe";
 import { AteliersCollectifs } from "./components/AteliersCollectifs";
+import { amorcerVoix } from "./narration";
 import {
   deconnecter,
   lireErreurLienMagique,
@@ -72,6 +73,7 @@ export default function App() {
     setVisite("guidee");
   }, []);
   const lancerDemo = useCallback(() => {
+    amorcerVoix();
     setFicheId(null);
     setVisite("demo");
   }, []);

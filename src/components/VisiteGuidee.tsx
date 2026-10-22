@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import { Narrateur, dureeEstimeeMs } from "../narration";
 
 export type VueVisite = "tdb" | "apprenants" | "ateliers" | "entreprises" | "espace" | "rapport";
 
@@ -11,6 +12,8 @@ interface Etape {
   fiche?: string | null;
   /** Démo : élément sur lequel cliquer avant de montrer la cible (ex. un onglet). */
   clic?: string;
+  /** Démo : le texte dit par la voix, écrit pour l'oral. */
+  voix?: string;
 }
 
 export const ETAPES_VISITE: Etape[] = [
@@ -78,6 +81,8 @@ export const ETAPES_DEMO: Etape[] = [
     cible: ".semaine",
     titre: "Lundi matin au pôle carrière",
     texte: "La semaine en un coup d'œil : rendez-vous, ateliers collectifs, et ce qui est en retard.",
+    voix:
+      "Bienvenue au pôle carrière. Lundi matin, en un coup d'œil : les rendez-vous de la semaine, les ateliers collectifs, et ce qui est en retard.",
   },
   {
     vue: "tdb",
@@ -85,6 +90,8 @@ export const ETAPES_DEMO: Etape[] = [
     cible: ".relances-auto",
     titre: "Les relances sont déjà écrites",
     texte: "Rappels d'atelier et apprenants sans nouvelles : les messages sont prêts, un clic les envoie via Make.",
+    voix:
+      "Les relances sont déjà écrites : rappels d'atelier, et messages aux apprenants sans nouvelles depuis deux semaines. Un clic, et elles partent.",
   },
   {
     vue: "tdb",
@@ -92,6 +99,8 @@ export const ETAPES_DEMO: Etape[] = [
     cible: ".promos",
     titre: "Chaque carré est un apprenant",
     texte: "Une couleur par situation, un point rouge pour qui relancer. Suivons Hugo, en recherche d'emploi.",
+    voix:
+      "Ici, chaque carré est un apprenant, avec une couleur par situation. Le point rouge signale qui relancer. Suivons Hugo, en recherche d'emploi.",
   },
   {
     vue: "tdb",
@@ -101,6 +110,8 @@ export const ETAPES_DEMO: Etape[] = [
     titre: "L'effet de l'accompagnement, mesuré",
     texte:
       "Les scores CV et entretien sont relevés à chaque séance : la courbe montre ce que l'accompagnement a changé pour Hugo.",
+    voix:
+      "À chaque séance, ses scores de CV et d'entretien sont relevés. La courbe le montre : l'accompagnement a un effet mesurable.",
   },
   {
     vue: "tdb",
@@ -109,6 +120,8 @@ export const ETAPES_DEMO: Etape[] = [
     cible: ".atelier-resultat",
     titre: "Atelier CV",
     texte: "6 critères notés en séance, un score, et un plan d'action qui commence par le plus faible.",
+    voix:
+      "Atelier CV : six critères notés pendant la séance, un score sur cent, et un plan d'action qui commence par le point le plus faible.",
   },
   {
     vue: "tdb",
@@ -117,6 +130,8 @@ export const ETAPES_DEMO: Etape[] = [
     cible: ".marche",
     titre: "Une prétention salariale argumentée",
     texte: "La fourchette du marché, sourcée, et le montant à annoncer selon ses atouts. Plus un plancher.",
+    voix:
+      "Pour le salaire, l'outil part de fourchettes de marché sourcées, et calcule le montant à annoncer selon les atouts d'Hugo. Avec un plancher à ne pas franchir.",
   },
   {
     vue: "tdb",
@@ -125,6 +140,8 @@ export const ETAPES_DEMO: Etape[] = [
     cible: ".appel-entrainement",
     titre: "S'entraîner à convaincre",
     texte: "Un pitch de 2 minutes construit depuis la fiche, et un mode entraînement chronométré en plein écran.",
+    voix:
+      "Pour convaincre : un pitch de deux minutes, construit à partir de sa fiche, et un mode entraînement chronométré, en plein écran.",
   },
   {
     vue: "tdb",
@@ -133,6 +150,8 @@ export const ETAPES_DEMO: Etape[] = [
     cible: ".fiche-candidat",
     titre: "La fiche envoyée à l'entreprise",
     texte: "Une page propre, partageable par lien ou en PDF : pitch, projets, préparation. Sans données internes.",
+    voix:
+      "Voici la fiche envoyée à l'entreprise : son pitch, ses projets, sa préparation. Sans notes internes, ni salaire. Partageable par lien, ou en PDF.",
   },
   {
     vue: "entreprises",
@@ -140,6 +159,8 @@ export const ETAPES_DEMO: Etape[] = [
     cible: ".shortlist-ligne",
     titre: "La shortlist part en un clic",
     texte: "Depuis une offre : 3 profils, un mail prêt avec la fiche de chacun. Le pôle place, il ne fait pas que suivre.",
+    voix:
+      "Côté entreprises, la shortlist part en un clic : trois profils, un mail prêt, avec la fiche de chacun. Le pôle ne fait pas que suivre : il place.",
   },
   {
     vue: "espace",
@@ -147,6 +168,8 @@ export const ETAPES_DEMO: Etape[] = [
     cible: ".boite-outils",
     titre: "L'apprenant avance seul",
     texte: "Dans son espace, Hugo retrouve son CV à corriger, son pitch, sa prétention, et s'entraîne à l'oral.",
+    voix:
+      "Entre deux séances, Hugo avance seul. Dans son espace, il retrouve son CV à corriger, son pitch, sa prétention, et il s'entraîne à l'oral.",
   },
   {
     vue: "rapport",
@@ -154,6 +177,8 @@ export const ETAPES_DEMO: Etape[] = [
     cible: ".rapport-page",
     titre: "Et la direction a ses chiffres",
     texte: "Taux d'insertion, délais, promo par promo : un rapport d'une page, prêt à imprimer.",
+    voix:
+      "Enfin, la direction a ses chiffres : taux d'insertion, délais, promo par promo. Un pôle carrière piloté, de l'accompagnement jusqu'à l'emploi.",
   },
 ];
 
@@ -178,6 +203,16 @@ export function VisiteGuidee({ changerVue, terminer, auto = false, ouvrirFiche }
   const bulle = useRef<HTMLDivElement>(null);
   const etape = etapes[index];
   const derniere = index === etapes.length - 1;
+
+  // Narration : la démo est commentée à voix haute, et avance quand la voix a fini.
+  const narrateur = useRef<Narrateur | null>(null);
+  narrateur.current ??= new Narrateur();
+  const [voixActive, setVoixActive] = useState(true);
+  const [voixDispo, setVoixDispo] = useState(true);
+  const [nomVoix, setNomVoix] = useState("");
+  const modeVoix = auto && voixActive && voixDispo;
+  const texteVoix = etape.voix ?? etape.texte;
+  const duree = modeVoix ? dureeEstimeeMs(texteVoix) : DUREE_ETAPE_MS;
 
   const mesurer = useCallback(() => {
     const el = document.querySelector(etape.cible);
@@ -212,18 +247,49 @@ export function VisiteGuidee({ changerVue, terminer, auto = false, ouvrirFiche }
     };
   }, [etape, changerVue, mesurer, ouvrirFiche]);
 
-  // Démo automatique : avance seule, sauf en pause.
+  const avancer = useCallback(() => {
+    if (derniere) terminer();
+    else setIndex((i) => i + 1);
+  }, [derniere, terminer]);
+
+  // Démo automatique : le temps s'écoule, sauf en pause.
   useEffect(() => {
     if (!auto || pause) return;
     const t = setInterval(() => setEcoule((e) => e + 200), 200);
     return () => clearInterval(t);
   }, [auto, pause]);
 
+  // Sans voix : on avance au minuteur. Avec voix : à la fin de la phrase (filet de sécurité si elle ne finit jamais).
   useEffect(() => {
-    if (!auto || ecoule < DUREE_ETAPE_MS) return;
-    if (derniere) terminer();
-    else setIndex((i) => i + 1);
-  }, [auto, ecoule, derniere, terminer]);
+    if (!auto) return;
+    if ((!modeVoix && ecoule >= DUREE_ETAPE_MS) || (modeVoix && ecoule >= duree * 2 + 4000)) avancer();
+  }, [auto, modeVoix, ecoule, duree, avancer]);
+
+  useEffect(() => {
+    if (!modeVoix) return;
+    const n = narrateur.current!;
+    let actif = true;
+    let suite = 0;
+    n.dire(texteVoix, index).then((fin) => {
+      if (!actif) return;
+      setNomVoix(n.nomVoix);
+      if (fin === "fini") suite = window.setTimeout(avancer, 700);
+      if (fin === "indisponible") setVoixDispo(false);
+    });
+    setNomVoix(n.nomVoix);
+    return () => {
+      actif = false;
+      clearTimeout(suite);
+      n.arreter();
+    };
+  }, [modeVoix, texteVoix, index, avancer]);
+
+  useEffect(() => {
+    if (pause) narrateur.current?.pause();
+    else narrateur.current?.reprendre();
+  }, [pause]);
+
+  useEffect(() => () => narrateur.current?.arreter(), []);
 
   useEffect(() => {
     window.addEventListener("resize", mesurer);
@@ -282,9 +348,10 @@ export function VisiteGuidee({ changerVue, terminer, auto = false, ouvrirFiche }
         </p>
         {auto && (
           <div className="visite-temps" aria-hidden="true">
-            <span style={{ width: `${Math.min(100, (ecoule / DUREE_ETAPE_MS) * 100)}%` }} />
+            <span style={{ width: `${Math.min(modeVoix ? 98 : 100, (ecoule / duree) * 100)}%` }} />
           </div>
         )}
+        {modeVoix && nomVoix && <p className="visite-voix">Commentée par {nomVoix}</p>}
         <h2 id="visite-titre">{etape.titre}</h2>
         <p>{etape.texte}</p>
         <div className="visite-actions">
@@ -292,6 +359,16 @@ export function VisiteGuidee({ changerVue, terminer, auto = false, ouvrirFiche }
             {auto ? "Quitter la démo" : "Passer la visite"}
           </button>
           <span className="visite-nav">
+            {auto && voixDispo && (
+              <button
+                className="bouton bouton-discret bouton-voix"
+                aria-pressed={voixActive}
+                onClick={() => setVoixActive(!voixActive)}
+                title={voixActive ? "Couper la voix" : "Activer la voix"}
+              >
+                {voixActive ? "🔊 Voix" : "🔇 Voix"}
+              </button>
+            )}
             {auto && (
               <button className="bouton bouton-discret" onClick={() => setPause(!pause)}>
                 {pause ? "Reprendre" : "Pause"}

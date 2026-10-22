@@ -51,7 +51,7 @@ Et pour aller jusqu'à l'emploi :
 | Rapport | Direction | Rapport d'insertion d'une page par promo, prêt à imprimer ou à enregistrer en PDF. |
 | Espace apprenant | Apprenant | Son tableau de bord (parcours, prochaine étape, offres), ses séances, sa boîte à outils (CV, pitch, prétention, progression, entraînement à l'oral), et un formulaire pour dire où il en est. Sa fiche se met à jour sans relance manuelle. |
 
-Au premier passage, une **visite guidée** de 8 étapes présente l'app. La **démo auto** (2 minutes) déroule seule l'histoire d'un apprenant, de la semaine du pôle jusqu'à l'entreprise : idéale à montrer sans commentaire.
+Au premier passage, une **visite guidée** de 8 étapes présente l'app. La **démo auto** (2 minutes) déroule seule l'histoire d'un apprenant, de la semaine du pôle jusqu'à l'entreprise, **commentée à voix haute** : voix neuronale du navigateur par défaut, ou voix générée par IA si les fichiers audio sont déposés (voir [docs/voix-demo.md](docs/voix-demo.md)). La démo avance au rythme de la voix ; on peut la couper ou mettre en pause.
 
 > Toutes les données sont fictives et calculées à partir de la date du jour, pour que la démo reste cohérente quel que soit le jour de visite. Elles sont enregistrées dans le navigateur (localStorage) : aucune donnée personnelle ne quitte l'ordinateur.
 
@@ -126,6 +126,7 @@ src/
   accompagnement/     ateliers CV, portfolio, salaire (référentiel sourcé), pitch, ateliers collectifs,
                       progression, fiche candidat, shortlist, relances, entraînement (testés)
   rapport.ts          entonnoir d'insertion et statistiques par promo (testés)
+  narration.ts        voix de la démo : fichiers IA, sinon meilleure voix française du navigateur
   brief.ts            préparation de rendez-vous : données pour l'IA, brief de secours (testés)
   api.ts              appels aux fonctions serveur
   supabase.ts         client minimal : lien magique, session, lecture/écriture
