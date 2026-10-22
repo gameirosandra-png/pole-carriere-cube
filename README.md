@@ -54,7 +54,7 @@ Je suis apprenante Product Builder No-Code à l'École Cube, donc je connais ce 
 
 ## Ce que j'ai appris
 
-- **Construire avec l'IA, c'est surtout spécifier et vérifier.** Claude écrit vite ; mon travail est de dire précisément quoi construire, de relire, et de prouver que ça marche : 68 tests unitaires, plus de 160 vérifications de bout en bout et une intégration continue.
+- **Construire avec l'IA, c'est surtout spécifier et vérifier.** Claude écrit vite ; mon travail est de dire précisément quoi construire, de relire, et de prouver que ça marche : 69 tests unitaires, plus de 160 vérifications de bout en bout et une intégration continue.
 - **Le retour d'un expert vaut plus qu'une fonctionnalité de plus.** La V1 était juste techniquement mais à côté du vrai besoin.
 - **Un MVP, c'est aussi savoir s'arrêter.** Rôles, temps réel, import des données de l'école : listés en V2, pas improvisés.
 
@@ -108,7 +108,7 @@ Et pour aller jusqu'à l'emploi :
 | Rapport | Direction | Rapport d'insertion d'une page par promo, prêt à imprimer ou à enregistrer en PDF. |
 | Espace apprenant | Apprenant | Son tableau de bord (parcours, prochaine étape, offres), son questionnaire « Faisons connaissance », ses séances, une boîte à questions, sa boîte à outils (CV, pitch, prétention, progression, entraînement à l'oral), et un formulaire pour dire où il en est. Sa fiche se met à jour sans relance manuelle. |
 
-Au premier passage, une **visite guidée** de 8 étapes présente l'app. La **démo auto** (2 minutes) déroule seule l'histoire d'un apprenant, de la semaine du pôle jusqu'à l'entreprise, **commentée à voix haute** : voix neuronale du navigateur par défaut, ou voix générée par IA si les fichiers audio sont déposés (voir [docs/voix-demo.md](docs/voix-demo.md)). La démo avance au rythme de la voix ; on peut la couper ou mettre en pause.
+Au premier passage, une **visite guidée** de 8 étapes présente l'app. La **démo auto** (2 minutes) déroule seule l'histoire d'un apprenant, de la semaine du pôle jusqu'à l'entreprise, **commentée à voix haute** : voix neuronale du navigateur par défaut, ou voix générée par IA si les fichiers audio sont déposés (voir [docs/voix-demo.md](docs/voix-demo.md)). La démo avance au rythme de la voix ; on peut la couper, la mettre en pause (Espace) ou changer sa vitesse de 0,75× à 1,5× (bouton ou touches + et -).
 
 > Toutes les données sont fictives et calculées à partir de la date du jour, pour que la démo reste cohérente quel que soit le jour de visite. Elles sont enregistrées dans le navigateur (localStorage) : aucune donnée personnelle ne quitte l'ordinateur.
 
@@ -155,8 +155,8 @@ Ces règles sont des fonctions pures dans [`src/regles.ts`](src/regles.ts), [`sr
 
 ## Qualité
 
-- **Tests** : 68 tests unitaires sur les règles métier, parcours et ateliers d'accompagnement, matching, entonnoir, calculs de dates (fin de mois, changement d'heure, fuseaux) et export CSV, avec Vitest.
-- **Bout en bout** : 164 vérifications Playwright dans [`e2e/`](e2e) (parcours complets dans un vrai navigateur, sur ordinateur et mobile), lancées avant chaque version avec `npm run e2e` ; pas encore dans la CI.
+- **Tests** : 69 tests unitaires sur les règles métier, parcours et ateliers d'accompagnement, matching, entonnoir, calculs de dates (fin de mois, changement d'heure, fuseaux) et export CSV, avec Vitest.
+- **Bout en bout** : 171 vérifications Playwright dans [`e2e/`](e2e) (parcours complets dans un vrai navigateur, sur ordinateur et mobile), lancées avant chaque version avec `npm run e2e` ; pas encore dans la CI.
 - **Intégration continue** : à chaque modification, GitHub vérifie les types TypeScript, lance les tests et le build ([workflow](.github/workflows/ci.yml)).
 - **Accessibilité** : couleurs de statut au contraste WCAG AA (4,5:1), statut toujours écrit en plus de la couleur, panneaux utilisables au clavier (focus piégé, Échap, retour du focus).
 - **Responsive** : utilisable sur mobile.

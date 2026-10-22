@@ -1,5 +1,15 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
-import { Narrateur, dureeEstimeeMs } from "../narration";
+import { Narrateur, dureeEstimeeMs, libelleVitesse, vitesseSuivante } from "../narration";
+
+const CLE_VITESSE = "pole-carriere-cube:vitesse-demo";
+const vitesseEnregistree = () => {
+  try {
+    const v = Number(localStorage.getItem(CLE_VITESSE));
+    return [0.75, 1, 1.25, 1.5].includes(v) ? v : 1;
+  } catch {
+    return 1;
+  }
+};
 
 export type VueVisite = "tdb" | "apprenants" | "ateliers" | "entreprises" | "espace" | "rapport";
 
@@ -210,8 +220,21 @@ export function VisiteGuidee({ changerVue, terminer, auto = false, ouvrirFiche }
   const [voixActive, setVoixActive] = useState(true);
   const [voixDispo, setVoixDispo] = useState(true);
   const [nomVoix, setNomVoix] = useState("");
+  const [vitesse, setVitesse] = useState(vitesseEnregistree);
+  const changerVitesse = useCallback(
+    (v: number) => {
+      setVitesse(v);
+      try {
+        localStorage.setItem(CLE_VITESSE, String(v));
+      } catch {
+        /* préférence non mémorisée : sans conséquence */
+      }
+    },
+    [],
+  );
   const modeVoix = auto && voixActive && voixDispo;
   const texteVoix = etape.voix ?? etape.texte;
+  // Durées exprimées en temps réel : à 1,5×, une étape dure 1,5 fois moins longtemps.
   const duree = modeVoix ? dureeEstimeeMs(texteVoix) : DUREE_ETAPE_MS;
 
   const mesurer = useCallback(() => {
@@ -255,9 +278,9 @@ export function VisiteGuidee({ changerVue, terminer, auto = false, ouvrirFiche }
   // Démo automatique : le temps s'écoule, sauf en pause.
   useEffect(() => {
     if (!auto || pause) return;
-    const t = setInterval(() => setEcoule((e) => e + 200), 200);
+    const t = setInterval(() => setEcoule((e) => e + 200 * vitesse), 200);
     return () => clearInterval(t);
-  }, [auto, pause]);
+  }, [auto, pause, vitesse]);
 
   // Sans voix : on avance au minuteur. Avec voix : à la fin de la phrase (filet de sécurité si elle ne finit jamais).
   useEffect(() => {
@@ -270,10 +293,10 @@ export function VisiteGuidee({ changerVue, terminer, auto = false, ouvrirFiche }
     const n = narrateur.current!;
     let actif = true;
     let suite = 0;
-    n.dire(texteVoix, index).then((fin) => {
+    n.dire(texteVoix, index, vitesse).then((fin) => {
       if (!actif) return;
       setNomVoix(n.nomVoix);
-      if (fin === "fini") suite = window.setTimeout(avancer, 700);
+      if (fin === "fini") suite = window.setTimeout(avancer, 700 / vitesse);
       if (fin === "indisponible") setVoixDispo(false);
     });
     setNomVoix(n.nomVoix);
@@ -282,7 +305,7 @@ export function VisiteGuidee({ changerVue, terminer, auto = false, ouvrirFiche }
       clearTimeout(suite);
       n.arreter();
     };
-  }, [modeVoix, texteVoix, index, avancer]);
+  }, [modeVoix, texteVoix, index, avancer, vitesse]);
 
   useEffect(() => {
     if (pause) narrateur.current?.pause();
@@ -321,6 +344,8 @@ export function VisiteGuidee({ changerVue, terminer, auto = false, ouvrirFiche }
         e.preventDefault();
         setPause((p) => !p);
       }
+      if (auto && (e.key === "+" || e.key === "=")) changerVitesse(Math.min(1.5, vitesse + 0.25));
+      if (auto && (e.key === "-" || e.key === "_")) changerVitesse(Math.max(0.75, vitesse - 0.25));
     };
     window.addEventListener("keydown", onKey);
     return () => {
@@ -328,7 +353,7 @@ export function VisiteGuidee({ changerVue, terminer, auto = false, ouvrirFiche }
       window.removeEventListener("scroll", mesurer, true);
       window.removeEventListener("keydown", onKey);
     };
-  }, [mesurer, terminer, derniere, auto]);
+  }, [mesurer, terminer, derniere, auto, vitesse, changerVitesse]);
 
   // Bulle sous la zone s'il y a la place, sinon au-dessus ; collée en bas sur mobile.
   const marge = 12;
@@ -389,6 +414,14 @@ export function VisiteGuidee({ changerVue, terminer, auto = false, ouvrirFiche }
                   {voixActive ? "Voix" : "Voix coupée"}
                 </button>
               )}
+              <button
+                className="film-bouton bouton-vitesse"
+                onClick={() => changerVitesse(vitesseSuivante(vitesse))}
+                title="Changer la vitesse (touches + et -)"
+                aria-label={`Vitesse ${libelleVitesse(vitesse)}, changer`}
+              >
+                {libelleVitesse(vitesse)}
+              </button>
               <button className="film-bouton" onClick={() => setPause(!pause)}>
                 {pause ? "Reprendre" : "Pause"}
               </button>

@@ -20,7 +20,7 @@ const URL = process.env.URL || 'http://127.0.0.1:4173/';
     Object.defineProperty(window, 'speechSynthesis', { value: {
       getVoices: () => voix,
       addEventListener() {},
-      speak(u) { if (!u.text.trim()) return; window.__dits.push({ texte: u.text, voix: u.voice && u.voice.name }); enCours = u; timer = setTimeout(() => { enCours = null; u.onend && u.onend(); }, 600); },
+      speak(u) { if (!u.text.trim()) return; window.__dits.push({ texte: u.text, voix: u.voice && u.voice.name, rate: u.rate }); enCours = u; timer = setTimeout(() => { enCours = null; u.onend && u.onend(); }, 600); },
       cancel() { clearTimeout(timer); const u = enCours; enCours = null; u && u.onerror && u.onerror({ error: 'canceled' }); },
       pause() { enPause = true; clearTimeout(timer); window.__pause = true; },
       resume() { if (enPause && enCours) { const u = enCours; timer = setTimeout(() => { enCours = null; u.onend && u.onend(); }, 600); } enPause = false; },
@@ -57,6 +57,21 @@ const URL = process.env.URL || 'http://127.0.0.1:4173/';
   await p.waitForTimeout(200);
   const derniers = await p.evaluate(() => window.__dits.slice(-1)[0].texte);
   ok(derniers.length > 20, 'Suivant : nouvelle phrase dite');
+  // Vitesse : 1× → 1,25×, transmise à la voix, mémorisée
+  ok((await p.textContent('.bouton-vitesse')) === '1×', 'vitesse : 1× par défaut');
+  await p.click('.bouton-vitesse');
+  await p.waitForTimeout(200);
+  ok((await p.textContent('.bouton-vitesse')) === '1,25×', 'vitesse : 1,25× au clic');
+  const rate = await p.evaluate(() => window.__dits.slice(-1)[0].rate);
+  ok(Math.abs(rate - 1.275) < 0.001, 'vitesse : transmise à la voix (' + rate + ')');
+  await p.keyboard.press('-');
+  ok((await p.textContent('.bouton-vitesse')) === '1×', 'vitesse : touche - pour ralentir');
+  await p.keyboard.press('+'); await p.keyboard.press('+');
+  ok((await p.textContent('.bouton-vitesse')) === '1,5×', 'vitesse : touche + pour accélérer');
+  ok((await p.evaluate(() => localStorage.getItem('pole-carriere-cube:vitesse-demo'))) === '1.5', 'vitesse : mémorisée');
+  await p.click('.bouton-vitesse');
+  ok((await p.textContent('.bouton-vitesse')) === '0,75×', 'vitesse : 0,75× après 1,5×');
+  await p.click('.bouton-vitesse');
   // Aller jusqu'au bout seul
   await p.waitForTimeout(13000);
   ok(!(await p.locator('.visite').count()), 'la démo commentée se termine seule');

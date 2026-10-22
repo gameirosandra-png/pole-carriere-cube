@@ -5,7 +5,7 @@ import { ficheCandidat, lienFiche, lireFicheDepuisHash } from "./ficheCandidat";
 import { messageShortlist, lienMailto } from "./shortlist";
 import { relancesAuto } from "./relances";
 import { formatChrono, QUESTIONS_ENTRAINEMENT, tirerQuestions } from "./convaincre";
-import { dureeEstimeeMs, scoreVoix } from "../narration";
+import { dureeEstimeeMs, libelleVitesse, scoreVoix, vitesseSuivante } from "../narration";
 import { appliquerQuestionnaire, pointsAttention, poserQuestion, questionsEnAttente, repondreQuestion, resumeQuestionnaire } from "./questionnaire";
 import { scorer } from "../matching";
 
@@ -171,5 +171,13 @@ describe("boîte à questions", () => {
     const avec = poserQuestion(parId("a16"), "Une question ?", "x", TODAY);
     expect(avec.questions?.length).toBe(1);
     expect(avec.dernierContact).toBe(TODAY);
+  });
+});
+
+describe("vitesse de la démo", () => {
+  it("tourne en boucle sur les vitesses proposées", () => {
+    expect(vitesseSuivante(1)).toBe(1.25);
+    expect(vitesseSuivante(1.5)).toBe(0.75);
+    expect(libelleVitesse(1.25)).toBe("1,25×");
   });
 });

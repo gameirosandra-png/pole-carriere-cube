@@ -68,6 +68,16 @@ function voixPretes(): Promise<void> {
   });
 }
 
+/** Vitesses proposées pour la démo. */
+export const VITESSES = [0.75, 1, 1.25, 1.5] as const;
+export type Vitesse = (typeof VITESSES)[number];
+
+/** Vitesse suivante, en boucle (1 → 1,25 → 1,5 → 0,75 → 1). Pure, testée. */
+export const vitesseSuivante = (v: number): Vitesse => VITESSES[(VITESSES.indexOf(v as Vitesse) + 1) % VITESSES.length];
+
+/** « 1,25× » */
+export const libelleVitesse = (v: number) => `${String(v).replace(".", ",")}×`;
+
 export class Narrateur {
   private audio: HTMLAudioElement | null = null;
   // Garder une référence à l'énoncé : sinon Chrome peut le libérer et ne jamais signaler la fin.
@@ -76,12 +86,12 @@ export class Narrateur {
   nomVoix = "";
 
   /** Lit le texte de l'étape `index` ; la promesse se résout quand la lecture est finie. */
-  async dire(texte: string, index: number): Promise<FinNarration> {
+  async dire(texte: string, index: number, vitesse = 1): Promise<FinNarration> {
     this.arreter();
     const fichiers = await chargerFichiersIA();
     const fichier = fichiers?.[index];
-    if (fichier) return this.lireFichier(`/voix/${fichier}`);
-    return this.lireSynthese(texte);
+    if (fichier) return this.lireFichier(`/voix/${fichier}`, vitesse);
+    return this.lireSynthese(texte, vitesse);
   }
 
   private attendre(): Promise<FinNarration> {
@@ -94,8 +104,9 @@ export class Narrateur {
     t?.(f);
   }
 
-  private lireFichier(src: string): Promise<FinNarration> {
+  private lireFichier(src: string, vitesse: number): Promise<FinNarration> {
     const audio = new Audio(src);
+    audio.playbackRate = vitesse;
     this.audio = audio;
     this.nomVoix = "une voix générée par IA";
     const fin = this.attendre();
@@ -105,7 +116,7 @@ export class Narrateur {
     return fin;
   }
 
-  private async lireSynthese(texte: string): Promise<FinNarration> {
+  private async lireSynthese(texte: string, vitesse: number): Promise<FinNarration> {
     const synthese = window.speechSynthesis;
     if (!synthese || typeof SpeechSynthesisUtterance === "undefined") return "indisponible";
     await voixPretes();
@@ -114,7 +125,7 @@ export class Narrateur {
     const enonce = new SpeechSynthesisUtterance(texte);
     enonce.voice = voix;
     enonce.lang = voix.lang;
-    enonce.rate = 1.02;
+    enonce.rate = 1.02 * vitesse;
     this.enonce = enonce;
     this.nomVoix = voix.name;
     const fin = this.attendre();
