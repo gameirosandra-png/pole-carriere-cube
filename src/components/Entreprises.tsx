@@ -4,6 +4,8 @@ import { estInsere } from "../regles";
 import { nouvelId } from "../store";
 import { completude, pretAProposer } from "../dossier";
 import { suggerer } from "../matching";
+import { messageShortlist, lienMailto, TAILLE_SHORTLIST } from "../accompagnement/shortlist";
+import { aujourdhui, formatDate } from "../dates";
 
 interface Props {
   donnees: Donnees;
@@ -144,6 +146,15 @@ export function Entreprises({ donnees, setDonnees, modifierAvecAnnulation, ouvri
                     />
                   )}
                 </div>
+
+                {o.ouverte && o.candidats.length > 0 && (
+                  <Shortlist
+                    entreprise={e}
+                    offre={o}
+                    apprenants={o.candidats.map(parId).filter((a): a is Apprenant => Boolean(a))}
+                    marquerEnvoyee={() => majOffre(e.id, o.id, (y) => ({ ...y, shortlistEnvoyee: aujourdhui() }))}
+                  />
+                )}
 
                 {o.ouverte && (
                   <Suggestions
@@ -320,5 +331,98 @@ function NouvelleOffre({ ajouter }: { ajouter: (titre: string, contrat: TypeCont
         Ajouter l'offre
       </button>
     </form>
+  );
+}
+
+/** Envoi des profils proposés à l'entreprise : un mail prêt, avec la fiche de chaque candidat. */
+function Shortlist({
+  entreprise,
+  offre,
+  apprenants,
+  marquerEnvoyee,
+}: {
+  entreprise: Entreprise;
+  offre: Offre;
+  apprenants: Apprenant[];
+  marquerEnvoyee: () => void;
+}) {
+  const [ouvert, setOuvert] = useState(false);
+  const [choisis, setChoisis] = useState<string[]>(() => apprenants.slice(0, TAILLE_SHORTLIST).map((a) => a.id));
+  const [copie, setCopie] = useState(false);
+
+  const selection = apprenants.filter((a) => choisis.includes(a.id));
+  const m = messageShortlist(entreprise, offre, selection, window.location.origin);
+  const basculer = (id: string) =>
+    setChoisis((c) => (c.includes(id) ? c.filter((x) => x !== id) : c.length < TAILLE_SHORTLIST ? [...c, id] : c));
+
+  if (!ouvert) {
+    return (
+      <div className="shortlist-ligne">
+        <button className="bouton-suggerer bouton-shortlist" onClick={() => setOuvert(true)}>
+          Envoyer la shortlist à {entreprise.nom}
+        </button>
+        {offre.shortlistEnvoyee && (
+          <span className="secondaire">Dernier envoi le {formatDate(offre.shortlistEnvoyee)}</span>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="shortlist">
+      <div className="suggestions-tete">
+        <strong>Shortlist pour {entreprise.nom}</strong>
+        <button className="bouton-texte" onClick={() => setOuvert(false)}>
+          Masquer
+        </button>
+      </div>
+      <fieldset className="shortlist-choix">
+        <legend className="secondaire">Profils à présenter ({TAILLE_SHORTLIST} maximum)</legend>
+        {apprenants.map((a) => (
+          <label key={a.id} className="case">
+            <input
+              type="checkbox"
+              checked={choisis.includes(a.id)}
+              disabled={!choisis.includes(a.id) && choisis.length >= TAILLE_SHORTLIST}
+              onChange={() => basculer(a.id)}
+            />
+            {a.prenom} {a.nom}
+          </label>
+        ))}
+      </fieldset>
+      {selection.length > 0 && (
+        <>
+          <p className="shortlist-sujet">
+            <span className="secondaire">Objet :</span> {m.sujet}
+          </p>
+          {/* Aperçu lisible : les longs liens sont abrégés à l'écran, pas dans le message envoyé. */}
+          <pre className="shortlist-message">
+            {m.corps.replace(/https?:\/\/\S+#candidat=\S+/g, "[lien vers la fiche candidat]")}
+          </pre>
+          <div className="actions">
+            <a className="bouton" href={lienMailto(m.sujet, m.corps)} onClick={marquerEnvoyee}>
+              Ouvrir dans ma messagerie
+            </a>
+            <button
+              className="bouton bouton-discret"
+              onClick={() =>
+                navigator.clipboard?.writeText(`${m.sujet}\n\n${m.corps}`).then(
+                  () => {
+                    setCopie(true);
+                    marquerEnvoyee();
+                  },
+                  () => setCopie(false),
+                )
+              }
+            >
+              {copie ? "Message copié" : "Copier le message"}
+            </button>
+          </div>
+          <p className="note-methode">
+            Chaque lien ouvre la fiche candidat : pitch, projets et préparation, sans données internes.
+          </p>
+        </>
+      )}
+    </div>
   );
 }

@@ -6,6 +6,12 @@ import { nouvelId } from "../store";
 import { Pastille } from "./Pastille";
 import { ChecklistDossier, JaugeDossier } from "./ChecklistDossier";
 import { cocherEtape, completude, prochaineEtape } from "../dossier";
+import { evaluerCV } from "../accompagnement/cv";
+import { scorePortfolio } from "../accompagnement/portfolio";
+import { genererPitch } from "../accompagnement/convaincre";
+import { calculerPretention, formatMontant } from "../accompagnement/salaire";
+import { Progression } from "./Progression";
+import { Entrainement } from "./Entrainement";
 
 interface Props {
   apprenants: Apprenant[];
@@ -238,6 +244,126 @@ function PageApprenant({
           </div>
         </div>
       </div>
+
+      <BoiteOutils apprenant={a} />
     </div>
+  );
+}
+
+/** Ce que l'apprenant retrouve de ses ateliers : il avance seul entre deux séances. */
+function BoiteOutils({ apprenant: a }: { apprenant: Apprenant }) {
+  const [entrainement, setEntrainement] = useState(false);
+  const cv = evaluerCV(a.accompagnement?.cv);
+  const portfolio = scorePortfolio(a.accompagnement?.portfolio ?? []);
+  const pitch = genererPitch(a);
+  const salaire = a.accompagnement?.salaire;
+  const pretention = salaire ? calculerPretention(a, salaire) : null;
+
+  return (
+    <section className="boite-outils" aria-labelledby="titre-boite">
+      <div className="boite-tete">
+        <div>
+          <h2 id="titre-boite">Ta boîte à outils</h2>
+          <p className="secondaire">Ce qu'on a travaillé ensemble, pour avancer entre deux séances.</p>
+        </div>
+        <button className="bouton bouton-cta" onClick={() => setEntrainement(true)}>
+          S'entraîner à l'oral
+        </button>
+      </div>
+      {entrainement && <Entrainement apprenant={a} fermer={() => setEntrainement(false)} />}
+
+      <div className="boite-grille">
+        <div className="espace-carte">
+          <h3>Ton CV</h3>
+          {cv.score === null ? (
+            <p className="vide">Ton CV sera évalué à la séance 2, avec l'équipe.</p>
+          ) : (
+            <>
+              <p className="boite-score">
+                {cv.score}
+                <small>/100</small>
+              </p>
+              {cv.priorites.length ? (
+                <ol className="plan-action">
+                  {cv.priorites.slice(0, 3).map((c) => (
+                    <li key={c.id}>
+                      <strong>{c.libelle}</strong> : {c.conseil}
+                    </li>
+                  ))}
+                </ol>
+              ) : (
+                <p className="texte-succes">Tous les critères sont solides. Bravo.</p>
+              )}
+            </>
+          )}
+        </div>
+
+        <div className="espace-carte">
+          <h3>Ta progression</h3>
+          <Progression apprenant={a} compact />
+        </div>
+
+        <div className="espace-carte">
+          <h3>Ton portfolio</h3>
+          {portfolio.projets.length === 0 ? (
+            <p className="vide">Ajoute tes projets avec l'équipe à la séance 3.</p>
+          ) : (
+            <>
+              <p>
+                <strong>{portfolio.projetsSolides}</strong> projet{portfolio.projetsSolides > 1 ? "s" : ""} solide
+                {portfolio.projetsSolides > 1 ? "s" : ""} sur {portfolio.projets.length}
+                {portfolio.phare && (
+                  <>
+                    {" "}
+                    · à mettre en avant : <strong>{portfolio.phare.nom}</strong>
+                  </>
+                )}
+              </p>
+              {portfolio.aTravailler && (
+                <p className="secondaire">
+                  À compléter sur tes projets :{" "}
+                  {portfolio.aTravailler.libelle.toLowerCase()}. {portfolio.aTravailler.question}
+                </p>
+              )}
+            </>
+          )}
+        </div>
+
+        <div className="espace-carte">
+          <h3>Ta prétention salariale</h3>
+          {pretention ? (
+            <>
+              <p className="boite-score">{formatMontant(pretention.annonce, pretention.unite)}</p>
+              <p className="secondaire">
+                Marché pour ton profil : {formatMontant(pretention.basMarche, pretention.unite)} à{" "}
+                {formatMontant(pretention.hautMarche, pretention.unite)}. Ne descends pas sous{" "}
+                {formatMontant(pretention.plancher, pretention.unite)} sans contrepartie.
+              </p>
+            </>
+          ) : (
+            <p className="vide">On la calcule ensemble à la séance 7, avec les chiffres du marché.</p>
+          )}
+        </div>
+      </div>
+
+      <div className="espace-carte">
+        <h3>Ton pitch de 2 minutes</h3>
+        <ol className="pitch">
+          {pitch.map((p) => (
+            <li key={p.titre}>
+              <span className="pitch-titre">
+                {p.titre} <span className="secondaire">· {p.duree}</span>
+              </span>
+              <p>
+                {p.texte
+                  .split(/(\[[^\]]+\])/)
+                  .map((m, i) => (m.startsWith("[") ? <mark key={i}>{m}</mark> : <span key={i}>{m}</span>))}
+              </p>
+            </li>
+          ))}
+        </ol>
+        <p className="secondaire">Les passages surlignés sont à compléter : prépare-les pour la prochaine séance.</p>
+      </div>
+    </section>
   );
 }

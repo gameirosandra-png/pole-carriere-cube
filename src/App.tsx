@@ -59,20 +59,25 @@ export default function App() {
   } = useDonnees(session, sessionPerdue);
   const [vue, setVue] = useState<Vue>("tdb");
   const [ficheId, setFicheId] = useState<string | null>(null);
-  const [visite, setVisite] = useState(false);
+  const [visite, setVisite] = useState<false | "guidee" | "demo">(false);
 
   // Au premier passage, la visite guidée démarre seule.
   useEffect(() => {
-    if (!visiteDejaVue()) setVisite(true);
+    if (!visiteDejaVue()) setVisite("guidee");
   }, []);
 
   const fermer = useCallback(() => setFicheId(null), []);
   const lancerVisite = useCallback(() => {
     setFicheId(null);
-    setVisite(true);
+    setVisite("guidee");
+  }, []);
+  const lancerDemo = useCallback(() => {
+    setFicheId(null);
+    setVisite("demo");
   }, []);
   const terminerVisite = useCallback(() => {
     setVisite(false);
+    setFicheId(null);
     setVue("tdb");
     window.scrollTo({ top: 0 });
     try {
@@ -107,6 +112,9 @@ export default function App() {
           ))}
         </nav>
         <div className="barre-pied">
+          <button className="bouton-visite bouton-demo" onClick={lancerDemo}>
+            ▶ Démo auto (2 min)
+          </button>
           <button className="bouton-visite" onClick={lancerVisite}>
             Visite guidée (1 min)
           </button>
@@ -160,6 +168,7 @@ export default function App() {
             ateliers={donnees.ateliers ?? []}
             ouvrir={setFicheId}
             lancerVisite={lancerVisite}
+            lancerDemo={lancerDemo}
             voirAteliers={() => setVue("ateliers")}
           />
         )}
@@ -221,7 +230,15 @@ export default function App() {
         </div>
       )}
 
-      {visite && <VisiteGuidee changerVue={setVue} terminer={terminerVisite} />}
+      {visite && (
+        <VisiteGuidee
+          key={visite}
+          auto={visite === "demo"}
+          changerVue={setVue}
+          ouvrirFiche={setFicheId}
+          terminer={terminerVisite}
+        />
+      )}
     </div>
   );
 }

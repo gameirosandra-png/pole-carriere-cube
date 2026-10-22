@@ -334,10 +334,19 @@ export function creerDonneesDemo(today = aujourdhui()): Donnees {
         motivation: "dans le retail, pour outiller les équipes terrain que je connais bien.",
         simulation: { clarte: 3, star: 2, exemples: 3, posture: 3, questions: 2 },
       },
+      historique: [
+        { date: j(-30), cv: 33, simulation: null },
+        { date: j(-16), cv: 50, simulation: 45 },
+        { date: j(-3), cv: 67, simulation: 65 },
+      ],
     },
     a4: {
       cv: { notes: { titre: 1, accroche: 0, projets: 1, resultats: 0 } },
       portfolio: [{ id: "p4", nom: "Tableau de suivi des livraisons", criteres: { probleme: true, outils: true } }],
+      historique: [
+        { date: j(-35), cv: 13, simulation: null },
+        { date: j(-20), cv: 25, simulation: null },
+      ],
     },
     a7: {
       cv: { notes: { titre: 2, accroche: 2, projets: 2, resultats: 2, competences: 2, lisibilite: 2 } },
@@ -347,6 +356,11 @@ export function creerDonneesDemo(today = aujourdhui()): Donnees {
       ],
       salaire: { poste: "productBuilder", zone: "idf", contrat: "salarie" },
       convaincre: { simulation: { clarte: 4, star: 3, exemples: 4, posture: 3, questions: 3 } },
+      historique: [
+        { date: j(-60), cv: 42, simulation: null },
+        { date: j(-40), cv: 83, simulation: 60 },
+        { date: j(-25), cv: 100, simulation: 85 },
+      ],
     },
   };
 

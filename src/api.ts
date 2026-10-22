@@ -5,6 +5,7 @@ import { aujourdhui, formatDate } from "./dates";
 import { calculerIndicateurs, raisonRelance } from "./regles";
 import { pretAProposer } from "./dossier";
 import { donneesPourBrief } from "./brief";
+import type { RelanceAuto } from "./accompagnement/relances";
 
 export type Resultat<T> = { ok: true; valeur: T } | { ok: false; erreur: string; nonConfigure: boolean };
 
@@ -43,6 +44,13 @@ export function envoyerRecap(apprenants: Apprenant[], today = aujourdhui()) {
     prets: apprenants
       .filter((a) => a.statut !== "poste" && a.statut !== "freelance" && pretAProposer(a))
       .map((a) => `${a.prenom} ${a.nom} (${a.posteVise})`),
+  });
+}
+
+/** Envoie les relances préparées (rappels d'atelier, apprenants sans contact) via Make. */
+export function envoyerRelances(relances: RelanceAuto[]) {
+  return appeler<{ envoye: number }>("/api/relances", {
+    relances: relances.map(({ destinataire, objet, message }) => ({ destinataire, objet, message })),
   });
 }
 

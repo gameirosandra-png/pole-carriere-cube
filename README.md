@@ -30,19 +30,28 @@ Le cœur du pôle carrière, c'est l'accompagnement : faire progresser chaque ap
 
 En collectif, l'écran **Ateliers** planifie les ateliers par thème et propose d'inviter les apprenants dont la séance n'est pas encore faite. L'accueil montre **la semaine du pôle** : rendez-vous individuels, ateliers, actions en retard.
 
+Et pour aller jusqu'à l'emploi :
+
+- **Fiche candidat** : une page propre à envoyer aux entreprises (pitch, projets, préparation), sans notes internes ni salaire. Partageable par lien ou en PDF. Le lien contient les données de la fiche après le `#` : rien n'est stocké en ligne.
+- **Shortlist** : depuis une offre, 3 profils maximum et un e-mail prêt, avec le lien de la fiche de chacun.
+- **Progression** : les scores CV et entretien sont relevés à chaque séance ; une courbe montre l'avant / après, et le tableau de bord affiche le gain moyen.
+- **Mode entraînement** : questions d'entretien tirées au hasard ou pitch, chrono de 2 minutes, en plein écran.
+- **Relances automatiques** : rappels d'atelier (48 h avant) et messages aux apprenants sans contact depuis 14 jours, écrits par l'app et envoyés via Make en un clic.
+- **Boîte à outils de l'apprenant** : dans son espace, il retrouve son CV à corriger, son pitch, sa prétention et sa progression.
+
 ## Ce que fait le MVP
 
 | Écran | Pour qui | Ce qu'on y fait |
 | --- | --- | --- |
-| Tableau de bord | Équipe | La semaine du pôle (rendez-vous, ateliers, retards), puis chaque promo d'un coup d'œil, le taux d'insertion à 6 mois, le délai moyen, l'entonnoir d'insertion avec son point de décrochage, les apprenants à relancer, et l'avancement des dossiers étape par étape. Exporter les indicateurs en CSV. |
+| Tableau de bord | Équipe | La semaine du pôle (rendez-vous, ateliers, retards), les relances automatiques prêtes à partir, puis chaque promo d'un coup d'œil, le taux d'insertion à 6 mois, le délai moyen, l'effet de l'accompagnement (gain moyen de score CV), l'entonnoir d'insertion avec son point de décrochage, les apprenants à relancer, et l'avancement des dossiers étape par étape. Exporter les indicateurs en CSV. |
 | Apprenants | Équipe | Rechercher, filtrer (dont « prêts à proposer »), voir l'avancement de chaque dossier, ajouter un apprenant, exporter la liste en CSV (ouvrable dans Excel). |
-| Fiche apprenant | Équipe | 5 onglets : Suivi, CV, Portfolio, Salaire, Convaincre. Changer le statut, valider les séances, planifier la prochaine action, noter les échanges, voir les offres proposées, supprimer la fiche. |
-| Entreprises & offres | Équipe | Suivre les partenaires et leurs offres. **Suggérer des candidats** : les 3 meilleurs profils par offre, avec un score expliqué. Proposer, retirer, supprimer (avec annulation). |
+| Fiche apprenant | Équipe | 6 onglets : Suivi (avec la courbe de progression), CV, Portfolio, Salaire, Convaincre (avec le mode entraînement), Fiche candidat. Changer le statut, valider les séances, planifier la prochaine action, noter les échanges, voir les offres proposées, supprimer la fiche. |
+| Entreprises & offres | Équipe | Suivre les partenaires et leurs offres. **Suggérer des candidats** : les 3 meilleurs profils par offre, avec un score expliqué. Proposer, retirer, supprimer (avec annulation). **Envoyer la shortlist** à l'entreprise par e-mail. |
 | Ateliers | Équipe | Planifier les ateliers collectifs, inscrire, inviter les apprenants qui en ont besoin. |
 | Rapport | Direction | Rapport d'insertion d'une page par promo, prêt à imprimer ou à enregistrer en PDF. |
-| Espace apprenant | Apprenant | Son tableau de bord (dossier, prochaine étape, offres), sa checklist de dossier, et un formulaire pour dire où il en est. Sa fiche se met à jour sans relance manuelle. |
+| Espace apprenant | Apprenant | Son tableau de bord (parcours, prochaine étape, offres), ses séances, sa boîte à outils (CV, pitch, prétention, progression, entraînement à l'oral), et un formulaire pour dire où il en est. Sa fiche se met à jour sans relance manuelle. |
 
-Au premier passage, une **visite guidée** de 7 étapes présente l'app ; elle se relance depuis le tableau de bord.
+Au premier passage, une **visite guidée** de 8 étapes présente l'app. La **démo auto** (2 minutes) déroule seule l'histoire d'un apprenant, de la semaine du pôle jusqu'à l'entreprise : idéale à montrer sans commentaire.
 
 > Toutes les données sont fictives et calculées à partir de la date du jour, pour que la démo reste cohérente quel que soit le jour de visite. Elles sont enregistrées dans le navigateur (localStorage) : aucune donnée personnelle ne quitte l'ordinateur.
 
@@ -61,6 +70,7 @@ En production : rôles distincts (équipe, apprenant), politiques RLS par rôle,
 
 | Fonction | Comment ça marche |
 | --- | --- |
+| **Relances (Make)** | Le bouton « Envoyer les relances » appelle [`api/relances.ts`](api/relances.ts), qui met en forme les messages préparés par l'app et les transmet au même scénario Make. En démo, tout arrive dans la boîte du pôle. |
 | **Récap par e-mail (Make)** | Le bouton « Envoyer le récap par e-mail » appelle la fonction serveur [`api/recap.ts`](api/recap.ts), qui construit l'e-mail (apprenants à relancer, dossiers prêts, taux d'insertion) et le transmet à un scénario Make : *Webhook → Gmail → Réponse*. Le destinataire est fixé dans Make (l'équipe du pôle), jamais par le visiteur. |
 | **Brief de rendez-vous** | Dans la fiche, « Préparer le rendez-vous » propose une synthèse en 3 rubriques (situation, points à travailler, questions à poser), calculée à partir du suivi ([`src/brief.ts`](src/brief.ts), testé). |
 
@@ -113,7 +123,8 @@ src/
   regles.ts           règles métier et indicateurs (testés)
   dossier.ts          checklist du dossier et KPI de préparation (testés)
   matching.ts         suggestion de candidats pour une offre (testé)
-  accompagnement/     ateliers CV, portfolio, salaire (référentiel sourcé), pitch, ateliers collectifs (testés)
+  accompagnement/     ateliers CV, portfolio, salaire (référentiel sourcé), pitch, ateliers collectifs,
+                      progression, fiche candidat, shortlist, relances, entraînement (testés)
   rapport.ts          entonnoir d'insertion et statistiques par promo (testés)
   brief.ts            préparation de rendez-vous : données pour l'IA, brief de secours (testés)
   api.ts              appels aux fonctions serveur
@@ -121,6 +132,7 @@ src/
   synchro.ts          calcul des changements à envoyer à la base (testé)
 api/
   recap.ts            envoi du récap via Make
+  relances.ts         envoi des relances automatiques via Make
   brief.ts            brief de rendez-vous rédigé par Claude (V2, prêt mais non activé)
   dates.ts            calculs de dates sans décalage de fuseau (testés)
   csv.ts              export CSV compatible Excel (testé)
@@ -133,7 +145,7 @@ api/
 
 1. Rôles et droits par profil (équipe, apprenant) sur la base partagée, et schéma normalisé.
 2. Lien personnel et sécurisé pour l'espace apprenant, envoyé automatiquement chaque mois.
-3. Récap envoyé automatiquement chaque lundi par Make, à partir de la base partagée.
+3. Récap et relances envoyés automatiquement par Make (chaque lundi, chaque matin), à partir de la base partagée, et aux vrais destinataires.
 4. Import des apprenants depuis l'outil de gestion de l'école.
 5. **Brief de rendez-vous rédigé par l'IA** : la fonction serveur est prête ([`api/brief.ts`](api/brief.ts) : prompt borné, garde-fous de volume, modèle Claude Haiku). Activation = ajouter `ANTHROPIC_API_KEY` sur Vercel et brancher `demanderBrief` dans la fiche.
 

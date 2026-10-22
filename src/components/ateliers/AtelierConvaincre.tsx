@@ -8,6 +8,7 @@ import {
   trousDansPitch,
 } from "../../accompagnement/convaincre";
 import { avecAccompagnement, type PropsAtelier } from "./commun";
+import { Entrainement } from "../Entrainement";
 
 export function AtelierConvaincre({ apprenant: a, maj }: PropsAtelier) {
   const pitch = genererPitch(a);
@@ -15,6 +16,7 @@ export function AtelierConvaincre({ apprenant: a, maj }: PropsAtelier) {
   const notes = a.accompagnement?.convaincre?.simulation;
   const sim = evaluerSimulation(notes);
   const [copie, setCopie] = useState(false);
+  const [entrainement, setEntrainement] = useState(false);
 
   const noter = (critere: CritereEntretien, note: 1 | 2 | 3 | 4) =>
     maj(avecAccompagnement("convaincre", (c) => ({ ...c, simulation: { ...c?.simulation, [critere]: note } })));
@@ -69,6 +71,17 @@ export function AtelierConvaincre({ apprenant: a, maj }: PropsAtelier) {
           </button>
         </div>
       </div>
+
+      <div className="appel-entrainement">
+        <div>
+          <strong>Mode entraînement</strong>
+          <span className="secondaire">Plein écran, questions tirées au hasard, chrono de 2 minutes.</span>
+        </div>
+        <button className="bouton bouton-cta" onClick={() => setEntrainement(true)}>
+          S'entraîner à l'oral
+        </button>
+      </div>
+      {entrainement && <Entrainement apprenant={a} fermer={() => setEntrainement(false)} />}
 
       <h4>Questions d'entretien à préparer</h4>
       <ol className="plan-action">

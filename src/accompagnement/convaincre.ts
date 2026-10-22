@@ -10,10 +10,28 @@ export interface PartiePitch {
   texte: string;
 }
 
+/** Ce dont le pitch a besoin : de quoi le reconstruire aussi depuis un lien de fiche candidat. */
+export interface InfosPitch {
+  prenom: string;
+  posteVise: string;
+  parcoursAvant?: string;
+  /** Nom du projet phare. */
+  phare?: string;
+  motivation?: string;
+}
+
 /** Pitch en 4 temps : accroche, parcours, preuve, projet. Les trous sont signalés entre crochets. */
-export function genererPitch(a: Apprenant): PartiePitch[] {
-  const phare = scorePortfolio(a.accompagnement?.portfolio ?? []).phare;
-  const motivation = a.accompagnement?.convaincre?.motivation?.trim();
+export const genererPitch = (a: Apprenant): PartiePitch[] =>
+  pitchDepuis({
+    prenom: a.prenom,
+    posteVise: a.posteVise,
+    parcoursAvant: a.parcoursAvant,
+    phare: scorePortfolio(a.accompagnement?.portfolio ?? []).phare?.nom,
+    motivation: a.accompagnement?.convaincre?.motivation?.trim(),
+  });
+
+export function pitchDepuis(a: InfosPitch): PartiePitch[] {
+  const { phare, motivation } = a;
   return [
     {
       titre: "Accroche",
@@ -31,7 +49,7 @@ export function genererPitch(a: Apprenant): PartiePitch[] {
       titre: "Preuve",
       duree: "45 s",
       texte: phare
-        ? `Par exemple, avec ${phare.nom} : [le problème], j'ai construit [la solution] avec [les outils], et [le résultat chiffré].`
+        ? `Par exemple, avec ${phare} : [le problème], j'ai construit [la solution] avec [les outils], et [le résultat chiffré].`
         : "Par exemple, avec [mon meilleur projet] : [le problème], j'ai construit [la solution] avec [les outils], et [le résultat chiffré].",
     },
     {
@@ -55,6 +73,31 @@ export const QUESTIONS_ENTRETIEN = [
   "Comment expliquez-vous un projet technique à quelqu'un qui n'est pas du métier ?",
   "Quelles sont vos prétentions salariales ?",
 ];
+
+/** Questions supplémentaires pour le mode entraînement. */
+export const QUESTIONS_ENTRAINEMENT = [
+  ...QUESTIONS_ENTRETIEN,
+  "Présentez-vous en 1 minute.",
+  "Qu'est-ce qui vous a le plus appris pendant la formation ?",
+  "Parlez-moi d'une erreur sur un projet et de ce que vous en avez tiré.",
+  "Pourquoi notre entreprise ?",
+  "Comment priorisez-vous quand plusieurs demandes arrivent en même temps ?",
+  "Quel outil no-code recommanderiez-vous pour un premier projet, et pourquoi ?",
+  "Où vous voyez-vous dans 2 ans ?",
+];
+
+/** Tire n questions différentes ; `hasard` est injectable pour les tests. */
+export function tirerQuestions(n: number, hasard: () => number = Math.random): string[] {
+  const pioche = [...QUESTIONS_ENTRAINEMENT];
+  for (let i = pioche.length - 1; i > 0; i--) {
+    const j = Math.floor(hasard() * (i + 1));
+    [pioche[i], pioche[j]] = [pioche[j], pioche[i]];
+  }
+  return pioche.slice(0, Math.min(n, pioche.length));
+}
+
+export const formatChrono = (secondes: number) =>
+  `${Math.floor(Math.max(0, secondes) / 60)}:${String(Math.max(0, secondes) % 60).padStart(2, "0")}`;
 
 export const CRITERES_ENTRETIEN: { id: CritereEntretien; libelle: string }[] = [
   { id: "clarte", libelle: "Clarté et concision" },

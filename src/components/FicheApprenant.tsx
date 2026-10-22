@@ -12,8 +12,11 @@ import { AtelierCV } from "./ateliers/AtelierCV";
 import { AtelierPortfolio } from "./ateliers/AtelierPortfolio";
 import { AtelierSalaire } from "./ateliers/AtelierSalaire";
 import { AtelierConvaincre } from "./ateliers/AtelierConvaincre";
+import { OngletFicheCandidat } from "./FicheCandidat";
+import { Progression } from "./Progression";
+import { enregistrerPoint } from "../accompagnement/progression";
 
-type Onglet = "suivi" | "cv" | "portfolio" | "salaire" | "convaincre";
+type Onglet = "suivi" | "cv" | "portfolio" | "salaire" | "convaincre" | "candidat";
 
 const ONGLETS: { id: Onglet; libelle: string }[] = [
   { id: "suivi", libelle: "Suivi" },
@@ -21,6 +24,7 @@ const ONGLETS: { id: Onglet; libelle: string }[] = [
   { id: "portfolio", libelle: "Portfolio" },
   { id: "salaire", libelle: "Salaire" },
   { id: "convaincre", libelle: "Convaincre" },
+  { id: "candidat", libelle: "Fiche candidat" },
 ];
 
 interface Props {
@@ -35,6 +39,9 @@ interface Props {
 export function FicheApprenant({ apprenant: a, entreprises, maj, supprimer, supprimerNote, fermer }: Props) {
   const [note, setNote] = useState("");
   const [onglet, setOnglet] = useState<Onglet>("suivi");
+
+  // Les ateliers notés (CV, simulation) relèvent le score du jour pour la courbe de progression.
+  const majNote = (f: (a: Apprenant) => Apprenant) => maj((x) => enregistrerPoint(f(x)));
 
   const majStatut = (statut: Statut) => maj((x) => changerStatut(x, statut));
 
@@ -94,7 +101,7 @@ export function FicheApprenant({ apprenant: a, entreprises, maj, supprimer, supp
 
       {onglet === "cv" && (
         <div role="tabpanel" id="panneau-cv" aria-labelledby="onglet-cv">
-          <AtelierCV apprenant={a} maj={maj} />
+          <AtelierCV apprenant={a} maj={majNote} />
         </div>
       )}
       {onglet === "portfolio" && (
@@ -109,7 +116,13 @@ export function FicheApprenant({ apprenant: a, entreprises, maj, supprimer, supp
       )}
       {onglet === "convaincre" && (
         <div role="tabpanel" id="panneau-convaincre" aria-labelledby="onglet-convaincre">
-          <AtelierConvaincre apprenant={a} maj={maj} />
+          <AtelierConvaincre apprenant={a} maj={majNote} />
+        </div>
+      )}
+
+      {onglet === "candidat" && (
+        <div role="tabpanel" id="panneau-candidat" aria-labelledby="onglet-candidat">
+          <OngletFicheCandidat apprenant={a} />
         </div>
       )}
 
@@ -221,6 +234,9 @@ export function FicheApprenant({ apprenant: a, entreprises, maj, supprimer, supp
 
           <h3 className="fiche-titre">Préparer le rendez-vous</h3>
           <PreparationRdv key={a.id} apprenant={a} entreprises={entreprises} />
+
+          <h3 className="fiche-titre">Progression</h3>
+          <Progression apprenant={a} />
 
           <h3 className="fiche-titre">Parcours d'accompagnement</h3>
           <ChecklistDossier apprenant={a} mode="equipe" cocher={(id, faite) => maj((x) => cocherEtape(x, id, faite))} />

@@ -7,6 +7,10 @@ interface Etape {
   cible: string;
   titre: string;
   texte: string;
+  /** Démo : fiche apprenant à ouvrir (null = la fermer, absent = ne rien changer). */
+  fiche?: string | null;
+  /** Démo : élément sur lequel cliquer avant de montrer la cible (ex. un onglet). */
+  clic?: string;
 }
 
 export const ETAPES_VISITE: Etape[] = [
@@ -66,37 +70,160 @@ export const ETAPES_VISITE: Etape[] = [
   },
 ];
 
+/** Démo automatique de 2 minutes : l'histoire d'Hugo, de la semaine du pôle jusqu'à l'entreprise. */
+export const ETAPES_DEMO: Etape[] = [
+  {
+    vue: "tdb",
+    fiche: null,
+    cible: ".semaine",
+    titre: "Lundi matin au pôle carrière",
+    texte: "La semaine en un coup d'œil : rendez-vous, ateliers collectifs, et ce qui est en retard.",
+  },
+  {
+    vue: "tdb",
+    fiche: null,
+    cible: ".relances-auto",
+    titre: "Les relances sont déjà écrites",
+    texte: "Rappels d'atelier et apprenants sans nouvelles : les messages sont prêts, un clic les envoie via Make.",
+  },
+  {
+    vue: "tdb",
+    fiche: null,
+    cible: ".promos",
+    titre: "Chaque carré est un apprenant",
+    texte: "Une couleur par situation, un point rouge pour qui relancer. Suivons Hugo, en recherche d'emploi.",
+  },
+  {
+    vue: "tdb",
+    fiche: "a10",
+    clic: "#onglet-suivi",
+    cible: ".progression",
+    titre: "L'effet de l'accompagnement, mesuré",
+    texte:
+      "Les scores CV et entretien sont relevés à chaque séance : la courbe montre ce que l'accompagnement a changé pour Hugo.",
+  },
+  {
+    vue: "tdb",
+    fiche: "a10",
+    clic: "#onglet-cv",
+    cible: ".atelier-resultat",
+    titre: "Atelier CV",
+    texte: "6 critères notés en séance, un score, et un plan d'action qui commence par le plus faible.",
+  },
+  {
+    vue: "tdb",
+    fiche: "a10",
+    clic: "#onglet-salaire",
+    cible: ".marche",
+    titre: "Une prétention salariale argumentée",
+    texte: "La fourchette du marché, sourcée, et le montant à annoncer selon ses atouts. Plus un plancher.",
+  },
+  {
+    vue: "tdb",
+    fiche: "a10",
+    clic: "#onglet-convaincre",
+    cible: ".appel-entrainement",
+    titre: "S'entraîner à convaincre",
+    texte: "Un pitch de 2 minutes construit depuis la fiche, et un mode entraînement chronométré en plein écran.",
+  },
+  {
+    vue: "tdb",
+    fiche: "a10",
+    clic: "#onglet-candidat",
+    cible: ".fiche-candidat",
+    titre: "La fiche envoyée à l'entreprise",
+    texte: "Une page propre, partageable par lien ou en PDF : pitch, projets, préparation. Sans données internes.",
+  },
+  {
+    vue: "entreprises",
+    fiche: null,
+    cible: ".shortlist-ligne",
+    titre: "La shortlist part en un clic",
+    texte: "Depuis une offre : 3 profils, un mail prêt avec la fiche de chacun. Le pôle place, il ne fait pas que suivre.",
+  },
+  {
+    vue: "espace",
+    fiche: null,
+    cible: ".boite-outils",
+    titre: "L'apprenant avance seul",
+    texte: "Dans son espace, Hugo retrouve son CV à corriger, son pitch, sa prétention, et s'entraîne à l'oral.",
+  },
+  {
+    vue: "rapport",
+    fiche: null,
+    cible: ".rapport-page",
+    titre: "Et la direction a ses chiffres",
+    texte: "Taux d'insertion, délais, promo par promo : un rapport d'une page, prêt à imprimer.",
+  },
+];
+
+const DUREE_ETAPE_MS = 11_000;
+
 interface Props {
   changerVue: (v: VueVisite) => void;
   terminer: () => void;
+  /** Démo automatique : les étapes s'enchaînent seules. */
+  auto?: boolean;
+  ouvrirFiche?: (id: string | null) => void;
 }
 
 /** Visite guidée : met en lumière chaque zone clé de l'app, écran par écran. */
-export function VisiteGuidee({ changerVue, terminer }: Props) {
+export function VisiteGuidee({ changerVue, terminer, auto = false, ouvrirFiche }: Props) {
+  const etapes = auto ? ETAPES_DEMO : ETAPES_VISITE;
   const [index, setIndex] = useState(0);
   const [cadre, setCadre] = useState<DOMRect | null>(null);
+  const [fiche, setFiche] = useState<DOMRect | null>(null);
+  const [pause, setPause] = useState(false);
+  const [ecoule, setEcoule] = useState(0);
   const bulle = useRef<HTMLDivElement>(null);
-  const etape = ETAPES_VISITE[index];
-  const derniere = index === ETAPES_VISITE.length - 1;
+  const etape = etapes[index];
+  const derniere = index === etapes.length - 1;
 
   const mesurer = useCallback(() => {
     const el = document.querySelector(etape.cible);
     setCadre(el ? el.getBoundingClientRect() : null);
+    const panneau = el?.closest(".fiche");
+    setFiche(panneau ? panneau.getBoundingClientRect() : null);
   }, [etape.cible]);
 
-  // À chaque étape : afficher le bon écran, centrer la zone, puis la mesurer.
+  // À chaque étape : afficher le bon écran (et la bonne fiche), centrer la zone, puis la mesurer.
   useLayoutEffect(() => {
     changerVue(etape.vue);
+    if (etape.fiche !== undefined) ouvrirFiche?.(etape.fiche);
+    setEcoule(0);
+    let minuteur = 0;
     let image = requestAnimationFrame(() => {
       image = requestAnimationFrame(() => {
-        const el = document.querySelector(etape.cible);
-        el?.scrollIntoView({ block: "center", behavior: "auto" });
-        mesurer();
-        bulle.current?.focus();
+        if (etape.clic) document.querySelector<HTMLElement>(etape.clic)?.click();
+        minuteur = window.setTimeout(
+          () => {
+            const el = document.querySelector(etape.cible);
+            el?.scrollIntoView({ block: "center", behavior: "auto" });
+            mesurer();
+            bulle.current?.focus();
+          },
+          etape.clic ? 60 : 0,
+        );
       });
     });
-    return () => cancelAnimationFrame(image);
-  }, [etape, changerVue, mesurer]);
+    return () => {
+      cancelAnimationFrame(image);
+      clearTimeout(minuteur);
+    };
+  }, [etape, changerVue, mesurer, ouvrirFiche]);
+
+  // Démo automatique : avance seule, sauf en pause.
+  useEffect(() => {
+    if (!auto || pause) return;
+    const t = setInterval(() => setEcoule((e) => e + 200), 200);
+    return () => clearInterval(t);
+  }, [auto, pause]);
+
+  useEffect(() => {
+    if (!auto || ecoule < DUREE_ETAPE_MS) return;
+    if (derniere) terminer();
+    else setIndex((i) => i + 1);
+  }, [auto, ecoule, derniere, terminer]);
 
   useEffect(() => {
     window.addEventListener("resize", mesurer);
@@ -118,7 +245,14 @@ export function VisiteGuidee({ changerVue, terminer }: Props) {
   const marge = 12;
   const largeur = Math.min(360, window.innerWidth - 32);
   let style: CSSProperties = {};
-  if (window.innerWidth >= 700 && cadre) {
+  if (window.innerWidth >= 700 && cadre && fiche && fiche.left > largeur + 32) {
+    // Zone dans la fiche apprenant : la bulle se place à gauche du panneau, sans le masquer.
+    style = {
+      top: Math.min(Math.max(16, cadre.top), window.innerHeight - 280),
+      left: fiche.left - largeur - 16,
+      width: largeur,
+    };
+  } else if (window.innerWidth >= 700 && cadre) {
     const enDessous = cadre.bottom + marge + 220 < window.innerHeight;
     const gauche = Math.min(Math.max(16, cadre.left), window.innerWidth - largeur - 16);
     style = enDessous
@@ -144,15 +278,25 @@ export function VisiteGuidee({ changerVue, terminer }: Props) {
         style={style}
       >
         <p className="visite-compteur">
-          Visite guidée · {index + 1} / {ETAPES_VISITE.length}
+          {auto ? "Démo" : "Visite guidée"} · {index + 1} / {etapes.length}
         </p>
+        {auto && (
+          <div className="visite-temps" aria-hidden="true">
+            <span style={{ width: `${Math.min(100, (ecoule / DUREE_ETAPE_MS) * 100)}%` }} />
+          </div>
+        )}
         <h2 id="visite-titre">{etape.titre}</h2>
         <p>{etape.texte}</p>
         <div className="visite-actions">
           <button className="bouton-texte" onClick={terminer}>
-            Passer la visite
+            {auto ? "Quitter la démo" : "Passer la visite"}
           </button>
           <span className="visite-nav">
+            {auto && (
+              <button className="bouton bouton-discret" onClick={() => setPause(!pause)}>
+                {pause ? "Reprendre" : "Pause"}
+              </button>
+            )}
             {index > 0 && (
               <button className="bouton bouton-discret" onClick={() => setIndex(index - 1)}>
                 Précédent

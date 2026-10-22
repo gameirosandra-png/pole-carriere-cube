@@ -1,0 +1,93 @@
+import { describe, expect, it } from "vitest";
+import { creerDonneesDemo } from "../data/seed";
+import { enregistrerPoint, gainMoyenCV, progression } from "./progression";
+import { ficheCandidat, lienFiche, lireFicheDepuisHash } from "./ficheCandidat";
+import { messageShortlist, lienMailto } from "./shortlist";
+import { relancesAuto } from "./relances";
+import { formatChrono, QUESTIONS_ENTRAINEMENT, tirerQuestions } from "./convaincre";
+
+const TODAY = "2026-10-22";
+const demo = creerDonneesDemo(TODAY);
+const parId = (id: string) => demo.apprenants.find((a) => a.id === id)!;
+const hugo = parId("a10");
+
+describe("progression", () => {
+  it("mesure le gain entre le premier et le dernier relevé", () => {
+    const p = progression(hugo);
+    expect(p.cv?.debut).toBe(33);
+    expect(p.cv?.fin).toBe(67);
+    expect(p.cv?.gain).toBe(34);
+    expect(p.simulation?.gain).toBe(20);
+  });
+
+  it("n'ajoute un point que si un score change, un seul par jour", () => {
+    expect(enregistrerPoint(hugo, TODAY)).toBe(hugo);
+    const mieux = { ...hugo, accompagnement: { ...hugo.accompagnement, cv: { notes: { ...hugo.accompagnement!.cv!.notes, resultats: 2 as const } } } };
+    const un = enregistrerPoint(mieux, TODAY);
+    expect(un.accompagnement?.historique?.length).toBe(4);
+    expect(un.accompagnement?.historique?.[3].cv).toBe(83);
+    const encore = { ...un, accompagnement: { ...un.accompagnement, cv: { notes: { ...un.accompagnement!.cv!.notes, accroche: 2 as const } } } };
+    expect(enregistrerPoint(encore, TODAY).accompagnement?.historique?.length).toBe(4);
+  });
+
+  it("calcule le gain moyen de la cohorte", () => {
+    const g = gainMoyenCV(demo.apprenants);
+    expect(g?.effectif).toBe(3);
+    expect(g?.gain).toBe(35); // (34 + 12 + 58) / 3
+  });
+});
+
+describe("fiche candidat", () => {
+  it("ne garde que ce qu'un recruteur doit voir", () => {
+    const f = ficheCandidat(hugo);
+    expect(f.initiale).toBe("M");
+    expect(f.projets[0].nom).toBe("Suivi des ruptures en magasin");
+    expect(f.projets[0].phare).toBe(true);
+    expect(f.presentation.some((t) => t.includes("["))).toBe(false);
+    expect(JSON.stringify(f).includes("k€")).toBe(false);
+  });
+
+  it("fait l'aller-retour par le lien, accents compris", () => {
+    const f = ficheCandidat(hugo);
+    const lien = lienFiche(hugo, "https://exemple.fr");
+    expect(lien.length < 700).toBe(true);
+    const lu = lireFicheDepuisHash(lien.slice("https://exemple.fr/".length));
+    expect(JSON.stringify(lu)).toBe(JSON.stringify(f));
+    expect(lireFicheDepuisHash("#candidat=abime")).toBeNull();
+    expect(lireFicheDepuisHash("#autre")).toBeNull();
+  });
+});
+
+describe("shortlist", () => {
+  it("présente au plus 3 profils avec le lien de leur fiche", () => {
+    const e = demo.entreprises[0];
+    const o = e.offres[0];
+    const m = messageShortlist(e, o, demo.apprenants.slice(0, 5), "https://exemple.fr");
+    expect(m.sujet.startsWith("3 profils")).toBe(true);
+    expect(m.corps.split("#candidat=").length - 1).toBe(3);
+    expect(lienMailto(m.sujet, m.corps).length < 2000).toBe(true);
+    expect(lienMailto("a b", "c").startsWith("mailto:?subject=a%20b")).toBe(true);
+  });
+});
+
+describe("relances automatiques", () => {
+  it("rappelle l'atelier aux inscrits et relance les silencieux", () => {
+    const r = relancesAuto(demo.apprenants, demo.ateliers ?? [], TODAY);
+    const rappels = r.filter((x) => x.type === "atelier");
+    expect(rappels.map((x) => x.apprenantId).join(",")).toBe("a4,a15");
+    expect(rappels[0].objet.includes("Raconter un projet")).toBe(true);
+    const silences = r.filter((x) => x.type === "silence");
+    expect(silences.length > 0).toBe(true);
+    expect(silences.every((x) => x.message.includes("jours"))).toBe(true);
+  });
+});
+
+describe("entraînement", () => {
+  it("tire des questions différentes et formate le chrono", () => {
+    const q = tirerQuestions(5, () => 0.3);
+    expect(new Set(q).size).toBe(5);
+    expect(q.every((x) => QUESTIONS_ENTRAINEMENT.includes(x))).toBe(true);
+    expect(formatChrono(120)).toBe("2:00");
+    expect(formatChrono(65)).toBe("1:05");
+  });
+});

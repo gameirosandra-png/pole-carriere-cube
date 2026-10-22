@@ -6,19 +6,23 @@ import { indicateursDossier } from "../dossier";
 import { Funnel } from "./Funnel";
 import { BoutonRecap } from "./BoutonRecap";
 import { CetteSemaine } from "./CetteSemaine";
+import { RelancesAuto } from "./RelancesAuto";
+import { gainMoyenCV } from "../accompagnement/progression";
 
 interface Props {
   apprenants: Apprenant[];
   ateliers: AtelierCollectif[];
   ouvrir: (id: string) => void;
   lancerVisite: () => void;
+  lancerDemo: () => void;
   voirAteliers: () => void;
 }
 
-export function TableauDeBord({ apprenants, ateliers, ouvrir, lancerVisite, voirAteliers }: Props) {
+export function TableauDeBord({ apprenants, ateliers, ouvrir, lancerVisite, lancerDemo, voirAteliers }: Props) {
   const today = aujourdhui();
   const ind = calculerIndicateurs(apprenants, today);
   const dossiers = indicateursDossier(apprenants);
+  const gainCV = gainMoyenCV(apprenants);
 
   // Regroupe les apprenants par promo, de la plus ancienne à la plus récente.
   const premiereFin = (promo: string) =>
@@ -40,6 +44,9 @@ export function TableauDeBord({ apprenants, ateliers, ouvrir, lancerVisite, voir
           <p className="sous-titre">Les rendez-vous et ateliers à venir, puis où en est chaque apprenant.</p>
         </div>
         <div className="actions">
+          <button className="bouton bouton-cta" onClick={lancerDemo}>
+            ▶ Démo auto
+          </button>
           <button className="bouton bouton-discret" onClick={lancerVisite}>
             Visite guidée
           </button>
@@ -54,6 +61,7 @@ export function TableauDeBord({ apprenants, ateliers, ouvrir, lancerVisite, voir
       </header>
 
       <CetteSemaine apprenants={apprenants} ateliers={ateliers} ouvrir={ouvrir} voirAteliers={voirAteliers} />
+      <RelancesAuto apprenants={apprenants} ateliers={ateliers} ouvrir={ouvrir} />
 
       <h2 className="titre-section">Où en sont les apprenants</h2>
       <p className="sous-titre sous-titre-section">
@@ -116,6 +124,15 @@ export function TableauDeBord({ apprenants, ateliers, ouvrir, lancerVisite, voir
           <dt>En entretiens</dt>
           <dd>{ind.enEntretiens}</dd>
           <small>process de recrutement en cours</small>
+        </div>
+        <div className="chiffre-progression">
+          <dt>Effet de l'accompagnement</dt>
+          <dd>{gainCV ? `${gainCV.gain >= 0 ? "+" : ""}${gainCV.gain} pts` : "—"}</dd>
+          <small>
+            {gainCV
+              ? `de score CV en moyenne, sur ${gainCV.effectif} apprenant${gainCV.effectif > 1 ? "s" : ""} suivi${gainCV.effectif > 1 ? "s" : ""}`
+              : "gain de score CV, dès deux évaluations"}
+          </small>
         </div>
         <div className={ind.aRelancer.length ? "chiffre-alerte" : ""}>
           <dt>À relancer</dt>

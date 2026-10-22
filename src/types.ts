@@ -73,11 +73,19 @@ export interface AtelierConvaincre {
   simulation?: Partial<Record<CritereEntretien, 1 | 2 | 3 | 4>>;
 }
 
+/** Scores relevés au fil des séances, pour mesurer la progression. */
+export interface PointProgression {
+  date: string; // ISO
+  cv: number | null;
+  simulation: number | null;
+}
+
 export interface Accompagnement {
   cv?: AtelierCV;
   portfolio?: ProjetPortfolio[];
   salaire?: AtelierSalaire;
   convaincre?: AtelierConvaincre;
+  historique?: PointProgression[];
 }
 
 export interface Apprenant {
@@ -108,6 +116,8 @@ export interface Offre {
   contrat: TypeContrat;
   ouverte: boolean;
   candidats: string[]; // ids d'apprenants mis en relation
+  /** Date du dernier envoi de la shortlist à l'entreprise. */
+  shortlistEnvoyee?: string;
 }
 
 export interface Entreprise {
