@@ -6,13 +6,68 @@
 
 **Démo en ligne : [pole-carriere-cube.vercel.app](https://pole-carriere-cube.vercel.app)**
 
-Outil de suivi de l'insertion professionnelle des apprenants, construit comme preuve de concept pour le pôle carrière de l'École Cube.
+Outil pour accompagner les apprenants jusqu'à l'emploi et piloter le taux d'insertion, construit comme preuve de concept pour le pôle carrière de l'École Cube. Ce README est aussi une **étude de cas** : le problème, mes choix et ce que j'en ai appris.
+
+**Pour voir l'essentiel en 2 minutes** : bouton « ▶ Démo auto » sur le site (le son est meilleur sur Edge).
 
 ![Tableau de bord : chaque carré est un apprenant, coloré selon sa situation](docs/capture-tableau-de-bord.png)
 
+## L'étude de cas en bref
+
+| | |
+| --- | --- |
+| **Le besoin** | Accompagner les apprenants d'une école no-code jusqu'à l'emploi, et piloter le taux d'insertion |
+| **Pour qui** | L'équipe du pôle carrière, les apprenants, la direction |
+| **Ce que j'ai livré** | Une app en ligne, testée, documentée, avec un mode équipe sur base partagée |
+| **En combien de temps** | Une journée, en 14 versions successives (voir l'[historique des commits](https://github.com/gameirosandra-png/pole-carriere-cube/commits/main)) |
+| **Comment** | Je spécifie, je construis avec Claude, je vérifie par des tests, je déploie, puis j'itère sur les retours |
+
 ## Le problème
 
-Après la formation, le suivi des apprenants est souvent dispersé entre tableurs, messages et mémoire. On perd de vue ceux qui décrochent, et le taux d'insertion (demandé pour le reporting RNCP et Qualiopi) est long à calculer.
+Après la formation, le suivi des apprenants est souvent dispersé entre tableurs, messages et mémoire. On perd de vue ceux qui décrochent, et le taux d'insertion, demandé pour le reporting RNCP et Qualiopi, est long à calculer.
+
+Mais suivre ne suffit pas. Le vrai travail d'un pôle carrière, c'est d'**accompagner** : faire un CV qui tient la route, un portfolio qui convainc, annoncer un salaire juste, réussir un entretien. Puis **placer** : présenter les bons profils aux bonnes entreprises.
+
+## Pourquoi moi sur ce sujet
+
+Je suis apprenante Product Builder No-Code à l'École Cube, donc je connais ce parcours de l'intérieur. Avant, j'ai passé 10 ans à accompagner des personnes : infirmière et tutrice d'étudiants, puis responsable des opérations, avec 30+ managers formés et 300+ créateurs suivis. Ce projet réunit les deux : le terrain de l'accompagnement et la construction d'outils.
+
+## Comment le produit a évolué
+
+1. **V1, suivre** : tableau de bord par promo, taux d'insertion à 6 mois, apprenants à relancer, entreprises et offres.
+2. **Retour d'un mentor du secteur** : « Ce qu'ils veulent, c'est de l'accompagnement : les CV, les portfolios, le salaire, convaincre. » J'ai recentré le produit sur ce retour.
+3. **V2, accompagner** : un parcours en 7 séances, avec un atelier outillé pour chaque étape clé.
+4. **V3, placer** : fiche candidat à envoyer aux entreprises, shortlist en un clic, matching expliqué, progression mesurée.
+5. **Et pour le montrer** : une démo de 2 minutes commentée à voix haute, qui se lance seule.
+
+## Mes choix, et pourquoi
+
+| Choix | Pourquoi | Ce que j'accepte en échange |
+| --- | --- | --- |
+| Démo locale par défaut, base partagée en option | N'importe qui teste en un clic, sans compte ; les deux modes ont exactement les mêmes écrans | Deux façons de stocker les données à maintenir |
+| Règles métier en fonctions pures, testées | Taux d'insertion, matching, prétention salariale : chaque règle se relit et se vérifie sans ouvrir l'interface | Un peu plus de code au départ |
+| Un document JSON par fiche dans Supabase | Aller vite sans changer le modèle de l'app ; sécurité par RLS et taille bornée | Pas de requêtes fines côté base : un schéma normalisé est prévu en V2 |
+| Les e-mails passent par des fonctions serveur et Make | Aucun secret dans le navigateur ; le destinataire est fixé dans Make, jamais par le visiteur | Un outil de plus dans la chaîne |
+| La fiche candidat voyage dans le lien | Aucune base publique de profils : rien n'est stocké en ligne, c'est plus simple pour le RGPD | Le lien est long, et figé au moment où il est créé |
+| L'IA reportée en V2 | Le brief de rendez-vous fonctionne déjà avec des règles ; l'IA ajoute un coût et un risque qu'un MVP n'a pas besoin de porter | La fonction est écrite et testée, mais pas activée |
+| Fourchettes de salaire sourcées et datées | Une prétention se défend avec des chiffres vérifiables | Des chiffres indicatifs, dont certains anciens, à remplacer par les données réelles de l'école |
+
+## Ce que j'ai appris
+
+- **Construire avec l'IA, c'est surtout spécifier et vérifier.** Claude écrit vite ; mon travail est de dire précisément quoi construire, de relire, et de prouver que ça marche : 68 tests unitaires, plus de 160 vérifications de bout en bout et une intégration continue.
+- **Le retour d'un expert vaut plus qu'une fonctionnalité de plus.** La V1 était juste techniquement mais à côté du vrai besoin.
+- **Un MVP, c'est aussi savoir s'arrêter.** Rôles, temps réel, import des données de l'école : listés en V2, pas improvisés.
+
+## Ses limites aujourd'hui
+
+- Pas encore de rôles distincts (équipe, apprenant) sur la base partagée.
+- Synchronisation toutes les 20 secondes, pas en temps réel.
+- Récap et relances envoyés à l'équipe en un clic, mais pas encore programmés ni adressés aux vrais destinataires.
+- La qualité de la voix de la démo dépend du navigateur (meilleure sur Edge).
+
+---
+
+# Découvrir l'app
 
 ## La méthode d'accompagnement
 
@@ -92,7 +147,7 @@ Variable d'environnement (Vercel) : `MAKE_RECAP_WEBHOOK` (URL du webhook Make). 
 | Prétention salariale | Départ à 25 % de la fourchette junior, puis + 20 points en Île-de-France, + 15 si 5 ans d'expérience avant la reconversion, + 10 si parcours bouclé, + 10 si 2 projets solides (plafond 85 %) ; plancher = 92 % de l'annonce |
 | Qui coche quoi | L'apprenant coche portfolio et LinkedIn ; l'équipe valide les autres séances |
 | KPI de préparation | Part des apprenants en accompagnement (non insérés) ayant fait chaque étape, et nombre de dossiers prêts |
-| Score de matching (sur 100) | Parcours (40, proportionnel aux séances faites) + poste visé retrouvé dans l'intitulé de l'offre (35) + disponibilité (25 en recherche, 15 en entretiens ailleurs, 25 en formation pour une alternance, 5 sinon) |
+| Score de matching (sur 100) | Parcours (40, proportionnel aux séances faites) + poste visé retrouvé dans l'intitulé de l'offre (35) + disponibilité (25 en recherche, 15 en entretiens ailleurs, 25 en formation pour une alternance, 5 sinon ; plafonnée à 5 si le contrat de l'offre n'est pas celui souhaité dans le questionnaire) |
 | Entonnoir d'insertion | Sortis de formation → parcours bouclé → en entretiens ou au-delà → en poste ou freelance ; niveaux cumulatifs, le plus gros écart signale le goulot |
 | Dernier contact | Mis à jour par une note, un changement de statut, une action faite ou une réponse de l'apprenant |
 
@@ -100,14 +155,15 @@ Ces règles sont des fonctions pures dans [`src/regles.ts`](src/regles.ts), [`sr
 
 ## Qualité
 
-- **Tests** : règles métier, parcours et ateliers d'accompagnement, matching, entonnoir, calculs de dates (fin de mois, changement d'heure, fuseaux) et export CSV, avec Vitest.
+- **Tests** : 68 tests unitaires sur les règles métier, parcours et ateliers d'accompagnement, matching, entonnoir, calculs de dates (fin de mois, changement d'heure, fuseaux) et export CSV, avec Vitest.
+- **Bout en bout** : 164 vérifications Playwright dans [`e2e/`](e2e) (parcours complets dans un vrai navigateur, sur ordinateur et mobile), lancées avant chaque version avec `npm run e2e` ; pas encore dans la CI.
 - **Intégration continue** : à chaque modification, GitHub vérifie les types TypeScript, lance les tests et le build ([workflow](.github/workflows/ci.yml)).
 - **Accessibilité** : couleurs de statut au contraste WCAG AA (4,5:1), statut toujours écrit en plus de la couleur, panneaux utilisables au clavier (focus piégé, Échap, retour du focus).
 - **Responsive** : utilisable sur mobile.
 
 ## Stack
 
-React 19 + TypeScript, Vite, CSS sans framework, Vitest. Supabase (Postgres, Auth), fonctions serveur Vercel, Make, API Claude. Déployé sur Vercel à chaque push sur `main`. Construit avec Claude.
+React 19 + TypeScript, Vite, CSS sans framework, Vitest, Playwright. Supabase (Postgres, Auth), fonctions serveur Vercel, Make ; API Claude prête pour la V2. Déployé sur Vercel à chaque push sur `main`. Construit avec Claude.
 
 ## Lancer en local
 
@@ -115,6 +171,8 @@ React 19 + TypeScript, Vite, CSS sans framework, Vitest. Supabase (Postgres, Aut
 npm install
 npm run dev      # serveur de développement
 npm run check    # types + tests + build, comme la CI
+npm run build && npm run preview   # puis, dans un autre terminal :
+npm run e2e      # vérifications de bout en bout (Playwright à installer : npm i -D playwright && npx playwright install chromium)
 ```
 
 ## Structure
@@ -133,15 +191,16 @@ src/
   api.ts              appels aux fonctions serveur
   supabase.ts         client minimal : lien magique, session, lecture/écriture
   synchro.ts          calcul des changements à envoyer à la base (testé)
-api/
-  recap.ts            envoi du récap via Make
-  relances.ts         envoi des relances automatiques via Make
-  brief.ts            brief de rendez-vous rédigé par Claude (V2, prêt mais non activé)
   dates.ts            calculs de dates sans décalage de fuseau (testés)
   csv.ts              export CSV compatible Excel (testé)
   store.ts            état de l'app et persistance locale
   data/seed.ts        données de démo, relatives à la date du jour
   components/         un composant par écran, plus le panneau accessible
+e2e/                  vérifications de bout en bout (Playwright), lancées par npm run e2e
+api/
+  recap.ts            envoi du récap via Make
+  relances.ts         envoi des relances automatiques via Make
+  brief.ts            brief de rendez-vous rédigé par Claude (V2, prêt mais non activé)
 ```
 
 ## Prochaines étapes (V2)
@@ -154,4 +213,4 @@ api/
 
 ---
 
-Conçu par Sandra Gameiro, apprenante Product Builder No-Code · [LinkedIn](https://www.linkedin.com/in/sandra-gameiro/)
+Conçu par Sandra Gameiro, Product & Operations Builder, apprenante Product Builder No-Code à l'École Cube · [LinkedIn](https://www.linkedin.com/in/sandra-gameiro/) · ladoucenaissance@gmail.com

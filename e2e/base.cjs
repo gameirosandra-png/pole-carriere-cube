@@ -1,0 +1,74 @@
+const { chromium } = require('playwright');
+const out = process.argv[2] || require('os').tmpdir();
+const URL = process.env.URL || 'http://127.0.0.1:4173/';
+(async () => {
+  const b = await chromium.launch();
+  const SKIP = () => localStorage.setItem('pole-carriere-cube:visite-vue','1');
+  const ctx = await b.newContext({ viewport: { width: 1360, height: 900 }, acceptDownloads: true });
+  await ctx.addInitScript(SKIP);
+  const p = await ctx.newPage();
+  const errs = []; p.on('pageerror', e => errs.push(e.message));
+  p.on('dialog', d => d.accept());
+  const ok = (c, m) => console.log(c ? '✓' : '✗', m);
+  await p.goto(URL); await p.waitForTimeout(500);
+  await p.screenshot({ path: out + '/v2-tdb.png', fullPage: true });
+  ok((await p.locator('.carre').count()) === 16, '16 carrés');
+  ok((await p.locator('.section-relances .relance').count()) === 4, '4 à relancer');
+  ok((await p.textContent('.chiffres')).includes('83'), 'taux 83 %');
+  const [dl] = await Promise.all([p.waitForEvent('download'), p.click('text=Exporter les indicateurs')]);
+  ok(dl.suggestedFilename().startsWith('indicateurs-insertion-'), 'export indicateurs : ' + dl.suggestedFilename());
+
+  await p.click('nav >> text=Apprenants');
+  await p.click('button:has-text("Ajouter un apprenant")');
+  await p.click('button[type=submit]:has-text("Ajouter l\'apprenant")');
+  ok(await p.locator('[role=alert]').isVisible(), 'erreur si champs vides');
+  await p.getByLabel('Prénom').fill('Alice');
+  await p.getByLabel('Nom', { exact: true }).fill('Durand');
+  await p.getByLabel('Fin de formation').fill('2026-12-18');
+  await p.screenshot({ path: out + '/v2-ajout.png' });
+  await p.click('button[type=submit]:has-text("Ajouter l\'apprenant")');
+  ok((await p.textContent('.sous-titre')).includes('17 sur 17'), 'apprenant ajouté (17)');
+  const [dl2] = await Promise.all([p.waitForEvent('download'), p.click('text=Exporter en CSV')]);
+  const csv = require('fs').readFileSync(await dl2.path(), 'utf8');
+  ok(csv.includes('Alice;Durand') && csv.split('\r\n').length === 18, 'CSV apprenants avec Alice (18 lignes)');
+
+  await p.click('button.lien-ligne:has-text("Thomas Girard")');
+  await p.waitForTimeout(300);
+  ok(await p.evaluate(() => document.activeElement?.getAttribute('role') === 'dialog'), 'focus dans la fiche');
+  for (let i = 0; i < 40; i++) await p.keyboard.press('Tab');
+  ok(await p.evaluate(() => !!document.activeElement?.closest('.fiche')), 'focus piégé dans la fiche après 40 Tab');
+  await p.locator('.fiche select').first().selectOption('entretiens');
+  ok((await p.textContent('.fiche-statut')).includes('En entretiens'), 'statut modifié');
+  ok(!(await p.textContent('.fiche-statut')).includes('Sans contact'), 'plus à relancer après changement de statut');
+  await p.screenshot({ path: out + '/v2-fiche.png' });
+  await p.click('text=Supprimer la fiche');
+  ok((await p.textContent('.sous-titre')).includes('16 sur 16'), 'apprenant supprimé (16)');
+
+  await p.click('nav >> text=Espace apprenant');
+  await p.selectOption('.choix-demo select', { label: 'Hugo Martin' });
+  await p.check('input[value=poste]');
+  await p.getByLabel('Ton entreprise').fill('Atelier Merlin');
+  await p.getByLabel('Un message pour le pôle carrière (facultatif)').fill('Signé hier, merci !');
+  await p.screenshot({ path: out + '/v2-espace.png', fullPage: true });
+  await p.click('text=Envoyer ma mise à jour');
+  ok(await p.locator('.texte-succes').isVisible(), 'confirmation envoi');
+  await p.click('nav >> text=Tableau de bord');
+  ok((await p.locator('.section-relances .relance').count()) === 2, 'Hugo et Thomas sortis des relances (2)');
+  await p.click('.carre[title="Hugo Martin"]');
+  ok((await p.textContent('.fiche')).includes("Mise à jour par l'apprenant : En poste chez Atelier Merlin. « Signé hier, merci ! »"), 'note apprenant dans la fiche');
+  await p.keyboard.press('Escape');
+  ok(await p.evaluate(() => document.activeElement?.getAttribute('title') === 'Hugo Martin'), 'focus rendu au carré après fermeture');
+
+  const m = await b.newPage({ viewport: { width: 390, height: 844 } });
+  await m.addInitScript(SKIP);
+  await m.goto(URL); await m.waitForTimeout(400);
+  ok(await m.evaluate(() => document.documentElement.scrollWidth <= 390), 'pas de défilement horizontal mobile');
+  await m.screenshot({ path: out + '/v2-mobile.png', fullPage: true });
+
+  const r = await b.newPage({ viewport: { width: 1280, height: 820 } });
+  await r.addInitScript(SKIP);
+  await r.goto(URL); await r.waitForTimeout(400);
+  await r.screenshot({ path: '/home/claude/pole-carriere-cube/docs/capture-tableau-de-bord.png' });
+  console.log('erreurs JS:', JSON.stringify(errs));
+  await b.close();
+})();
