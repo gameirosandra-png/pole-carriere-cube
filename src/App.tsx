@@ -7,6 +7,14 @@ import { EspaceApprenant } from "./components/EspaceApprenant";
 import { FicheApprenant } from "./components/FicheApprenant";
 import { Rapport } from "./components/Rapport";
 import { VisiteGuidee, type VueVisite } from "./components/VisiteGuidee";
+import { ModeEquipe } from "./components/ModeEquipe";
+import {
+  deconnecter,
+  lireErreurLienMagique,
+  lireRetourLienMagique,
+  sessionEnregistree,
+  type Session,
+} from "./supabase";
 
 type Vue = VueVisite;
 
@@ -28,7 +36,13 @@ const visiteDejaVue = () => {
   }
 };
 
+// Lu une seule fois au chargement : retour d'un lien magique, ou session déjà ouverte.
+const sessionInitiale = lireRetourLienMagique() ?? sessionEnregistree();
+const erreurLienInitiale = lireErreurLienMagique();
+
 export default function App() {
+  const [session, setSession] = useState<Session | null>(sessionInitiale);
+  const sessionPerdue = useCallback(() => setSession(null), []);
   const {
     donnees,
     setDonnees,
@@ -39,7 +53,8 @@ export default function App() {
     annulation,
     fermerAnnulation,
     reinitialiser,
-  } = useDonnees();
+    synchro,
+  } = useDonnees(session, sessionPerdue);
   const [vue, setVue] = useState<Vue>("tdb");
   const [ficheId, setFicheId] = useState<string | null>(null);
   const [visite, setVisite] = useState(false);
@@ -93,9 +108,30 @@ export default function App() {
           <button className="bouton-visite" onClick={lancerVisite}>
             Visite guidée (1 min)
           </button>
-          <p>Démo indépendante, non affiliée à l'École Cube. Données fictives, enregistrées dans votre navigateur.</p>
-          <button className="bouton-texte" onClick={() => confirm("Revenir aux données de démo ?") && reinitialiser()}>
-            Réinitialiser la démo
+          <ModeEquipe
+            session={session}
+            synchro={synchro}
+            erreurLien={erreurLienInitiale}
+            deconnecter={async () => {
+              await deconnecter(session);
+              setSession(null);
+            }}
+          />
+          <p>
+            Démo indépendante, non affiliée à l'École Cube. Données fictives
+            {session ? ", partagées entre les membres connectés." : ", enregistrées dans votre navigateur."}
+          </p>
+          <button
+            className="bouton-texte"
+            onClick={() =>
+              confirm(
+                session
+                  ? "Remplacer le contenu de la base partagée par les données de démo ?"
+                  : "Revenir aux données de démo ?",
+              ) && reinitialiser()
+            }
+          >
+            {session ? "Remettre la base partagée à zéro" : "Réinitialiser la démo"}
           </button>
           <a className="bouton-texte" href="https://github.com/gameirosandra-png/pole-carriere-cube">
             Voir le code sur GitHub
@@ -104,6 +140,18 @@ export default function App() {
       </aside>
 
       <main className="contenu">
+        {session && synchro === "chargement" && <p className="bandeau-mode">Chargement de la base partagée…</p>}
+        {session && synchro === "vide" && (
+          <div className="bandeau-mode">
+            <p>
+              <strong>La base partagée est vide.</strong> Remplissez-la avec les données de démo pour tester le travail
+              en équipe : ouvrez l'app sur un 2e appareil, vos modifications y apparaissent.
+            </p>
+            <button className="bouton bouton-cta" onClick={reinitialiser}>
+              Remplir avec les données de démo
+            </button>
+          </div>
+        )}
         {vue === "tdb" && (
           <TableauDeBord apprenants={donnees.apprenants} ouvrir={setFicheId} lancerVisite={lancerVisite} />
         )}

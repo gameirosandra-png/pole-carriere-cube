@@ -1348,6 +1348,76 @@ textarea {
   padding-left: 18px;
 }
 
+/* ---------- Mode équipe (Supabase) ---------- */
+.bouton-mode {
+  display: block;
+  width: 100%;
+  margin-bottom: 14px;
+  background: transparent;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: var(--rayon);
+  padding: 8px 12px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.bouton-mode:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+.mode-equipe {
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  border-radius: var(--rayon);
+  background: rgba(255, 255, 255, 0.08);
+}
+.mode-equipe p {
+  margin: 0 0 4px;
+}
+.mode-titre {
+  font-weight: 600;
+  color: #fff;
+}
+.mode-email {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.synchro {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.synchro-point {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #9be3b8;
+  flex: none;
+}
+.synchro-enregistrement .synchro-point,
+.synchro-chargement .synchro-point {
+  background: var(--orange);
+}
+.synchro-erreur .synchro-point {
+  background: #ff9b8f;
+}
+.bandeau-mode {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0 0 20px;
+  padding: 14px 16px;
+  background: var(--violet-pale);
+  border-left: 3px solid var(--orange);
+  border-radius: var(--rayon);
+}
+.bandeau-mode p {
+  margin: 0;
+  flex: 1 1 320px;
+}
+
 /* ---------- Mobile ---------- */
 @media (max-width: 820px) {
   .app {
@@ -1395,7 +1465,19 @@ textarea {
     white-space: nowrap;
   }
   .barre-pied {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+  .barre-pied > p,
+  .barre-pied .bouton-visite {
     display: none;
+  }
+  .barre-pied .bouton-mode,
+  .barre-pied .mode-equipe {
+    margin: 0;
+    width: auto;
   }
   .toast {
     left: 16px;

@@ -29,6 +29,17 @@ Au premier passage, une **visite guidée** de 7 étapes présente l'app ; elle s
 
 > Toutes les données sont fictives et calculées à partir de la date du jour, pour que la démo reste cohérente quel que soit le jour de visite. Elles sont enregistrées dans le navigateur (localStorage) : aucune donnée personnelle ne quitte l'ordinateur.
 
+## Mode équipe (base partagée)
+
+Par défaut, l'app tourne en **démo locale** : données fictives dans le navigateur. Le bouton « Passer en mode équipe » permet de se connecter **par lien magique** (sans mot de passe) : les données vivent alors dans une base **Supabase** partagée, et chaque membre voit les mises à jour des autres (actualisation toutes les 20 secondes et au retour sur l'onglet).
+
+- Schéma : tables `apprenants` et `entreprises`, un document JSON par ligne, au format de l'app (aucun écran ne change entre les deux modes). Horodatage et auteur de chaque modification par trigger.
+- Sécurité : RLS activée, lecture et écriture réservées aux utilisateurs connectés ; taille des documents bornée.
+- Synchronisation : seules les fiches ajoutées, modifiées ou supprimées sont envoyées ([`src/synchro.ts`](src/synchro.ts), testé).
+- Client Supabase minimal, sans dépendance ([`src/supabase.ts`](src/supabase.ts)) : lien magique, rafraîchissement de session, lecture et écriture via l'API REST.
+
+En production : rôles distincts (équipe, apprenant), politiques RLS par rôle, schéma normalisé (offres et candidatures en tables), temps réel.
+
 ## Automatisation et IA
 
 | Fonction | Comment ça marche |
@@ -66,7 +77,7 @@ Ces règles sont des fonctions pures dans [`src/regles.ts`](src/regles.ts), [`sr
 
 ## Stack
 
-React 19 + TypeScript, Vite, CSS sans framework, Vitest. Fonctions serveur Vercel, Make, API Claude. Déployé sur Vercel à chaque push sur `main`. Construit avec Claude.
+React 19 + TypeScript, Vite, CSS sans framework, Vitest. Supabase (Postgres, Auth), fonctions serveur Vercel, Make, API Claude. Déployé sur Vercel à chaque push sur `main`. Construit avec Claude.
 
 ## Lancer en local
 
@@ -87,6 +98,8 @@ src/
   rapport.ts          entonnoir d'insertion et statistiques par promo (testés)
   brief.ts            préparation de rendez-vous : données pour l'IA, brief de secours (testés)
   api.ts              appels aux fonctions serveur
+  supabase.ts         client minimal : lien magique, session, lecture/écriture
+  synchro.ts          calcul des changements à envoyer à la base (testé)
 api/
   recap.ts            envoi du récap via Make
   brief.ts            brief de rendez-vous rédigé par Claude
@@ -99,7 +112,7 @@ api/
 
 ## Prochaines étapes (V2)
 
-1. Base de données partagée (Supabase) et connexion de l'équipe du pôle par lien magique.
+1. Rôles et droits par profil (équipe, apprenant) sur la base partagée, et schéma normalisé.
 2. Lien personnel et sécurisé pour l'espace apprenant, envoyé automatiquement chaque mois.
 3. Récap envoyé automatiquement chaque lundi par Make, à partir de la base partagée.
 4. Import des apprenants depuis l'outil de gestion de l'école.
