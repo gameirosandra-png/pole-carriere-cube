@@ -5,6 +5,8 @@ import { aujourdhui, formatDate } from "../dates";
 import { csvApprenants, telechargerCsv } from "../csv";
 import { Pastille } from "./Pastille";
 import { NouvelApprenant } from "./NouvelApprenant";
+import { JaugeDossier } from "./ChecklistDossier";
+import { pretAProposer } from "../dossier";
 
 interface Props {
   apprenants: Apprenant[];
@@ -17,6 +19,7 @@ export function Apprenants({ apprenants, ouvrir, ajouter }: Props) {
   const [statut, setStatut] = useState<Statut | "tous">("tous");
   const [promo, setPromo] = useState("toutes");
   const [seulementRelances, setSeulementRelances] = useState(false);
+  const [seulementPrets, setSeulementPrets] = useState(false);
   const [formulaireOuvert, setFormulaireOuvert] = useState(false);
 
   const promos = useMemo(() => [...new Set(apprenants.map((a) => a.promo))], [apprenants]);
@@ -27,7 +30,8 @@ export function Apprenants({ apprenants, ouvrir, ajouter }: Props) {
       texte.includes(recherche.trim().toLowerCase()) &&
       (statut === "tous" || a.statut === statut) &&
       (promo === "toutes" || a.promo === promo) &&
-      (!seulementRelances || raisonRelance(a) !== null)
+      (!seulementRelances || raisonRelance(a) !== null) &&
+      (!seulementPrets || pretAProposer(a))
     );
   });
 
@@ -92,6 +96,10 @@ export function Apprenants({ apprenants, ouvrir, ajouter }: Props) {
           <input type="checkbox" checked={seulementRelances} onChange={(e) => setSeulementRelances(e.target.checked)} />
           À relancer uniquement
         </label>
+        <label className="case">
+          <input type="checkbox" checked={seulementPrets} onChange={(e) => setSeulementPrets(e.target.checked)} />
+          Prêts à proposer
+        </label>
       </div>
 
       {liste.length === 0 ? (
@@ -103,6 +111,7 @@ export function Apprenants({ apprenants, ouvrir, ajouter }: Props) {
               <tr>
                 <th scope="col">Apprenant</th>
                 <th scope="col">Statut</th>
+                <th scope="col">Dossier</th>
                 <th scope="col">Poste visé</th>
                 <th scope="col">Dernier contact</th>
                 <th scope="col">Prochaine action</th>
@@ -114,13 +123,22 @@ export function Apprenants({ apprenants, ouvrir, ajouter }: Props) {
                 return (
                   <tr key={a.id} onClick={() => ouvrir(a.id)}>
                     <td>
-                      <button className="lien-ligne" onClick={(e) => { e.stopPropagation(); ouvrir(a.id); }}>
+                      <button
+                        className="lien-ligne"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          ouvrir(a.id);
+                        }}
+                      >
                         {a.prenom} {a.nom}
                       </button>
                       <span className="secondaire">{a.promo}</span>
                     </td>
                     <td>
                       <Pastille statut={a.statut} />
+                    </td>
+                    <td>
+                      <JaugeDossier apprenant={a} compacte />
                     </td>
                     <td>{a.entreprise ? `${a.posteVise} chez ${a.entreprise}` : a.posteVise}</td>
                     <td className={relance ? "texte-alerte" : ""}>

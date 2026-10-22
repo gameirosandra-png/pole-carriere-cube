@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { Apprenant, Donnees, Entreprise, TypeContrat } from "../types";
 import { estInsere } from "../regles";
 import { nouvelId } from "../store";
+import { completude, pretAProposer } from "../dossier";
 
 interface Props {
   donnees: Donnees;
@@ -22,7 +23,10 @@ export function Entreprises({ donnees, setDonnees, ouvrir }: Props) {
     if (!nom.trim()) return;
     setDonnees((d) => ({
       ...d,
-      entreprises: [...d.entreprises, { id: nouvelId(), nom: nom.trim(), secteur: secteur.trim(), contact: "", offres: [] }],
+      entreprises: [
+        ...d.entreprises,
+        { id: nouvelId(), nom: nom.trim(), secteur: secteur.trim(), contact: "", offres: [] },
+      ],
     }));
     setNom("");
     setSecteur("");
@@ -146,7 +150,10 @@ function SelectionCandidat({
   exclus: string[];
   ajouter: (id: string) => void;
 }) {
-  const choix = apprenants.filter((a) => !exclus.includes(a.id));
+  // Les dossiers prêts d'abord : ce sont eux qu'on propose en priorité.
+  const choix = apprenants
+    .filter((a) => !exclus.includes(a.id))
+    .sort((x, y) => completude(y).faites - completude(x).faites);
   if (choix.length === 0) return null;
   return (
     <select
@@ -158,7 +165,8 @@ function SelectionCandidat({
       <option value="">+ Proposer un apprenant</option>
       {choix.map((a) => (
         <option key={a.id} value={a.id}>
-          {a.prenom} {a.nom} ({a.posteVise})
+          {a.prenom} {a.nom} ·{" "}
+          {pretAProposer(a) ? "dossier prêt" : `dossier ${completude(a).faites}/${completude(a).total}`}
         </option>
       ))}
     </select>

@@ -4,6 +4,8 @@ import { STATUTS, changerStatut, estInsere } from "../regles";
 import { aujourdhui, formatDate } from "../dates";
 import { nouvelId } from "../store";
 import { Pastille } from "./Pastille";
+import { ChecklistDossier, JaugeDossier } from "./ChecklistDossier";
+import { cocherEtape, completude, prochaineEtape } from "../dossier";
 
 interface Props {
   apprenants: Apprenant[];
@@ -26,8 +28,8 @@ export function EspaceApprenant({ apprenants, entreprises, maj }: Props) {
       <header className="entete-page">
         <h1 id="titre-espace">Espace apprenant</h1>
         <p className="sous-titre">
-          Démo de la page que chaque apprenant recevrait par un lien personnel. Ses réponses mettent à jour le suivi
-          de l'équipe sans relance manuelle.
+          Démo de la page que chaque apprenant recevrait par un lien personnel. Ses réponses mettent à jour le suivi de
+          l'équipe sans relance manuelle.
         </p>
       </header>
 
@@ -89,79 +91,135 @@ function PageApprenant({
     setEnvoye(true);
   };
 
+  const c = completude(a);
+  const etape = prochaineEtape(a);
+  const offresOuvertes = offres.filter((o) => o.offre.ouverte).length;
+
   return (
-    <div className="espace">
-      <div className="espace-carte">
+    <div className="espace-page">
+      <div className="espace-bonjour">
         <h2>Bonjour {a.prenom}</h2>
         <p>
           Ta situation enregistrée : <Pastille statut={a.statut} />
           {estInsere(a) && a.entreprise && <> chez {a.entreprise}</>}
         </p>
-        {a.prochaineAction ? (
-          <p>
-            Ta prochaine étape avec le pôle carrière : <strong>{a.prochaineAction.libelle}</strong>, le{" "}
-            {formatDate(a.prochaineAction.date)}
-          </p>
-        ) : (
-          <p>Aucun rendez-vous prévu. Réponds ci-dessous si tu as besoin d'un coup de pouce.</p>
-        )}
-
-        <h3 className="fiche-titre">Offres qu'on t'a proposées</h3>
-        {offres.length === 0 ? (
-          <p className="vide">Pas encore d'offre. Le pôle carrière t'en proposera selon ton projet.</p>
-        ) : (
-          <ul className="liste-simple">
-            {offres.map(({ entreprise: nomEntreprise, offre }) => (
-              <li key={offre.id}>
-                {offre.titre} chez {nomEntreprise} ({offre.contrat}){!offre.ouverte && " · pourvue"}
-              </li>
-            ))}
-          </ul>
-        )}
       </div>
 
-      <form className="espace-carte" onSubmit={envoyer}>
-        <h2>Où en es-tu ?</h2>
-        <fieldset className="choix-statut">
-          <legend className="secondaire">Ta situation aujourd'hui</legend>
-          {STATUTS.filter((s) => s.id !== "formation").map((s) => (
-            <label key={s.id} className="case">
-              <input
-                type="radio"
-                name="statut"
-                value={s.id}
-                checked={statut === s.id}
-                onChange={() => {
-                  setStatut(s.id);
-                  setEnvoye(false);
-                }}
-              />
-              {s.libelle}
-            </label>
-          ))}
-        </fieldset>
+      <dl className="tuiles">
+        <div className="tuile">
+          <dt>Ton dossier</dt>
+          <dd className="tuile-chiffre">
+            {c.faites}/{c.total}
+          </dd>
+          <JaugeDossier apprenant={a} avecTexte={false} />
+          <small>
+            {c.faites === c.total
+              ? "Complet : tu peux être proposé aux entreprises"
+              : `Encore ${c.total - c.faites} étape${c.total - c.faites > 1 ? "s" : ""} avant d'être proposé`}
+          </small>
+        </div>
+        <div className="tuile">
+          <dt>Ta prochaine étape</dt>
+          {a.prochaineAction ? (
+            <>
+              <dd className="tuile-texte">{a.prochaineAction.libelle}</dd>
+              <small>Prévue le {formatDate(a.prochaineAction.date)} avec le pôle carrière</small>
+            </>
+          ) : etape ? (
+            <>
+              <dd className="tuile-texte">{etape.libelle}</dd>
+              <small>{etape.par === "apprenant" ? etape.aide : "Demande un rendez-vous au pôle carrière"}</small>
+            </>
+          ) : (
+            <>
+              <dd className="tuile-texte">Ton dossier est prêt</dd>
+              <small>Le pôle carrière te propose aux entreprises partenaires</small>
+            </>
+          )}
+        </div>
+        <div className="tuile">
+          <dt>Offres proposées</dt>
+          <dd className="tuile-chiffre">{offres.length}</dd>
+          <small>
+            {offres.length === 0
+              ? "Elles arrivent une fois ton dossier complet"
+              : `dont ${offresOuvertes} encore ouverte${offresOuvertes > 1 ? "s" : ""}`}
+          </small>
+        </div>
+      </dl>
 
-        {(statut === "poste" || statut === "freelance") && (
-          <label className="champ">
-            <span>{statut === "freelance" ? "Ton premier client" : "Ton entreprise"}</span>
-            <input value={entreprise} onChange={(e) => setEntreprise(e.target.value)} />
-          </label>
-        )}
-
-        <label className="champ">
-          <span>Un message pour le pôle carrière (facultatif)</span>
-          <textarea rows={3} value={message} onChange={(e) => setMessage(e.target.value)} />
-        </label>
-
-        <button className="bouton" type="submit">
-          Envoyer ma mise à jour
-        </button>
-        {envoye && (
-          <p className="texte-succes" role="status">
-            Mise à jour envoyée. Elle apparaît dans ta fiche côté équipe.
+      <div className="espace">
+        <div className="espace-carte">
+          <h2>Ton dossier de candidature</h2>
+          <p className="secondaire">
+            Coche les étapes que tu as faites. Les autres sont validées par l'équipe lors de vos rendez-vous.
           </p>
-        )}
-      </form>
+          <ChecklistDossier
+            apprenant={a}
+            mode="apprenant"
+            cocher={(id, faite) => maj((x) => cocherEtape(x, id, faite))}
+          />
+        </div>
+
+        <div className="espace-colonne">
+          <form className="espace-carte" onSubmit={envoyer}>
+            <h2>Où en es-tu ?</h2>
+            <fieldset className="choix-statut">
+              <legend className="secondaire">Ta situation aujourd'hui</legend>
+              {STATUTS.filter((s) => s.id !== "formation").map((s) => (
+                <label key={s.id} className="case">
+                  <input
+                    type="radio"
+                    name="statut"
+                    value={s.id}
+                    checked={statut === s.id}
+                    onChange={() => {
+                      setStatut(s.id);
+                      setEnvoye(false);
+                    }}
+                  />
+                  {s.libelle}
+                </label>
+              ))}
+            </fieldset>
+
+            {(statut === "poste" || statut === "freelance") && (
+              <label className="champ">
+                <span>{statut === "freelance" ? "Ton premier client" : "Ton entreprise"}</span>
+                <input value={entreprise} onChange={(e) => setEntreprise(e.target.value)} />
+              </label>
+            )}
+
+            <label className="champ">
+              <span>Un message pour le pôle carrière (facultatif)</span>
+              <textarea rows={3} value={message} onChange={(e) => setMessage(e.target.value)} />
+            </label>
+
+            <button className="bouton" type="submit">
+              Envoyer ma mise à jour
+            </button>
+            {envoye && (
+              <p className="texte-succes" role="status">
+                Mise à jour envoyée. Elle apparaît dans ta fiche côté équipe.
+              </p>
+            )}
+          </form>
+          <div className="espace-carte">
+            <h2>Offres qu'on t'a proposées</h2>
+            {offres.length === 0 ? (
+              <p className="vide">Pas encore d'offre. Le pôle carrière t'en proposera selon ton projet.</p>
+            ) : (
+              <ul className="liste-simple">
+                {offres.map(({ entreprise: nomEntreprise, offre }) => (
+                  <li key={offre.id}>
+                    {offre.titre} chez {nomEntreprise} ({offre.contrat}){!offre.ouverte && " · pourvue"}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -16,11 +16,11 @@ Après la formation, le suivi des apprenants est souvent dispersé entre tableur
 
 | Écran | Pour qui | Ce qu'on y fait |
 | --- | --- | --- |
-| Tableau de bord | Équipe | Voir chaque promo d'un coup d'œil, le taux d'insertion à 6 mois, le délai moyen, les apprenants à relancer. Exporter les indicateurs en CSV. |
-| Apprenants | Équipe | Rechercher, filtrer, ajouter un apprenant, exporter la liste en CSV (ouvrable dans Excel). |
-| Fiche apprenant | Équipe | Changer le statut, planifier la prochaine action, noter les échanges, voir les offres proposées, supprimer la fiche. |
-| Entreprises & offres | Équipe | Suivre les partenaires et leurs offres, proposer des apprenants. |
-| Espace apprenant | Apprenant | L'apprenant indique lui-même où il en est ; sa fiche se met à jour sans relance manuelle. |
+| Tableau de bord | Équipe | Voir chaque promo d'un coup d'œil, le taux d'insertion à 6 mois, le délai moyen, les apprenants à relancer, et l'avancement des dossiers étape par étape. Exporter les indicateurs en CSV. |
+| Apprenants | Équipe | Rechercher, filtrer (dont « prêts à proposer »), voir l'avancement de chaque dossier, ajouter un apprenant, exporter la liste en CSV (ouvrable dans Excel). |
+| Fiche apprenant | Équipe | Changer le statut, valider les étapes du dossier, planifier la prochaine action, noter les échanges, voir les offres proposées, supprimer la fiche. |
+| Entreprises & offres | Équipe | Suivre les partenaires et leurs offres, proposer des apprenants (dossiers prêts en premier). |
+| Espace apprenant | Apprenant | Son tableau de bord (dossier, prochaine étape, offres), sa checklist de dossier, et un formulaire pour dire où il en est. Sa fiche se met à jour sans relance manuelle. |
 
 > Toutes les données sont fictives et calculées à partir de la date du jour, pour que la démo reste cohérente quel que soit le jour de visite. Elles sont enregistrées dans le navigateur (localStorage) : aucune donnée personnelle ne quitte l'ordinateur.
 
@@ -32,13 +32,16 @@ Après la formation, le suivi des apprenants est souvent dispersé entre tableur
 | Taux à 6 mois | Insérés dans les 6 mois après la fin de formation / apprenants dont ces 6 mois sont écoulés |
 | Délai moyen | Jours entre la fin de formation et la date d'insertion |
 | À relancer | Prochaine action dépassée, ou aucun contact depuis plus de 14 jours (hors apprenants en formation ou insérés) |
+| Dossier prêt à proposer | Les 7 étapes faites : rendez-vous objectif, CV envoyé, CV validé, LinkedIn, portfolio, pitch, simulation d'entretien |
+| Qui coche quoi | L'apprenant coche ses étapes (CV envoyé, LinkedIn, portfolio) ; l'équipe valide les autres |
+| KPI de préparation | Part des apprenants en accompagnement (non insérés) ayant fait chaque étape, et nombre de dossiers prêts |
 | Dernier contact | Mis à jour par une note, un changement de statut, une action faite ou une réponse de l'apprenant |
 
-Ces règles sont des fonctions pures dans [`src/regles.ts`](src/regles.ts), couvertes par des tests dans [`src/regles.test.ts`](src/regles.test.ts).
+Ces règles sont des fonctions pures dans [`src/regles.ts`](src/regles.ts) et [`src/dossier.ts`](src/dossier.ts), couvertes par des tests.
 
 ## Qualité
 
-- **Tests** : règles métier, calculs de dates (fin de mois, changement d'heure, fuseaux) et export CSV, avec Vitest.
+- **Tests** : règles métier, checklist du dossier, calculs de dates (fin de mois, changement d'heure, fuseaux) et export CSV, avec Vitest.
 - **Intégration continue** : à chaque modification, GitHub vérifie les types TypeScript, lance les tests et le build ([workflow](.github/workflows/ci.yml)).
 - **Accessibilité** : couleurs de statut au contraste WCAG AA (4,5:1), statut toujours écrit en plus de la couleur, panneaux utilisables au clavier (focus piégé, Échap, retour du focus).
 - **Responsive** : utilisable sur mobile.
@@ -61,6 +64,7 @@ npm run check    # types + tests + build, comme la CI
 src/
   types.ts            modèle de données (Apprenant, Entreprise, Offre)
   regles.ts           règles métier et indicateurs (testés)
+  dossier.ts          checklist du dossier et KPI de préparation (testés)
   dates.ts            calculs de dates sans décalage de fuseau (testés)
   csv.ts              export CSV compatible Excel (testé)
   store.ts            état de l'app et persistance locale

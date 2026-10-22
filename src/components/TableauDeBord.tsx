@@ -2,6 +2,7 @@ import type { Apprenant } from "../types";
 import { STATUTS, calculerIndicateurs, libelleStatut, raisonRelance } from "../regles";
 import { aujourdhui, formatDate } from "../dates";
 import { csvIndicateurs, telechargerCsv } from "../csv";
+import { indicateursDossier } from "../dossier";
 
 interface Props {
   apprenants: Apprenant[];
@@ -11,10 +12,13 @@ interface Props {
 export function TableauDeBord({ apprenants, ouvrir }: Props) {
   const today = aujourdhui();
   const ind = calculerIndicateurs(apprenants, today);
+  const dossiers = indicateursDossier(apprenants);
 
   // Regroupe les apprenants par promo, de la plus ancienne à la plus récente.
   const premiereFin = (promo: string) =>
-    apprenants.filter((a) => a.promo === promo).reduce((min, a) => (a.finFormation < min ? a.finFormation : min), "9999");
+    apprenants
+      .filter((a) => a.promo === promo)
+      .reduce((min, a) => (a.finFormation < min ? a.finFormation : min), "9999");
   const promos = [...new Set(apprenants.map((a) => a.promo))]
     .sort((x, y) => premiereFin(x).localeCompare(premiereFin(y)))
     .map((promo) => ({
@@ -31,7 +35,7 @@ export function TableauDeBord({ apprenants, ouvrir }: Props) {
         </div>
         <button
           className="bouton bouton-discret"
-          onClick={() => telechargerCsv(`indicateurs-insertion-${today}.csv`, csvIndicateurs(ind, today))}
+          onClick={() => telechargerCsv(`indicateurs-insertion-${today}.csv`, csvIndicateurs(ind, dossiers, today))}
         >
           Exporter les indicateurs
         </button>
@@ -123,6 +127,30 @@ export function TableauDeBord({ apprenants, ouvrir }: Props) {
           ))}
         </ul>
       )}
+
+      <h2 className="titre-section">Préparation des dossiers</h2>
+      <p className="lead-section">
+        <strong>
+          {dossiers.prets} apprenant{dossiers.prets > 1 ? "s" : ""} sur {dossiers.base}
+        </strong>{" "}
+        en accompagnement {dossiers.prets > 1 ? "sont prêts" : "est prêt"} à être proposé
+        {dossiers.prets > 1 ? "s" : ""} aux entreprises. Complétude moyenne des dossiers :{" "}
+        {dossiers.completudeMoyenne ?? 0}&nbsp;%.
+      </p>
+      <ul className="etapes-kpi" aria-label="Part des apprenants ayant fait chaque étape">
+        {dossiers.parEtape.map(({ etape, faites, pourcentage }) => (
+          <li key={etape.id}>
+            <span className="etapes-kpi-libelle">{etape.libelle}</span>
+            <span className="etapes-kpi-barre" aria-hidden="true">
+              <span style={{ width: `${pourcentage}%` }} />
+            </span>
+            <span className="etapes-kpi-valeur">
+              {faites}/{dossiers.base}
+            </span>
+          </li>
+        ))}
+      </ul>
+      <p className="secondaire">L'étape la moins avancée indique où concentrer les ateliers collectifs.</p>
     </section>
   );
 }

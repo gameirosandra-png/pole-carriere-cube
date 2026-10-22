@@ -5,7 +5,7 @@ import { creerDonneesDemo } from "./data/seed";
 // Persistance locale (MVP sans backend) : les données restent dans le navigateur.
 // La V2 remplacera ce module par une base partagée (Supabase).
 
-const CLE = "pole-carriere-cube:v2";
+const CLE = "pole-carriere-cube:v3";
 
 function charger(): Donnees {
   try {
