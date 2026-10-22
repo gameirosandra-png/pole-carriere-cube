@@ -29,6 +29,17 @@ Au premier passage, une **visite guidée** de 7 étapes présente l'app ; elle s
 
 > Toutes les données sont fictives et calculées à partir de la date du jour, pour que la démo reste cohérente quel que soit le jour de visite. Elles sont enregistrées dans le navigateur (localStorage) : aucune donnée personnelle ne quitte l'ordinateur.
 
+## Automatisation et IA
+
+| Fonction | Comment ça marche |
+| --- | --- |
+| **Récap par e-mail (Make)** | Le bouton « Envoyer le récap par e-mail » appelle la fonction serveur [`api/recap.ts`](api/recap.ts), qui construit l'e-mail (apprenants à relancer, dossiers prêts, taux d'insertion) et le transmet à un scénario Make : *Webhook → Gmail → Réponse*. Le destinataire est fixé dans Make (l'équipe du pôle), jamais par le visiteur. |
+| **Brief de rendez-vous (IA)** | Dans la fiche, « Préparer le rendez-vous avec l'IA » appelle [`api/brief.ts`](api/brief.ts), qui envoie à Claude (modèle Haiku) une fiche bornée : statut, étapes du dossier, offres, dernières notes. Réponse en 3 rubriques : situation, points à travailler, questions à poser. Si l'IA est indisponible, un brief est calculé à partir des règles du suivi. |
+
+Les deux fonctions limitent le rythme et le volume d'appels, et n'acceptent que des champs structurés et tronqués : elles ne peuvent servir ni de relais d'e-mails ni de chatbot générique.
+
+Variables d'environnement (Vercel) : `MAKE_RECAP_WEBHOOK` (URL du webhook Make) et `ANTHROPIC_API_KEY` (clé API Anthropic). Sans elles, l'app fonctionne et l'indique clairement.
+
 ## Règles métier
 
 | Indicateur | Règle |
@@ -55,7 +66,7 @@ Ces règles sont des fonctions pures dans [`src/regles.ts`](src/regles.ts), [`sr
 
 ## Stack
 
-React 19 + TypeScript, Vite, CSS sans framework, Vitest. Déployé sur Vercel à chaque push sur `main`. Construit avec Claude.
+React 19 + TypeScript, Vite, CSS sans framework, Vitest. Fonctions serveur Vercel, Make, API Claude. Déployé sur Vercel à chaque push sur `main`. Construit avec Claude.
 
 ## Lancer en local
 
@@ -74,6 +85,11 @@ src/
   dossier.ts          checklist du dossier et KPI de préparation (testés)
   matching.ts         suggestion de candidats pour une offre (testé)
   rapport.ts          entonnoir d'insertion et statistiques par promo (testés)
+  brief.ts            préparation de rendez-vous : données pour l'IA, brief de secours (testés)
+  api.ts              appels aux fonctions serveur
+api/
+  recap.ts            envoi du récap via Make
+  brief.ts            brief de rendez-vous rédigé par Claude
   dates.ts            calculs de dates sans décalage de fuseau (testés)
   csv.ts              export CSV compatible Excel (testé)
   store.ts            état de l'app et persistance locale
@@ -83,9 +99,9 @@ src/
 
 ## Prochaines étapes (V2)
 
-1. Base de données partagée (Supabase) et connexion de l'équipe du pôle.
+1. Base de données partagée (Supabase) et connexion de l'équipe du pôle par lien magique.
 2. Lien personnel et sécurisé pour l'espace apprenant, envoyé automatiquement chaque mois.
-3. Relances par e-mail (Make ou n8n) quand un apprenant passe en « À relancer ».
+3. Récap envoyé automatiquement chaque lundi par Make, à partir de la base partagée.
 4. Import des apprenants depuis l'outil de gestion de l'école.
 
 ---

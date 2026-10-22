@@ -4,6 +4,7 @@ import { aujourdhui, formatDate } from "../dates";
 import { csvIndicateurs, telechargerCsv } from "../csv";
 import { indicateursDossier } from "../dossier";
 import { Funnel } from "./Funnel";
+import { BoutonRecap } from "./BoutonRecap";
 
 interface Props {
   apprenants: Apprenant[];
@@ -45,6 +46,7 @@ export function TableauDeBord({ apprenants, ouvrir, lancerVisite }: Props) {
           >
             Exporter les indicateurs
           </button>
+          <BoutonRecap apprenants={apprenants} />
         </div>
       </header>
 

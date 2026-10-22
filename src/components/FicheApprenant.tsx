@@ -7,6 +7,7 @@ import { Pastille } from "./Pastille";
 import { Panneau } from "./Panneau";
 import { ChecklistDossier } from "./ChecklistDossier";
 import { cocherEtape } from "../dossier";
+import { PreparationRdv } from "./PreparationRdv";
 
 interface Props {
   apprenant: Apprenant;
@@ -136,6 +137,9 @@ export function FicheApprenant({ apprenant: a, entreprises, maj, supprimer, supp
         </button>
       </div>
       <p className="secondaire">Dernier contact : {formatDate(a.dernierContact)}</p>
+
+      <h3 className="fiche-titre">Préparer le rendez-vous</h3>
+      <PreparationRdv key={a.id} apprenant={a} entreprises={entreprises} />
 
       <h3 className="fiche-titre">Dossier de candidature</h3>
       <ChecklistDossier apprenant={a} mode="equipe" cocher={(id, faite) => maj((x) => cocherEtape(x, id, faite))} />
