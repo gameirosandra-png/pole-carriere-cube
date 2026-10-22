@@ -32,7 +32,7 @@ export default function App() {
           </span>
           <span>
             Pôle carrière
-            <small>École Cube · MVP</small>
+            <small>pour l'École Cube · MVP</small>
           </span>
         </div>
         <nav aria-label="Navigation principale">
@@ -48,7 +48,7 @@ export default function App() {
           ))}
         </nav>
         <div className="barre-pied">
-          <p>Données fictives, enregistrées dans votre navigateur.</p>
+          <p>Démo indépendante, non affiliée à l'École Cube. Données fictives, enregistrées dans votre navigateur.</p>
           <button className="bouton-texte" onClick={() => confirm("Revenir aux données de démo ?") && reinitialiser()}>
             Réinitialiser la démo
           </button>

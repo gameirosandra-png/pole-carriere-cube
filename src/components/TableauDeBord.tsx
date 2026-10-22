@@ -28,7 +28,7 @@ export function TableauDeBord({ apprenants, ouvrir }: Props) {
 
   return (
     <section aria-labelledby="titre-tdb">
-      <header className="entete-page entete-avec-actions">
+      <header className="entete-page entete-avec-actions entete-banniere">
         <div>
           <h1 id="titre-tdb">Où en sont les apprenants</h1>
           <p className="sous-titre">Chaque carré est une personne. Cliquez dessus pour ouvrir sa fiche.</p>

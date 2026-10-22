@@ -1,22 +1,29 @@
 /* ---------- Jetons ---------- */
 :root {
-  --encre: #1e2a36;
-  --encre-douce: #4a5663;
+  /* Palette inspirée de l'univers École Cube : violet, nuit, touche d'orange */
+  --violet: #6e1fff;
+  --violet-nuit: #2a0462;
+  --violet-pale: #f3ecff;
+  --orange: #fe771b;
+  --encre: #1d1d23;
+  --encre-douce: #5f6069;
   --papier: #ffffff;
-  --brume: #eef1ee;
-  --trait: #d8ddd8;
+  --brume: #f3f4f6;
+  --trait: #e5e7eb;
 
   /* Une couleur par statut : la même partout dans l'app */
   --s-formation: #66707c;
   --s-recherche: #3a5ba0;
-  --s-entretiens: #9a6a12;
+  --s-entretiens: #b5520c;
   --s-poste: #2e7d5b;
-  --s-freelance: #6b4fa0;
+  --s-freelance: #a3266f;
   --alerte: #b5483b;
   /* Toutes ces couleurs passent 4,5:1 avec du texte blanc (WCAG AA) */
 
-  --rayon: 6px;
-  font-family: "Instrument Sans", system-ui, sans-serif;
+  --rayon: 4px;
+  /* Coin coupé, signature visuelle reprise des encarts du site École Cube */
+  --coupe: 22px;
+  font-family: "Inter", system-ui, sans-serif;
   color: var(--encre);
   background: var(--papier);
   font-size: 16px;
@@ -41,14 +48,19 @@ textarea {
   color: inherit;
 }
 :focus-visible {
-  outline: 2px solid var(--s-recherche);
+  outline: 2px solid var(--violet);
   outline-offset: 2px;
 }
 h1,
 h2,
 h3 {
+  font-family: "Outfit", "Inter", system-ui, sans-serif;
+  font-weight: 500;
   line-height: 1.2;
   margin: 0;
+}
+a {
+  color: var(--violet);
 }
 
 /* ---------- Mise en page ---------- */
@@ -58,8 +70,8 @@ h3 {
   min-height: 100vh;
 }
 .barre {
-  background: var(--encre);
-  color: #e8ece9;
+  background: var(--violet-nuit);
+  color: #ece4ff;
   padding: 24px 16px;
   display: flex;
   flex-direction: column;
@@ -83,12 +95,17 @@ h3 {
 .marque-logo {
   width: 34px;
   height: 34px;
-  border-radius: var(--rayon);
-  background: var(--s-poste);
+  background: var(--violet);
+  clip-path: polygon(0 0, calc(100% - 9px) 0, 100% 9px, 100% 100%, 0 100%);
   display: grid;
   place-items: center;
   font-size: 13px;
   font-weight: 700;
+}
+.marque > span:last-child {
+  font-family: "Outfit", "Inter", sans-serif;
+  font-weight: 500;
+  font-size: 17px;
 }
 nav {
   display: flex;
@@ -101,7 +118,7 @@ nav {
   text-align: left;
   padding: 9px 12px;
   border-radius: var(--rayon);
-  color: #c8d0cb;
+  color: #d6c7f7;
   cursor: pointer;
 }
 .nav-lien:hover {
@@ -109,14 +126,14 @@ nav {
   color: #fff;
 }
 .nav-lien.actif {
-  background: rgba(255, 255, 255, 0.12);
+  background: var(--violet);
   color: #fff;
   font-weight: 600;
 }
 .barre-pied {
   margin-top: auto;
   font-size: 13px;
-  opacity: 0.75;
+  opacity: 0.85;
 }
 .barre-pied p {
   margin: 0 0 6px;
@@ -139,8 +156,8 @@ nav {
   margin-bottom: 28px;
 }
 .entete-page h1 {
-  font-size: 30px;
-  font-weight: 700;
+  font-size: 32px;
+  font-weight: 500;
   letter-spacing: -0.01em;
 }
 .sous-titre,
@@ -161,6 +178,28 @@ nav {
 .vide {
   color: var(--encre-douce);
   font-style: italic;
+}
+
+/* Bannière du tableau de bord : encart violet au coin coupé */
+.entete-banniere {
+  background: var(--violet);
+  color: #fff;
+  padding: 26px 28px;
+  clip-path: polygon(0 0, calc(100% - var(--coupe)) 0, 100% var(--coupe), 100% 100%, 0 100%);
+}
+.entete-banniere h1 {
+  color: #fff;
+}
+.entete-banniere .sous-titre {
+  color: #e8dcff;
+}
+.entete-banniere .bouton-discret {
+  background: transparent;
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.7);
+}
+.entete-banniere .bouton-discret:hover {
+  background: rgba(255, 255, 255, 0.12);
 }
 
 /* ---------- Statuts : couleurs partagées ---------- */
@@ -294,8 +333,9 @@ nav {
 }
 .chiffres dd {
   margin: 4px 0 2px;
-  font-size: 34px;
-  font-weight: 600;
+  font-family: "Outfit", "Inter", sans-serif;
+  font-size: 36px;
+  font-weight: 500;
   letter-spacing: -0.02em;
 }
 .chiffres small {
@@ -379,9 +419,9 @@ textarea {
   cursor: pointer;
 }
 .bouton {
-  background: var(--encre);
+  background: var(--violet);
   color: #fff;
-  border: 1px solid var(--encre);
+  border: 1px solid var(--violet);
   border-radius: var(--rayon);
   padding: 8px 14px;
   font-weight: 500;
@@ -394,8 +434,15 @@ textarea {
 }
 .bouton-discret {
   background: var(--papier);
+  color: var(--violet);
+  border-color: var(--violet);
+}
+/* Action principale de l'écran : orange, avec un texte sombre pour rester lisible (contraste 6:1) */
+.bouton-cta {
+  background: var(--orange);
+  border-color: var(--orange);
   color: var(--encre);
-  border-color: var(--trait);
+  font-weight: 600;
 }
 .texte-alerte {
   color: var(--alerte);
@@ -730,7 +777,7 @@ textarea {
 .jauge-rempli {
   display: block;
   height: 100%;
-  background: var(--s-recherche);
+  background: var(--violet);
 }
 .jauge-pret {
   background: var(--s-poste);
@@ -824,7 +871,7 @@ textarea {
 .etapes-kpi-barre span {
   display: block;
   height: 100%;
-  background: var(--encre);
+  background: var(--violet);
 }
 .etapes-kpi-valeur {
   text-align: right;
@@ -864,8 +911,9 @@ textarea {
   margin: 0;
 }
 .tuile-chiffre {
-  font-size: 30px;
-  font-weight: 600;
+  font-family: "Outfit", "Inter", sans-serif;
+  font-size: 32px;
+  font-weight: 500;
   line-height: 1.1;
 }
 .tuile-texte {

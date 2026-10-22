@@ -52,7 +52,7 @@ export function Apprenants({ apprenants, ouvrir, ajouter }: Props) {
           >
             Exporter en CSV
           </button>
-          <button className="bouton" onClick={() => setFormulaireOuvert(true)}>
+          <button className="bouton bouton-cta" onClick={() => setFormulaireOuvert(true)}>
             Ajouter un apprenant
           </button>
         </div>
