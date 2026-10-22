@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" role="img" aria-label="Pôle carrière">
+  <!-- Trois carrés qui montent : chaque carré est un apprenant, la marche est son parcours vers l'emploi.
+       Le dernier, orange et au coin coupé, est l'arrivée en poste. -->
+  <rect x="3" y="25" width="11" height="11" rx="1.5" fill="#C9B8EC"/>
+  <rect x="14.5" y="14.5" width="11" height="11" rx="1.5" fill="#6E1FFF"/>
+  <path d="M27.5 4h6l3.5 3.5V15H26V5.5A1.5 1.5 0 0 1 27.5 4z" fill="#FE771B"/>
+</svg>

@@ -27,9 +27,7 @@ export default function App() {
     <div className="app">
       <aside className="barre">
         <div className="marque">
-          <span className="marque-logo" aria-hidden="true">
-            PC
-          </span>
+          <img className="marque-logo" src="/logo.svg" alt="" width="38" height="38" />
           <span>
             Pôle carrière
             <small>pour l'École Cube · MVP</small>

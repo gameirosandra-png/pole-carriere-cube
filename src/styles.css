@@ -93,14 +93,9 @@ a {
   opacity: 0.7;
 }
 .marque-logo {
-  width: 34px;
-  height: 34px;
-  background: var(--violet);
-  clip-path: polygon(0 0, calc(100% - 9px) 0, 100% 9px, 100% 100%, 0 100%);
-  display: grid;
-  place-items: center;
-  font-size: 13px;
-  font-weight: 700;
+  width: 38px;
+  height: 38px;
+  flex: none;
 }
 .marque > span:last-child {
   font-family: "Outfit", "Inter", sans-serif;

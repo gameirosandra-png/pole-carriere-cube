@@ -1,3 +1,5 @@
+<img src="public/logo.svg" alt="" width="56" />
+
 # Pôle carrière · École Cube (MVP)
 
 [![Vérifications](https://github.com/gameirosandra-png/pole-carriere-cube/actions/workflows/ci.yml/badge.svg)](https://github.com/gameirosandra-png/pole-carriere-cube/actions/workflows/ci.yml)
