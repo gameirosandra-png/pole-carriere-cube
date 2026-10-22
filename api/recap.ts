@@ -63,7 +63,7 @@ export async function POST(request: Request): Promise<Response> {
   });
   const prets = (Array.isArray(corps.prets) ? corps.prets : []).slice(0, 20).map((n) => texte(n, 60));
   const taux = corps.tauxSixMois === null ? null : entier(corps.tauxSixMois);
-  const date = texte(corps.date, 20);
+  const date = texte(corps.date, 40);
 
   const ligne = (r: Relance) =>
     `<li><strong>${echapperHtml(r.nom)}</strong> · ${echapperHtml(r.raison)}${r.action ? ` · ${echapperHtml(r.action)}` : ""}</li>`;

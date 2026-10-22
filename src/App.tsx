@@ -8,6 +8,7 @@ import { FicheApprenant } from "./components/FicheApprenant";
 import { Rapport } from "./components/Rapport";
 import { VisiteGuidee, type VueVisite } from "./components/VisiteGuidee";
 import { ModeEquipe } from "./components/ModeEquipe";
+import { AteliersCollectifs } from "./components/AteliersCollectifs";
 import {
   deconnecter,
   lireErreurLienMagique,
@@ -21,6 +22,7 @@ type Vue = VueVisite;
 const VUES: { id: Vue; libelle: string }[] = [
   { id: "tdb", libelle: "Tableau de bord" },
   { id: "apprenants", libelle: "Apprenants" },
+  { id: "ateliers", libelle: "Ateliers" },
   { id: "entreprises", libelle: "Entreprises & offres" },
   { id: "espace", libelle: "Espace apprenant" },
   { id: "rapport", libelle: "Rapport" },
@@ -153,10 +155,24 @@ export default function App() {
           </div>
         )}
         {vue === "tdb" && (
-          <TableauDeBord apprenants={donnees.apprenants} ouvrir={setFicheId} lancerVisite={lancerVisite} />
+          <TableauDeBord
+            apprenants={donnees.apprenants}
+            ateliers={donnees.ateliers ?? []}
+            ouvrir={setFicheId}
+            lancerVisite={lancerVisite}
+            voirAteliers={() => setVue("ateliers")}
+          />
         )}
         {vue === "apprenants" && (
           <Apprenants apprenants={donnees.apprenants} ouvrir={setFicheId} ajouter={ajouterApprenant} />
+        )}
+        {vue === "ateliers" && (
+          <AteliersCollectifs
+            donnees={donnees}
+            setDonnees={setDonnees}
+            modifierAvecAnnulation={modifierAvecAnnulation}
+            ouvrir={setFicheId}
+          />
         )}
         {vue === "entreprises" && (
           <Entreprises

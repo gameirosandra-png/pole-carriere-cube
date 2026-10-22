@@ -254,7 +254,7 @@ function Suggestions({
         </ol>
       )}
       <p className="note-methode">
-        Score sur 100 : dossier (40), adéquation entre poste visé et offre (35), disponibilité (25).
+        Score sur 100 : parcours d'accompagnement (40), adéquation entre poste visé et offre (35), disponibilité (25).
       </p>
     </div>
   );
@@ -285,7 +285,7 @@ function SelectionCandidat({
       {choix.map((a) => (
         <option key={a.id} value={a.id}>
           {a.prenom} {a.nom} ·{" "}
-          {pretAProposer(a) ? "dossier prêt" : `dossier ${completude(a).faites}/${completude(a).total}`}
+          {pretAProposer(a) ? "parcours bouclé" : `parcours ${completude(a).faites}/${completude(a).total}`}
         </option>
       ))}
     </select>

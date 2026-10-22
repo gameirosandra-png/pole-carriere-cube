@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { Apprenant, Donnees, Entreprise } from "./types";
+import type { Apprenant, AtelierCollectif, Donnees, Entreprise } from "./types";
 import { creerDonneesDemo } from "./data/seed";
 import { changementsDonnees } from "./synchro";
 import { ecrire, lireTable, sessionValide, supprimer, type Session } from "./supabase";
@@ -8,7 +8,7 @@ import { ecrire, lireTable, sessionValide, supprimer, type Session } from "./sup
 // - démo (par défaut) : données fictives enregistrées dans le navigateur (localStorage) ;
 // - équipe : données partagées dans Supabase, après connexion par lien magique.
 
-const CLE = "pole-carriere-cube:v3";
+const CLE = "pole-carriere-cube:v4";
 const DUREE_ANNULATION_MS = 8000;
 const DELAI_ENREGISTREMENT_MS = 600;
 const INTERVALLE_ACTUALISATION_MS = 20_000;
@@ -52,11 +52,12 @@ export function useDonnees(session: Session | null, sessionPerdue: () => void) {
   const lireBase = useCallback(async (): Promise<Donnees | null> => {
     const s = await sessionFraiche();
     if (!s) return null;
-    const [apprenants, entreprises] = await Promise.all([
+    const [apprenants, entreprises, ateliers] = await Promise.all([
       lireTable<Apprenant>(s, "apprenants"),
       lireTable<Entreprise>(s, "entreprises"),
+      lireTable<AtelierCollectif>(s, "ateliers"),
     ]);
-    return { apprenants, entreprises };
+    return { apprenants, entreprises, ateliers };
   }, [sessionFraiche]);
 
   // Changement de mode : connexion → chargement de la base ; déconnexion → retour à la démo locale.
@@ -109,6 +110,8 @@ export function useDonnees(session: Session | null, sessionPerdue: () => void) {
           ecrire(s, "entreprises", c.entreprises.aEcrire),
           supprimer(s, "apprenants", c.apprenants.aSupprimer),
           supprimer(s, "entreprises", c.entreprises.aSupprimer),
+          ecrire(s, "ateliers", c.ateliers.aEcrire),
+          supprimer(s, "ateliers", c.ateliers.aSupprimer),
         ]);
         distant.current = instantane;
         setSynchro("synchronise");
@@ -177,6 +180,7 @@ export function useDonnees(session: Session | null, sessionPerdue: () => void) {
   const supprimerApprenant = (id: string) => {
     const a = donnees.apprenants.find((x) => x.id === id);
     modifierAvecAnnulation(`Fiche de ${a?.prenom ?? ""} ${a?.nom ?? ""} supprimée`.trim(), (d) => ({
+      ateliers: (d.ateliers ?? []).map((x) => ({ ...x, inscrits: x.inscrits.filter((i) => i !== id) })),
       apprenants: d.apprenants.filter((x) => x.id !== id),
       entreprises: d.entreprises.map((e) => ({
         ...e,

@@ -13,43 +13,48 @@ export interface DefinitionEtape {
   par: "apprenant" | "equipe";
 }
 
-/** Dans l'ordre où on conseille de les faire. */
+/** Le parcours d'accompagnement, dans l'ordre des séances. */
 export const ETAPES_DOSSIER: DefinitionEtape[] = [
   {
     id: "rdvObjectif",
-    libelle: "Rendez-vous objectif professionnel",
-    aide: "Cadrer le poste visé, le secteur et le calendrier de recherche.",
+    libelle: "Séance 1 · Bilan et objectif",
+    aide: "Clarifier le poste visé, les atouts du parcours d'avant, le calendrier de recherche.",
     par: "equipe",
   },
   {
-    id: "cvEnvoye",
-    libelle: "CV envoyé au pôle carrière",
-    aide: "Transmettre la dernière version du CV pour relecture.",
+    id: "cv",
+    libelle: "Séance 2 · Atelier CV",
+    aide: "Revoir le CV sur 6 critères et réécrire l'accroche.",
+    par: "equipe",
+  },
+  {
+    id: "portfolio",
+    libelle: "Séance 3 · Atelier portfolio",
+    aide: "Au moins deux projets présentables : problème, solution, outils, démo, résultat.",
     par: "apprenant",
   },
-  { id: "cvValide", libelle: "CV relu et validé", aide: "L'équipe valide le CV après relecture.", par: "equipe" },
   {
     id: "linkedin",
-    libelle: "Profil LinkedIn à jour",
+    libelle: "Séance 4 · Profil LinkedIn",
     aide: "Titre, résumé et projets alignés avec le poste visé.",
     par: "apprenant",
   },
   {
-    id: "portfolio",
-    libelle: "Portfolio de projets en ligne",
-    aide: "Au moins deux projets présentables, avec un lien de démo.",
-    par: "apprenant",
-  },
-  {
     id: "pitch",
-    libelle: "Pitch de présentation travaillé",
-    aide: "Se présenter en 2 minutes : parcours, projets, poste visé.",
+    libelle: "Séance 5 · Pitch de 2 minutes",
+    aide: "Se présenter avec conviction : parcours, preuve, projet.",
     par: "equipe",
   },
   {
     id: "simulation",
-    libelle: "Simulation d'entretien réalisée",
-    aide: "Un entretien blanc avec retour de l'équipe.",
+    libelle: "Séance 6 · Simulation d'entretien",
+    aide: "Un entretien blanc noté, avec un retour concret.",
+    par: "equipe",
+  },
+  {
+    id: "negociation",
+    libelle: "Séance 7 · Négociation salariale",
+    aide: "Fixer sa prétention à partir du marché et préparer ses arguments.",
     par: "equipe",
   },
 ];

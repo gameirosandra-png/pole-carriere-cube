@@ -9,7 +9,7 @@ const hugo = demo.apprenants.find((a) => a.id === "a10")!;
 describe("brief de rendez-vous", () => {
   it("n'envoie à l'IA que les champs utiles, dont les étapes manquantes", () => {
     const d = donneesPourBrief(hugo, demo.entreprises, TODAY);
-    expect(d.etapesManquantes.join(",")).toBe("Simulation d'entretien réalisée");
+    expect(d.etapesManquantes.join(",")).toBe("Séance 6 · Simulation d'entretien,Séance 7 · Négociation salariale");
     expect(d.offres[0]).toBe("Chef de projet no-code chez Atelier Merlin");
     expect(d.joursSansContact).toBe(12);
   });
@@ -27,6 +27,6 @@ describe("brief de rendez-vous", () => {
     const r = briefSansIA(hugo, demo.entreprises, TODAY);
     expect(r.map((x) => x.titre).join(",")).toBe("Situation,Points à travailler,Questions à poser");
     expect(r[0].points.some((p) => p.includes("action en retard"))).toBe(true);
-    expect(r[1].points[0]).toBe("Avancer sur : simulation d'entretien réalisée");
+    expect(r[1].points[0]).toBe("Avancer sur : simulation d'entretien");
   });
 });

@@ -2,7 +2,7 @@
 // connexion par lien magique, rafraîchissement de session, lecture et écriture des documents.
 // La clé publishable est publique par nature : la sécurité repose sur les règles RLS de la base.
 
-import type { Apprenant, Entreprise } from "./types";
+import type { Apprenant, AtelierCollectif, Entreprise } from "./types";
 
 export const SUPABASE_URL = "https://yxnvgytdjxtqxqhoxbth.supabase.co";
 export const SUPABASE_CLE_PUBLIQUE = "sb_publishable_YnWosDgrboegfPruuv6xqA_Gh5xn-09";
@@ -122,7 +122,7 @@ export async function deconnecter(s: Session | null) {
 
 /* ---------- Données ---------- */
 
-type Table = "apprenants" | "entreprises";
+type Table = "apprenants" | "entreprises" | "ateliers";
 
 const entetes = (s: Session) => ({
   apikey: SUPABASE_CLE_PUBLIQUE,
@@ -141,7 +141,7 @@ export async function lireTable<T>(s: Session, table: Table): Promise<T[]> {
 }
 
 /** Insère ou met à jour des documents (par id). */
-export async function ecrire(s: Session, table: Table, documents: (Apprenant | Entreprise)[]) {
+export async function ecrire(s: Session, table: Table, documents: (Apprenant | Entreprise | AtelierCollectif)[]) {
   if (!documents.length) return;
   const r = await fetch(`${SUPABASE_URL}/rest/v1/${table}?on_conflict=id`, {
     method: "POST",

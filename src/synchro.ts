@@ -25,10 +25,7 @@ export function comparer<T extends AvecId>(avant: T[], apres: T[]): Changements<
 export function changementsDonnees(avant: Donnees, apres: Donnees) {
   const apprenants = comparer(avant.apprenants, apres.apprenants);
   const entreprises = comparer(avant.entreprises, apres.entreprises);
-  const vide =
-    !apprenants.aEcrire.length &&
-    !apprenants.aSupprimer.length &&
-    !entreprises.aEcrire.length &&
-    !entreprises.aSupprimer.length;
-  return { apprenants, entreprises, vide };
+  const ateliers = comparer(avant.ateliers ?? [], apres.ateliers ?? []);
+  const vide = [apprenants, entreprises, ateliers].every((c) => !c.aEcrire.length && !c.aSupprimer.length);
+  return { apprenants, entreprises, ateliers, vide };
 }

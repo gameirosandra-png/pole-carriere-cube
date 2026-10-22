@@ -87,12 +87,12 @@ export function Rapport({ apprenants }: { apprenants: Apprenant[] }) {
         <h3>Parcours d'insertion</h3>
         <Funnel apprenants={apprenants} />
 
-        <h3>Préparation des dossiers</h3>
+        <h3>Parcours d'accompagnement</h3>
         <table className="tableau rapport-tableau">
           <thead>
             <tr>
-              <th scope="col">Étape du dossier</th>
-              <th scope="col">Apprenants l'ayant faite</th>
+              <th scope="col">Séance</th>
+              <th scope="col">Apprenants l'ayant suivie</th>
             </tr>
           </thead>
           <tbody>

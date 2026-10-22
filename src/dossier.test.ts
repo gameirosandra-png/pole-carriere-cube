@@ -22,7 +22,10 @@ const apprenant = (champs: Partial<Apprenant>): Apprenant => ({
 describe("checklist du dossier", () => {
   it("calcule la complétude, y compris sans dossier", () => {
     expect(completude(apprenant({})).pourcentage).toBe(0);
-    expect(completude(apprenant({ dossier: { rdvObjectif: "2026-10-01", cvEnvoye: "2026-10-02" } })).faites).toBe(2);
+    expect(
+      completude(apprenant({ dossier: { rdvObjectif: "2026-10-01", cv: "2026-10-02", cvEnvoye: "2026-09-01" } }))
+        .faites,
+    ).toBe(2);
     expect(completude(apprenant({ dossier: TOUT })).pourcentage).toBe(100);
   });
 
@@ -35,7 +38,7 @@ describe("checklist du dossier", () => {
 
   it("propose la première étape manquante dans l'ordre conseillé", () => {
     expect(prochaineEtape(apprenant({}))?.id).toBe("rdvObjectif");
-    expect(prochaineEtape(apprenant({ dossier: { rdvObjectif: "2026-10-01" } }))?.id).toBe("cvEnvoye");
+    expect(prochaineEtape(apprenant({ dossier: { rdvObjectif: "2026-10-01" } }))?.id).toBe("cv");
     expect(prochaineEtape(apprenant({ dossier: TOUT }))).toBeNull();
   });
 

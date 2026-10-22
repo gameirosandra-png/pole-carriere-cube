@@ -284,33 +284,124 @@ export function creerDonneesDemo(today = aujourdhui()): Donnees {
     ],
   };
 
-  // Avancement du dossier de chaque apprenant (étapes faites, dans l'ordre conseillé).
-  const TOUTES: EtapeDossier[] = [
-    "rdvObjectif",
-    "cvEnvoye",
-    "cvValide",
-    "linkedin",
-    "portfolio",
-    "pitch",
-    "simulation",
-  ];
+  // Avancement du parcours de chaque apprenant (séances faites, dans l'ordre).
+  const TOUTES: EtapeDossier[] = ["rdvObjectif", "cv", "portfolio", "linkedin", "pitch", "simulation", "negociation"];
   const etapes: Record<string, EtapeDossier[]> = {
-    a4: ["rdvObjectif", "cvEnvoye", "cvValide", "linkedin", "pitch"],
+    a4: ["rdvObjectif", "cv", "linkedin", "pitch"],
     a7: TOUTES,
-    a8: ["rdvObjectif", "cvEnvoye"],
-    a10: ["rdvObjectif", "cvEnvoye", "cvValide", "linkedin", "portfolio", "pitch"],
+    a8: ["rdvObjectif", "cv"],
+    a10: ["rdvObjectif", "cv", "portfolio", "linkedin", "pitch"],
     a11: TOUTES,
     a13: ["rdvObjectif"],
-    a14: ["rdvObjectif", "cvEnvoye"],
-    a15: ["rdvObjectif", "cvEnvoye", "cvValide", "linkedin"],
+    a14: ["rdvObjectif", "cv"],
+    a15: ["rdvObjectif", "cv", "portfolio", "linkedin"],
     a16: ["rdvObjectif"],
   };
-  const avecDossier = (a: Apprenant): Apprenant => {
-    // Les apprenants insérés ont un dossier complet, bouclé avant leur embauche.
-    const faites = a.dateInsertion ? TOUTES : (etapes[a.id] ?? []);
-    const debut = a.dateInsertion ? ajouterJours(a.dateInsertion, -30) : j(-45);
-    return { ...a, dossier: Object.fromEntries(faites.map((e, i) => [e, ajouterJours(debut, i * 5)])) };
+
+  // Parcours d'avant la reconversion : l'atout que l'accompagnement aide à valoriser.
+  const profils: Record<string, Pick<Apprenant, "parcoursAvant" | "anneesExperience">> = {
+    a4: { parcoursAvant: "6 ans comme assistant logistique", anneesExperience: 6 },
+    a7: { parcoursAvant: "5 ans dans l'hôtellerie", anneesExperience: 5 },
+    a8: { parcoursAvant: "3 ans en cabinet comptable", anneesExperience: 3 },
+    a10: { parcoursAvant: "8 ans dans la grande distribution, dont 3 comme chef de rayon", anneesExperience: 8 },
+    a11: { parcoursAvant: "4 ans en agence événementielle", anneesExperience: 4 },
+    a13: { parcoursAvant: "2 ans au service client d'un opérateur", anneesExperience: 2 },
+    a14: { parcoursAvant: "7 ans dans l'enseignement", anneesExperience: 7 },
+    a15: { parcoursAvant: "4 ans en ressources humaines", anneesExperience: 4 },
+    a16: { parcoursAvant: "5 ans dans la vente", anneesExperience: 5 },
   };
 
-  return { ...donnees, apprenants: donnees.apprenants.map(avecDossier) };
+  const tout = { probleme: true, solution: true, outils: true, demo: true, resultat: true };
+  const accompagnements: Record<string, Apprenant["accompagnement"]> = {
+    a10: {
+      cv: {
+        notes: { titre: 2, accroche: 1, projets: 2, resultats: 0, competences: 2, lisibilite: 1 },
+        accrocheAvant: "Chef de rayon en reconversion, motivé et polyvalent, à la recherche d'un nouveau défi.",
+        accrocheApres:
+          "Product Builder no-code : je conçois des outils internes qui font gagner du temps aux équipes terrain. 8 ans en grande distribution, 3 projets livrés avec Airtable, Make et Lovable.",
+      },
+      portfolio: [
+        { id: "p1", nom: "Suivi des ruptures en magasin", lien: "", criteres: tout },
+        {
+          id: "p2",
+          nom: "Planning des équipes du week-end",
+          criteres: { probleme: true, solution: true, outils: true, demo: true },
+        },
+        { id: "p3", nom: "Formulaire de retours clients", criteres: { solution: true, outils: true } },
+      ],
+      salaire: { poste: "productBuilder", zone: "idf", contrat: "salarie" },
+      convaincre: {
+        motivation: "dans le retail, pour outiller les équipes terrain que je connais bien.",
+        simulation: { clarte: 3, star: 2, exemples: 3, posture: 3, questions: 2 },
+      },
+    },
+    a4: {
+      cv: { notes: { titre: 1, accroche: 0, projets: 1, resultats: 0 } },
+      portfolio: [{ id: "p4", nom: "Tableau de suivi des livraisons", criteres: { probleme: true, outils: true } }],
+    },
+    a7: {
+      cv: { notes: { titre: 2, accroche: 2, projets: 2, resultats: 2, competences: 2, lisibilite: 2 } },
+      portfolio: [
+        { id: "p5", nom: "App de réservation pour un hôtel", criteres: tout },
+        { id: "p6", nom: "Automatisation des check-in", criteres: tout },
+      ],
+      salaire: { poste: "productBuilder", zone: "idf", contrat: "salarie" },
+      convaincre: { simulation: { clarte: 4, star: 3, exemples: 4, posture: 3, questions: 3 } },
+    },
+  };
+
+  const enrichir = (a: Apprenant): Apprenant => {
+    // Les apprenants insérés ont un parcours complet, bouclé avant leur embauche.
+    const faites = a.dateInsertion ? TOUTES : (etapes[a.id] ?? []);
+    const debut = a.dateInsertion ? ajouterJours(a.dateInsertion, -40) : j(-45);
+    return {
+      ...a,
+      ...profils[a.id],
+      accompagnement: accompagnements[a.id],
+      dossier: Object.fromEntries(faites.map((e, i) => [e, ajouterJours(debut, i * 5)])),
+    };
+  };
+
+  return {
+    ...donnees,
+    apprenants: donnees.apprenants.map(enrichir),
+    ateliers: [
+      {
+        id: "at1",
+        theme: "portfolio",
+        titre: "Raconter un projet dans son portfolio",
+        date: j(2),
+        heure: "18:00",
+        places: 8,
+        inscrits: ["a4", "a15"],
+      },
+      {
+        id: "at2",
+        theme: "negociation",
+        titre: "Négocier son premier salaire",
+        date: j(5),
+        heure: "12:30",
+        places: 10,
+        inscrits: ["a10"],
+      },
+      {
+        id: "at3",
+        theme: "simulation",
+        titre: "Entretiens blancs en binôme",
+        date: j(9),
+        heure: "18:00",
+        places: 6,
+        inscrits: [],
+      },
+      {
+        id: "at4",
+        theme: "linkedin",
+        titre: "Un profil LinkedIn qui attire les recruteurs",
+        date: j(14),
+        heure: "18:30",
+        places: 12,
+        inscrits: ["a14", "a15", "a16"],
+      },
+    ],
+  };
 }

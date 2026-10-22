@@ -55,7 +55,9 @@ export function briefSansIA(a: Apprenant, entreprises: Entreprise[], today = auj
   const relance = raisonRelance(a, today);
   if (relance) situation.push(`À relancer : ${relance.toLowerCase()}`);
 
-  const points = d.etapesManquantes.slice(0, 3).map((e) => `Avancer sur : ${e.toLowerCase()}`);
+  const points = d.etapesManquantes
+    .slice(0, 3)
+    .map((e) => `Avancer sur : ${e.replace(/^Séance \d · /, "").toLowerCase()}`);
   if (!points.length) points.push("Dossier complet : le proposer aux offres ouvertes");
 
   const questions = [

@@ -47,7 +47,7 @@ export function scorer(a: Apprenant, offre: Offre): Suggestion {
   // 1. Dossier : proportionnel à la complétude.
   const c = completude(a);
   const scoreDossier = Math.round((c.faites / c.total) * POIDS.dossier);
-  raisons.push(pretAProposer(a) ? "Dossier prêt" : `Dossier ${c.faites}/${c.total}`);
+  raisons.push(pretAProposer(a) ? "Parcours bouclé" : `Parcours ${c.faites}/${c.total}`);
 
   // 2. Poste visé : part des mots du poste visé qu'on retrouve dans l'intitulé de l'offre.
   const vises = motsCles(a.posteVise);

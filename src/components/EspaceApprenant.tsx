@@ -109,7 +109,7 @@ function PageApprenant({
 
       <dl className="tuiles">
         <div className="tuile">
-          <dt>Ton dossier</dt>
+          <dt>Ton parcours</dt>
           <dd className="tuile-chiffre">
             {c.faites}/{c.total}
           </dd>
@@ -152,9 +152,9 @@ function PageApprenant({
 
       <div className="espace">
         <div className="espace-carte">
-          <h2>Ton dossier de candidature</h2>
+          <h2>Ton parcours en 7 séances</h2>
           <p className="secondaire">
-            Coche les étapes que tu as faites. Les autres sont validées par l'équipe lors de vos rendez-vous.
+            Coche ce que tu as fait de ton côté. Les séances avec l'équipe sont validées lors de vos rendez-vous.
           </p>
           <ChecklistDossier
             apprenant={a}

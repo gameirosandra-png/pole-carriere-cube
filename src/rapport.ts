@@ -30,7 +30,7 @@ function niveau(a: Apprenant): number {
 
 const ETAPES: { id: EtapeFunnel["id"]; libelle: string }[] = [
   { id: "sortis", libelle: "Sortis de formation" },
-  { id: "dossier", libelle: "Dossier prêt" },
+  { id: "dossier", libelle: "Parcours bouclé" },
   { id: "entretiens", libelle: "En entretiens ou au-delà" },
   { id: "insertion", libelle: "En poste ou freelance" },
 ];

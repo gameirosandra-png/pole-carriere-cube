@@ -2,7 +2,7 @@ import type { Apprenant } from "../types";
 import { funnelInsertion, goulot } from "../rapport";
 
 const CONSEIL: Record<string, string> = {
-  dossier: "Priorité : ateliers collectifs pour compléter les dossiers (portfolio, simulation d'entretien).",
+  dossier: "Priorité : ateliers collectifs sur les séances les moins avancées (portfolio, simulation d'entretien, négociation).",
   entretiens: "Priorité : proposer davantage de dossiers prêts aux entreprises partenaires.",
   insertion: "Priorité : débriefer les entretiens pour transformer les process en embauches.",
 };

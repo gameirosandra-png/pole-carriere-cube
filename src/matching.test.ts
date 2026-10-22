@@ -38,7 +38,7 @@ describe("scorer", () => {
   it("donne 100 à un candidat idéal", () => {
     const s = scorer(apprenant({ dossier: TOUT }), offre({}));
     expect(s.score).toBe(100);
-    expect(s.raisons.join(" | ")).toBe("Dossier prêt | Vise « Product Builder » | Disponible, en recherche");
+    expect(s.raisons.join(" | ")).toBe("Parcours bouclé | Vise « Product Builder » | Disponible, en recherche");
   });
 
   it("compte le recouvrement partiel entre poste visé et offre", () => {

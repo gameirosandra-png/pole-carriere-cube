@@ -1415,6 +1415,332 @@ textarea {
   flex: 1 1 320px;
 }
 
+/* ---------- Fiche : onglets et ateliers individuels ---------- */
+.fiche {
+  width: min(680px, 100%);
+}
+.onglets {
+  display: flex;
+  gap: 2px;
+  border-bottom: 1px solid var(--trait);
+  margin: 0 0 18px;
+  overflow-x: auto;
+}
+.onglet {
+  background: none;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  padding: 8px 12px;
+  font-weight: 500;
+  color: var(--encre-douce);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.onglet.actif {
+  color: var(--violet);
+  border-bottom-color: var(--violet);
+}
+.atelier h4 {
+  font-family: "Outfit", "Inter", sans-serif;
+  font-weight: 500;
+  font-size: 16px;
+  margin: 22px 0 8px;
+}
+.atelier-resultat {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--violet-pale);
+  border-radius: var(--rayon);
+  margin-bottom: 14px;
+}
+.atelier-resultat p {
+  margin: 0;
+}
+.atelier-score {
+  font-family: "Outfit", "Inter", sans-serif;
+  font-size: 32px;
+  font-weight: 500;
+  color: var(--violet-nuit);
+}
+.grille {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.grille th,
+.grille td {
+  padding: 7px 6px;
+  border-bottom: 1px solid var(--brume);
+  text-align: center;
+}
+.grille th[scope="row"],
+.grille thead th:first-child {
+  text-align: left;
+  font-weight: 500;
+}
+.grille thead th {
+  color: var(--encre-douce);
+  font-weight: 500;
+  font-size: 13px;
+}
+.grille input {
+  accent-color: var(--violet);
+  width: 17px;
+  height: 17px;
+}
+.plan-action {
+  margin: 0;
+  padding-left: 20px;
+}
+.plan-action li {
+  margin-bottom: 6px;
+}
+.grille-3 {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+.champ-bouton {
+  justify-content: flex-end;
+}
+.projet {
+  border: 1px solid var(--trait);
+  border-left: 4px solid var(--trait);
+  border-radius: var(--rayon);
+  padding: 10px 12px;
+  margin-bottom: 8px;
+}
+.projet-solide {
+  border-left-color: var(--s-poste);
+}
+.projet-tete {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+}
+.projet-tete .bouton-texte {
+  margin-left: auto;
+  font-size: 13px;
+}
+.projet-criteres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin-top: 6px;
+}
+.projet-criteres .case {
+  padding: 0;
+}
+.modele {
+  white-space: pre-wrap;
+  font-family: inherit;
+  font-size: 14px;
+  background: var(--brume);
+  padding: 12px 14px;
+  border-radius: var(--rayon);
+  margin: 0 0 8px;
+}
+/* Jauge de marché (atelier salaire) */
+.marche {
+  margin: 16px 0 4px;
+  padding: 16px;
+  border: 1px solid var(--trait);
+  border-radius: var(--rayon);
+}
+.marche-bornes {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+.marche-piste {
+  position: relative;
+  height: 12px;
+  background: var(--brume);
+  border-radius: 6px;
+  margin: 10px 0 16px;
+}
+.marche-zone {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  background: #c9b8ec;
+  border-radius: 6px;
+}
+.marche-repere {
+  position: absolute;
+  top: -5px;
+  width: 4px;
+  height: 22px;
+  margin-left: -2px;
+  background: var(--orange);
+  border-radius: 2px;
+}
+.marche-chiffres {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.marche-chiffres strong {
+  display: block;
+  font-family: "Outfit", "Inter", sans-serif;
+  font-weight: 500;
+  font-size: 24px;
+  color: var(--violet-nuit);
+}
+/* Pitch */
+.pitch {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+}
+.pitch li {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--brume);
+}
+.pitch-titre {
+  font-weight: 600;
+}
+.pitch-titre .secondaire {
+  display: inline;
+  font-weight: 400;
+}
+.pitch p {
+  margin: 4px 0 0;
+}
+.pitch mark {
+  background: #ffe2cf;
+  color: var(--encre);
+  border-radius: 3px;
+  padding: 0 2px;
+}
+
+/* ---------- Cette semaine ---------- */
+.semaine {
+  margin-bottom: 8px;
+}
+.semaine .titre-section {
+  margin-top: 28px;
+}
+.sous-titre-section {
+  margin: -8px 0 14px;
+}
+.agenda {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--trait);
+}
+.agenda-ligne {
+  display: grid;
+  grid-template-columns: 110px 140px 1fr;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 4px;
+  border-bottom: 1px solid var(--trait);
+}
+.agenda-date {
+  font-weight: 600;
+}
+.agenda-retard .agenda-date {
+  color: var(--alerte);
+}
+.agenda-type {
+  font-size: 13px;
+  color: var(--encre-douce);
+}
+.agenda-atelier .agenda-type {
+  color: var(--violet);
+  font-weight: 600;
+}
+.agenda-titre {
+  background: none;
+  border: 0;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 10px;
+  align-items: baseline;
+}
+.agenda-titre span {
+  color: var(--encre-douce);
+  font-size: 14px;
+}
+.agenda-titre:hover strong {
+  color: var(--violet);
+}
+
+/* ---------- Ateliers collectifs ---------- */
+.ateliers {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.atelier-collectif {
+  display: grid;
+  grid-template-columns: 84px 1fr;
+  gap: 18px;
+  padding: 18px 0;
+  border-top: 1px solid var(--trait);
+}
+.atelier-date {
+  background: var(--violet-pale);
+  border-radius: var(--rayon);
+  padding: 10px 6px;
+  text-align: center;
+  align-self: start;
+}
+.atelier-date strong {
+  display: block;
+  font-family: "Outfit", "Inter", sans-serif;
+  font-weight: 500;
+  font-size: 18px;
+  color: var(--violet-nuit);
+}
+.atelier-date span {
+  font-size: 13px;
+  color: var(--encre-douce);
+}
+.atelier-tete {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  align-items: baseline;
+}
+.atelier-tete h2 {
+  font-size: 19px;
+}
+.atelier-tete .bouton-texte {
+  margin-left: auto;
+  font-size: 13px;
+}
+.a-inviter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin-top: 10px;
+}
+.bouton-inviter {
+  background: var(--papier);
+  border: 1px dashed var(--violet);
+  color: var(--violet);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.bouton-inviter:hover {
+  background: var(--violet-pale);
+}
+.champ-court {
+  min-width: 100px;
+  flex: 0 1 110px;
+}
+
 /* ---------- Mobile ---------- */
 @media (max-width: 820px) {
   .app {
@@ -1512,6 +1838,24 @@ textarea {
   .espace,
   .tuiles {
     grid-template-columns: 1fr;
+  }
+  .grille-3,
+  .marche-chiffres {
+    grid-template-columns: 1fr;
+  }
+  .agenda-ligne {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+  .atelier-collectif {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .atelier-date {
+    justify-self: start;
+    display: flex;
+    gap: 8px;
+    align-items: baseline;
   }
   .etapes-kpi li {
     grid-template-columns: 1fr 44px;

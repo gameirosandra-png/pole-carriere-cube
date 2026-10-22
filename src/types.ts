@@ -14,18 +14,71 @@ export interface Note {
   texte: string;
 }
 
-/** Étapes du dossier de candidature, à compléter avant de proposer l'apprenant à une entreprise. */
+/**
+ * Parcours d'accompagnement en 7 séances, à boucler avant de proposer l'apprenant à une entreprise.
+ * (Les anciennes clés « cvEnvoye » et « cvValide » éventuellement présentes dans les données sont ignorées.)
+ */
 export type EtapeDossier =
-  | "rdvObjectif" // rendez-vous de cadrage du projet professionnel
-  | "cvEnvoye" // CV transmis au pôle carrière
-  | "cvValide" // CV relu et validé par l'équipe
-  | "linkedin" // profil LinkedIn à jour
-  | "portfolio" // projets présentables en ligne
-  | "pitch" // pitch de présentation travaillé
-  | "simulation"; // simulation d'entretien réalisée
+  | "rdvObjectif" // séance 1 : bilan et objectif professionnel
+  | "cv" // séance 2 : atelier CV
+  | "portfolio" // séance 3 : atelier portfolio
+  | "linkedin" // séance 4 : profil LinkedIn
+  | "pitch" // séance 5 : pitch de présentation
+  | "simulation" // séance 6 : simulation d'entretien
+  | "negociation"; // séance 7 : préparation à la négociation salariale
 
-/** Pour chaque étape terminée : la date à laquelle elle l'a été. */
-export type Dossier = Partial<Record<EtapeDossier, string>>;
+/** Pour chaque séance terminée : la date à laquelle elle l'a été. */
+export type Dossier = Partial<Record<EtapeDossier | string, string>>;
+
+/* ---------- Ateliers individuels (dans la fiche) ---------- */
+
+export type CritereCV = "titre" | "accroche" | "projets" | "resultats" | "competences" | "lisibilite";
+/** 0 = à retravailler, 1 = correct, 2 = solide */
+export type NoteCritere = 0 | 1 | 2;
+
+export interface AtelierCV {
+  notes: Partial<Record<CritereCV, NoteCritere>>;
+  accrocheAvant?: string;
+  accrocheApres?: string;
+}
+
+export type CriterePortfolio = "probleme" | "solution" | "outils" | "demo" | "resultat";
+
+export interface ProjetPortfolio {
+  id: string;
+  nom: string;
+  lien?: string;
+  criteres: Partial<Record<CriterePortfolio, boolean>>;
+}
+
+export type PosteReference =
+  | "productBuilder"
+  | "devNoCode"
+  | "automatisation"
+  | "noCodeOps"
+  | "chefProjet"
+  | "productOwner";
+
+export interface AtelierSalaire {
+  poste: PosteReference;
+  zone: "idf" | "regions";
+  contrat: "salarie" | "freelance";
+}
+
+export type CritereEntretien = "clarte" | "star" | "exemples" | "posture" | "questions";
+
+export interface AtelierConvaincre {
+  motivation?: string;
+  /** Notes de la dernière simulation, de 1 (à travailler) à 4 (excellent). */
+  simulation?: Partial<Record<CritereEntretien, 1 | 2 | 3 | 4>>;
+}
+
+export interface Accompagnement {
+  cv?: AtelierCV;
+  portfolio?: ProjetPortfolio[];
+  salaire?: AtelierSalaire;
+  convaincre?: AtelierConvaincre;
+}
 
 export interface Apprenant {
   id: string;
@@ -40,6 +93,10 @@ export interface Apprenant {
   dateInsertion?: string; // ISO, renseignée quand statut = poste | freelance
   entreprise?: string;
   dossier?: Dossier;
+  /** Parcours avant la formation, ex. « 8 ans dans la logistique » : un atout à valoriser. */
+  parcoursAvant?: string;
+  anneesExperience?: number;
+  accompagnement?: Accompagnement;
   notes: Note[];
 }
 
@@ -61,7 +118,21 @@ export interface Entreprise {
   offres: Offre[];
 }
 
+/* ---------- Ateliers collectifs ---------- */
+
+export interface AtelierCollectif {
+  id: string;
+  theme: EtapeDossier;
+  titre: string;
+  date: string; // ISO
+  heure: string; // "18:00"
+  places: number;
+  inscrits: string[]; // ids d'apprenants
+}
+
 export interface Donnees {
   apprenants: Apprenant[];
   entreprises: Entreprise[];
+  /** Absent dans les données enregistrées avant cette version : traité comme une liste vide. */
+  ateliers?: AtelierCollectif[];
 }

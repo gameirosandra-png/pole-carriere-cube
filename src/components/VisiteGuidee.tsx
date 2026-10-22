@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 
-export type VueVisite = "tdb" | "apprenants" | "entreprises" | "espace" | "rapport";
+export type VueVisite = "tdb" | "apprenants" | "ateliers" | "entreprises" | "espace" | "rapport";
 
 interface Etape {
   vue: VueVisite;
@@ -12,16 +12,17 @@ interface Etape {
 export const ETAPES_VISITE: Etape[] = [
   {
     vue: "tdb",
-    cible: ".promos",
-    titre: "Chaque carré est un apprenant",
+    cible: ".semaine",
+    titre: "D'abord, accompagner",
     texte:
-      "Une ligne par promo, une couleur par situation. Le point rouge signale quelqu'un à relancer. Cliquez sur un carré pour ouvrir sa fiche.",
+      "La semaine du pôle en un coup d'œil : rendez-vous individuels, ateliers collectifs, et les actions en retard à rattraper en premier.",
   },
   {
     vue: "tdb",
-    cible: ".chiffres",
-    titre: "Les indicateurs clés, calculés automatiquement",
-    texte: "Taux d'insertion à 6 mois, délai moyen, entretiens en cours, relances à faire : plus de tableur à tenir.",
+    cible: ".promos",
+    titre: "Chaque carré est un apprenant",
+    texte:
+      "Une ligne par promo, une couleur par situation, un point rouge pour qui relancer. Un clic ouvre la fiche, avec 4 ateliers : CV, portfolio, salaire et pitch.",
   },
   {
     vue: "tdb",
@@ -32,8 +33,16 @@ export const ETAPES_VISITE: Etape[] = [
   {
     vue: "tdb",
     cible: ".section-dossiers",
-    titre: "Des dossiers prêts avant d'être proposés",
-    texte: "Chaque apprenant suit une checklist en 7 étapes. Ici, la progression de toute la cohorte, étape par étape.",
+    titre: "Un parcours en 7 séances",
+    texte:
+      "Du bilan à la négociation salariale : la progression de toute la cohorte, séance par séance, pour savoir quel atelier organiser.",
+  },
+  {
+    vue: "ateliers",
+    cible: ".atelier-collectif",
+    titre: "Des ateliers collectifs ciblés",
+    texte:
+      "Pour chaque atelier, l'outil propose d'inviter les apprenants dont la séance n'est pas encore faite. Un clic pour les inscrire.",
   },
   {
     vue: "entreprises",
@@ -47,7 +56,7 @@ export const ETAPES_VISITE: Etape[] = [
     cible: ".espace-page",
     titre: "L'apprenant acteur de son parcours",
     texte:
-      "Chaque apprenant a son espace : son dossier, sa prochaine étape, ses offres. Ce qu'il coche met à jour le suivi de l'équipe.",
+      "Chaque apprenant a son espace : ses séances, sa prochaine étape, ses offres. Ce qu'il coche met à jour le suivi de l'équipe.",
   },
   {
     vue: "rapport",

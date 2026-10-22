@@ -1,18 +1,21 @@
-import type { Apprenant } from "../types";
+import type { Apprenant, AtelierCollectif } from "../types";
 import { STATUTS, calculerIndicateurs, libelleStatut, raisonRelance } from "../regles";
 import { aujourdhui, formatDate } from "../dates";
 import { csvIndicateurs, telechargerCsv } from "../csv";
 import { indicateursDossier } from "../dossier";
 import { Funnel } from "./Funnel";
 import { BoutonRecap } from "./BoutonRecap";
+import { CetteSemaine } from "./CetteSemaine";
 
 interface Props {
   apprenants: Apprenant[];
+  ateliers: AtelierCollectif[];
   ouvrir: (id: string) => void;
   lancerVisite: () => void;
+  voirAteliers: () => void;
 }
 
-export function TableauDeBord({ apprenants, ouvrir, lancerVisite }: Props) {
+export function TableauDeBord({ apprenants, ateliers, ouvrir, lancerVisite, voirAteliers }: Props) {
   const today = aujourdhui();
   const ind = calculerIndicateurs(apprenants, today);
   const dossiers = indicateursDossier(apprenants);
@@ -33,8 +36,8 @@ export function TableauDeBord({ apprenants, ouvrir, lancerVisite }: Props) {
     <section aria-labelledby="titre-tdb">
       <header className="entete-page entete-avec-actions entete-banniere">
         <div>
-          <h1 id="titre-tdb">Où en sont les apprenants</h1>
-          <p className="sous-titre">Chaque carré est une personne. Cliquez dessus pour ouvrir sa fiche.</p>
+          <h1 id="titre-tdb">Le pôle carrière, cette semaine</h1>
+          <p className="sous-titre">Les rendez-vous et ateliers à venir, puis où en est chaque apprenant.</p>
         </div>
         <div className="actions">
           <button className="bouton bouton-discret" onClick={lancerVisite}>
@@ -49,6 +52,13 @@ export function TableauDeBord({ apprenants, ouvrir, lancerVisite }: Props) {
           <BoutonRecap apprenants={apprenants} />
         </div>
       </header>
+
+      <CetteSemaine apprenants={apprenants} ateliers={ateliers} ouvrir={ouvrir} voirAteliers={voirAteliers} />
+
+      <h2 className="titre-section">Où en sont les apprenants</h2>
+      <p className="sous-titre sous-titre-section">
+        Chaque carré est une personne. Cliquez dessus pour ouvrir sa fiche.
+      </p>
 
       {apprenants.length === 0 && (
         <p className="vide">Aucun apprenant pour l'instant. Ajoutez-en depuis l'onglet Apprenants.</p>
@@ -150,17 +160,17 @@ export function TableauDeBord({ apprenants, ouvrir, lancerVisite }: Props) {
 
       <section className="section-dossiers" aria-labelledby="titre-dossiers">
         <h2 className="titre-section" id="titre-dossiers">
-          Préparation des dossiers
+          Avancement du parcours
         </h2>
         <p className="lead-section">
           <strong>
             {dossiers.prets} apprenant{dossiers.prets > 1 ? "s" : ""} sur {dossiers.base}
           </strong>{" "}
-          en accompagnement {dossiers.prets > 1 ? "sont prêts" : "est prêt"} à être proposé
-          {dossiers.prets > 1 ? "s" : ""} aux entreprises. Complétude moyenne des dossiers :{" "}
-          {dossiers.completudeMoyenne ?? 0}&nbsp;%.
+          en accompagnement {dossiers.prets > 1 ? "ont" : "a"} bouclé les 7 séances et{" "}
+          {dossiers.prets > 1 ? "sont prêts" : "est prêt"} à être proposé{dossiers.prets > 1 ? "s" : ""} aux
+          entreprises. Avancement moyen du parcours : {dossiers.completudeMoyenne ?? 0}&nbsp;%.
         </p>
-        <ul className="etapes-kpi" aria-label="Part des apprenants ayant fait chaque étape">
+        <ul className="etapes-kpi" aria-label="Part des apprenants ayant suivi chaque séance">
           {dossiers.parEtape.map(({ etape, faites, pourcentage }) => (
             <li key={etape.id}>
               <span className="etapes-kpi-libelle">{etape.libelle}</span>
@@ -173,7 +183,7 @@ export function TableauDeBord({ apprenants, ouvrir, lancerVisite }: Props) {
             </li>
           ))}
         </ul>
-        <p className="secondaire">L'étape la moins avancée indique où concentrer les ateliers collectifs.</p>
+        <p className="secondaire">La séance la moins avancée indique quel atelier collectif organiser en priorité.</p>
       </section>
     </section>
   );
