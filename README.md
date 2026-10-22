@@ -54,7 +54,7 @@ Je suis apprenante Product Builder No-Code à l'École Cube, donc je connais ce 
 
 ## Ce que j'ai appris
 
-- **Construire avec l'IA, c'est surtout spécifier et vérifier.** Claude écrit vite ; mon travail est de dire précisément quoi construire, de relire, et de prouver que ça marche : 69 tests unitaires, plus de 160 vérifications de bout en bout et une intégration continue.
+- **Construire avec l'IA, c'est surtout spécifier et vérifier.** Claude écrit vite ; mon travail est de dire précisément quoi construire, de relire, et de prouver que ça marche : 74 tests unitaires, plus de 160 vérifications de bout en bout et une intégration continue.
 - **Le retour d'un expert vaut plus qu'une fonctionnalité de plus.** La V1 était juste techniquement mais à côté du vrai besoin.
 - **Un MVP, c'est aussi savoir s'arrêter.** Rôles, temps réel, import des données de l'école : listés en V2, pas improvisés.
 
@@ -94,6 +94,7 @@ Et pour aller jusqu'à l'emploi :
 - **Relances automatiques** : rappels d'atelier (48 h avant) et messages aux apprenants sans contact depuis 14 jours, écrits par l'app et envoyés via Make en un clic.
 - **Questionnaire « Faisons connaissance »** : rempli par l'apprenant avant la séance 1 (parcours, poste et secteurs visés, contrat, mobilité, inquiétudes, motivation). Les réponses remplissent la fiche, le pitch et l'atelier salaire, affinent le matching (contrat souhaité) et font remonter les points d'attention dans la fiche et le brief de rendez-vous.
 - **Boîte à questions** : l'apprenant pose une question au pôle depuis son espace ; elle apparaît dans « Questions des apprenants » au tableau de bord, l'équipe répond depuis la fiche, et la réponse s'affiche chez l'apprenant.
+- **Simulateur freelance** : « je veux 3 000 € net par mois » → le TJM à facturer, les jours facturés, le nombre de missions, le taux horaire, la part des cotisations et des frais ; ou l'inverse, à partir d'un TJM. Le résultat est situé sur le marché junior du poste visé, avec des alertes sur la TVA et le plafond de la micro-entreprise. Taux et seuils 2026 sourcés et datés, taux modifiable. Ouvert d'office pour un apprenant qui vise le freelance, et utilisable seul comme module à intégrer : [`/#simulateur-freelance`](https://pole-carriere-cube.vercel.app/#simulateur-freelance).
 - **Boîte à outils de l'apprenant** : dans son espace, il retrouve son CV à corriger, son pitch, sa prétention et sa progression.
 
 ## Ce que fait le MVP
@@ -144,6 +145,7 @@ Variable d'environnement (Vercel) : `MAKE_RECAP_WEBHOOK` (URL du webhook Make). 
 | Délai moyen | Jours entre la fin de formation et la date d'insertion |
 | À relancer | Prochaine action dépassée, ou aucun contact depuis plus de 14 jours (hors apprenants en formation ou insérés) |
 | Prêt à proposer | Les 7 séances du parcours bouclées |
+| Simulateur freelance | Micro-entreprise, activité libérale : cotisations 25,6 % + formation 0,2 % (+ 2,2 % si versement libératoire) ; jours facturables = (52 − congés) × jours par semaine − 8 fériés, × part du temps facturée ; TJM arrondi à la dizaine supérieure ; plafond 83 600 €, TVA au-delà de 37 500 € |
 | Prétention salariale | Départ à 25 % de la fourchette junior, puis + 20 points en Île-de-France, + 15 si 5 ans d'expérience avant la reconversion, + 10 si parcours bouclé, + 10 si 2 projets solides (plafond 85 %) ; plancher = 92 % de l'annonce |
 | Qui coche quoi | L'apprenant coche portfolio et LinkedIn ; l'équipe valide les autres séances |
 | KPI de préparation | Part des apprenants en accompagnement (non insérés) ayant fait chaque étape, et nombre de dossiers prêts |
@@ -155,8 +157,8 @@ Ces règles sont des fonctions pures dans [`src/regles.ts`](src/regles.ts), [`sr
 
 ## Qualité
 
-- **Tests** : 69 tests unitaires sur les règles métier, parcours et ateliers d'accompagnement, matching, entonnoir, calculs de dates (fin de mois, changement d'heure, fuseaux) et export CSV, avec Vitest.
-- **Bout en bout** : 176 vérifications Playwright dans [`e2e/`](e2e) (parcours complets dans un vrai navigateur, sur ordinateur et mobile), lancées avant chaque version avec `npm run e2e` ; pas encore dans la CI.
+- **Tests** : 74 tests unitaires sur les règles métier, parcours et ateliers d'accompagnement, matching, entonnoir, calculs de dates (fin de mois, changement d'heure, fuseaux) et export CSV, avec Vitest.
+- **Bout en bout** : 188 vérifications Playwright dans [`e2e/`](e2e) (parcours complets dans un vrai navigateur, sur ordinateur et mobile), lancées avant chaque version avec `npm run e2e` ; pas encore dans la CI.
 - **Intégration continue** : à chaque modification, GitHub vérifie les types TypeScript, lance les tests et le build ([workflow](.github/workflows/ci.yml)).
 - **Accessibilité** : couleurs de statut au contraste WCAG AA (4,5:1), statut toujours écrit en plus de la couleur, panneaux utilisables au clavier (focus piégé, Échap, retour du focus).
 - **Responsive** : utilisable sur mobile.
@@ -184,7 +186,8 @@ src/
   dossier.ts          checklist du dossier et KPI de préparation (testés)
   matching.ts         suggestion de candidats pour une offre (testé)
   accompagnement/     ateliers CV, portfolio, salaire (référentiel sourcé), pitch, ateliers collectifs,
-                      progression, fiche candidat, shortlist, relances, entraînement, questionnaire (testés)
+                      progression, fiche candidat, shortlist, relances, entraînement, questionnaire,
+                      simulateur freelance (testés)
   rapport.ts          entonnoir d'insertion et statistiques par promo (testés)
   narration.ts        voix de la démo : fichiers IA, sinon meilleure voix française du navigateur
   brief.ts            préparation de rendez-vous : données pour l'IA, brief de secours (testés)
@@ -209,7 +212,8 @@ api/
 2. Lien personnel et sécurisé pour l'espace apprenant, envoyé automatiquement chaque mois.
 3. Récap et relances envoyés automatiquement par Make (chaque lundi, chaque matin), à partir de la base partagée, et aux vrais destinataires.
 4. Import des apprenants depuis l'outil de gestion de l'école.
-5. **Brief de rendez-vous rédigé par l'IA** : la fonction serveur est prête ([`api/brief.ts`](api/brief.ts) : prompt borné, garde-fous de volume, modèle Claude Haiku). Activation = ajouter `ANTHROPIC_API_KEY` sur Vercel et brancher `demanderBrief` dans la fiche.
+5. **Parcours freelance** : quand l'apprenant vise le freelance, les séances 6 et 7 deviennent « Se lancer » (comparatif des statuts, checklist de création, modèles de devis et factures) et « Fixer son TJM et décrocher sa première mission » (plateformes, pitch client).
+6. **Brief de rendez-vous rédigé par l'IA** : la fonction serveur est prête ([`api/brief.ts`](api/brief.ts) : prompt borné, garde-fous de volume, modèle Claude Haiku). Activation = ajouter `ANTHROPIC_API_KEY` sur Vercel et brancher `demanderBrief` dans la fiche.
 
 ---
 

@@ -13,6 +13,7 @@ import { calculerPretention, formatMontant } from "../accompagnement/salaire";
 import { Progression } from "./Progression";
 import { Entrainement } from "./Entrainement";
 import { BoiteQuestions, QuestionnaireApprenant } from "./QuestionnaireApprenant";
+import { SimulateurFreelance } from "./SimulateurFreelance";
 
 interface Props {
   apprenants: Apprenant[];
@@ -253,7 +254,37 @@ function PageApprenant({
       </div>
 
       <BoiteOutils apprenant={a} />
+      <VoletFreelance key={`freelance-${a.id}`} apprenant={a} />
     </div>
+  );
+}
+
+/** Et en freelance ? Ouvert d'office si l'apprenant vise le freelance. */
+function VoletFreelance({ apprenant: a }: { apprenant: Apprenant }) {
+  const vise = a.questionnaire?.contrat === "freelance" || a.statut === "freelance";
+  const [ouvert, setOuvert] = useState(vise);
+  return (
+    <section className="volet-freelance" aria-labelledby="titre-freelance">
+      <div className="boite-tete">
+        <div>
+          <h2 id="titre-freelance">{vise ? "Ton projet freelance" : "Et en freelance ?"}</h2>
+          <p className="secondaire">
+            Combien facturer, combien de jours, combien de missions pour vivre de ton activité : fais tes essais.
+          </p>
+        </div>
+        <div className="actions">
+          {!ouvert && (
+            <button className="bouton bouton-cta" onClick={() => setOuvert(true)}>
+              Ouvrir le simulateur
+            </button>
+          )}
+          <a className="bouton bouton-discret" href="/#simulateur-freelance" target="_blank" rel="noreferrer">
+            Plein écran
+          </a>
+        </div>
+      </div>
+      {ouvert && <SimulateurFreelance posteVise={a.posteVise} />}
+    </section>
   );
 }
 

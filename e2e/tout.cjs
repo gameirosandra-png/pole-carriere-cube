@@ -4,7 +4,7 @@
 // Puis : npm run e2e   (ou URL=https://… npm run e2e pour viser un autre déploiement)
 const { execFileSync } = require('child_process');
 const path = require('path');
-const suites = ['base', 'dossier', 'wow', 'accomp', 'plus', 'voix', 'questionnaire', 'ia'];
+const suites = ['base', 'dossier', 'wow', 'accomp', 'plus', 'voix', 'questionnaire', 'freelance', 'ia'];
 let ok = 0, ko = 0;
 for (const s of suites) {
   const sortie = execFileSync(process.execPath, [path.join(__dirname, `${s}.cjs`)], { encoding: 'utf8', env: process.env });

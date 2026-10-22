@@ -8,6 +8,7 @@ import { formatChrono, QUESTIONS_ENTRAINEMENT, tirerQuestions } from "./convainc
 import { dureeEstimeeMs, libelleVitesse, scoreVoix, vitesseSuivante } from "../narration";
 import { appliquerQuestionnaire, pointsAttention, poserQuestion, questionsEnAttente, repondreQuestion, resumeQuestionnaire } from "./questionnaire";
 import { scorer } from "../matching";
+import { HYPOTHESES_DEFAUT, joursFacturablesAn, positionMarche, simulerDepuisRevenu, simulerDepuisTjm } from "./freelance";
 
 const TODAY = "2026-10-22";
 const demo = creerDonneesDemo(TODAY);
@@ -179,5 +180,41 @@ describe("vitesse de la démo", () => {
     expect(vitesseSuivante(1)).toBe(1.25);
     expect(vitesseSuivante(1.5)).toBe(0.75);
     expect(libelleVitesse(1.25)).toBe("1,25×");
+  });
+});
+
+describe("simulateur freelance", () => {
+  const h = HYPOTHESES_DEFAUT;
+
+  it("compte les jours vraiment facturables", () => {
+    // (52 − 5) × 5 = 235 jours, − 8 fériés = 227, × 70 % = 159
+    expect(joursFacturablesAn(h)).toBe(159);
+  });
+
+  it("donne le TJM pour 3 000 € net par mois", () => {
+    const s = simulerDepuisRevenu(h);
+    // (3 000 + 150) × 12 / (1 − 25,8 %) = 50 943 € → 320,4 €/jour → 330 €
+    expect(s.tjm).toBe(330);
+    expect(s.tauxHoraire).toBe(47);
+    expect(s.netMensuel >= 3000).toBe(true);
+    expect(s.missionsParMois).toBe(1.3);
+    expect(s.depasseTVA).toBe(true);
+    expect(s.depassePlafond).toBe(false);
+  });
+
+  it("fait le calcul inverse à partir d'un TJM", () => {
+    const s = simulerDepuisTjm(h, 330);
+    expect(s.caAnnuel).toBe(52470);
+    expect(s.netMensuel).toBe(3094);
+  });
+
+  it("le versement libératoire augmente le TJM nécessaire", () => {
+    expect(simulerDepuisRevenu({ ...h, versementLiberatoire: true }).tjm > simulerDepuisRevenu(h).tjm).toBe(true);
+  });
+
+  it("signale le plafond de la micro-entreprise et situe le TJM sur le marché", () => {
+    expect(simulerDepuisRevenu({ ...h, netMensuel: 6000 }).depassePlafond).toBe(true);
+    expect(positionMarche(330, "productBuilder").position).toBe("dans");
+    expect(positionMarche(600, "productBuilder").position).toBe("au-dessus");
   });
 });

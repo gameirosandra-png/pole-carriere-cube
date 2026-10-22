@@ -2672,3 +2672,189 @@ textarea {
 .profil {
   padding: 4px 8px;
 }
+
+/* ---------- Simulateur freelance ---------- */
+.volet-freelance {
+  margin-top: 28px;
+}
+.page-simulateur {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 32px 16px 48px;
+}
+.page-simulateur h1 {
+  font-size: 32px;
+  margin: 4px 0 6px;
+}
+.simulateur {
+  border: 1px solid var(--trait);
+  border-radius: var(--rayon);
+  padding: 18px 20px;
+  margin-top: 12px;
+}
+.simulateur-modes {
+  display: inline-flex;
+  background: var(--brume);
+  border-radius: 999px;
+  padding: 3px;
+  margin-bottom: 16px;
+}
+.simulateur-modes button {
+  background: none;
+  border: 0;
+  border-radius: 999px;
+  padding: 7px 16px;
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--encre-douce);
+}
+.simulateur-modes button.actif {
+  background: var(--violet);
+  color: #fff;
+}
+.simulateur-grille {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 28px;
+}
+.simulateur-reglages {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.simulateur-reglages .champ {
+  margin: 0;
+}
+.simulateur-saisie {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.simulateur-saisie input[type="range"] {
+  flex: 1;
+  accent-color: var(--violet);
+  padding: 0;
+  border: 0;
+}
+.simulateur-saisie input[type="number"] {
+  width: 90px;
+}
+.simulateur-saisie strong {
+  min-width: 78px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.simulateur-principal {
+  padding: 12px 14px;
+  background: var(--violet-pale);
+  border-radius: var(--rayon);
+}
+.simulateur-principal strong {
+  font-size: 20px;
+  color: var(--violet-nuit);
+}
+.simulateur-resultats {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.simulateur-chiffre {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 18px;
+  background: var(--violet-nuit);
+  color: #fff;
+  border-radius: var(--rayon);
+}
+.simulateur-chiffre span,
+.simulateur-chiffre small {
+  color: #d9ccff;
+}
+.simulateur-reponse {
+  font-family: "Outfit", "Inter", sans-serif;
+  font-size: 44px;
+  font-weight: 500;
+  line-height: 1.1;
+}
+.simulateur-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+.simulateur-details div {
+  padding: 10px 12px;
+  border: 1px solid var(--trait);
+  border-radius: var(--rayon);
+}
+.simulateur-details dt {
+  font-size: 13px;
+  color: var(--encre-douce);
+}
+.simulateur-details dd {
+  margin: 2px 0 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+.simulateur-barre {
+  display: flex;
+  height: 14px;
+  border-radius: 7px;
+  overflow: hidden;
+  background: var(--brume);
+}
+.part-net,
+.pastille-net {
+  background: var(--s-poste);
+}
+.part-cotisations,
+.pastille-cotisations {
+  background: var(--violet);
+}
+.part-impot,
+.pastille-impot {
+  background: var(--s-entretiens);
+}
+.part-frais,
+.pastille-frais {
+  background: #8a8f99;
+}
+.simulateur-legende {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  font-size: 14px;
+}
+.simulateur-legende span {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  margin-right: 6px;
+}
+.simulateur-marche {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: var(--rayon);
+  background: #edf7f2;
+  color: #1f5c43;
+}
+.simulateur-marche.marche-au-dessus {
+  background: #fff4ec;
+  color: #8a3d08;
+}
+.simulateur-alerte {
+  margin: 0;
+  padding: 10px 12px;
+  border-left: 4px solid var(--orange);
+  background: #fff4ec;
+  border-radius: var(--rayon);
+}
+@media (max-width: 820px) {
+  .simulateur-grille {
+    grid-template-columns: 1fr;
+  }
+}
