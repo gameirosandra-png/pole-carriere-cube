@@ -3,13 +3,15 @@ import { STATUTS, calculerIndicateurs, libelleStatut, raisonRelance } from "../r
 import { aujourdhui, formatDate } from "../dates";
 import { csvIndicateurs, telechargerCsv } from "../csv";
 import { indicateursDossier } from "../dossier";
+import { Funnel } from "./Funnel";
 
 interface Props {
   apprenants: Apprenant[];
   ouvrir: (id: string) => void;
+  lancerVisite: () => void;
 }
 
-export function TableauDeBord({ apprenants, ouvrir }: Props) {
+export function TableauDeBord({ apprenants, ouvrir, lancerVisite }: Props) {
   const today = aujourdhui();
   const ind = calculerIndicateurs(apprenants, today);
   const dossiers = indicateursDossier(apprenants);
@@ -33,12 +35,17 @@ export function TableauDeBord({ apprenants, ouvrir }: Props) {
           <h1 id="titre-tdb">Où en sont les apprenants</h1>
           <p className="sous-titre">Chaque carré est une personne. Cliquez dessus pour ouvrir sa fiche.</p>
         </div>
-        <button
-          className="bouton bouton-discret"
-          onClick={() => telechargerCsv(`indicateurs-insertion-${today}.csv`, csvIndicateurs(ind, dossiers, today))}
-        >
-          Exporter les indicateurs
-        </button>
+        <div className="actions">
+          <button className="bouton bouton-discret" onClick={lancerVisite}>
+            Visite guidée
+          </button>
+          <button
+            className="bouton bouton-discret"
+            onClick={() => telechargerCsv(`indicateurs-insertion-${today}.csv`, csvIndicateurs(ind, dossiers, today))}
+          >
+            Exporter les indicateurs
+          </button>
+        </div>
       </header>
 
       {apprenants.length === 0 && (
@@ -105,52 +112,67 @@ export function TableauDeBord({ apprenants, ouvrir }: Props) {
         </div>
       </dl>
 
-      <h2 className="titre-section">À relancer</h2>
-      {ind.aRelancer.length === 0 ? (
-        <p className="vide">Personne à relancer : tous les suivis sont à jour.</p>
-      ) : (
-        <ul className="relances">
-          {ind.aRelancer.map((a) => (
-            <li key={a.id}>
-              <button className="relance" onClick={() => ouvrir(a.id)}>
-                <span className="relance-nom">
-                  {a.prenom} {a.nom}
-                </span>
-                <span className="relance-raison">{raisonRelance(a)}</span>
-                <span className="relance-action">
-                  {a.prochaineAction
-                    ? `${a.prochaineAction.libelle} (prévu le ${formatDate(a.prochaineAction.date)})`
-                    : "Aucune action prévue"}
-                </span>
-              </button>
+      <section className="section-funnel" aria-labelledby="titre-funnel">
+        <h2 className="titre-section" id="titre-funnel">
+          Le parcours d'insertion
+        </h2>
+        <Funnel apprenants={apprenants} />
+      </section>
+
+      <section className="section-relances" aria-labelledby="titre-relances">
+        <h2 className="titre-section" id="titre-relances">
+          À relancer
+        </h2>
+        {ind.aRelancer.length === 0 ? (
+          <p className="vide">Personne à relancer : tous les suivis sont à jour.</p>
+        ) : (
+          <ul className="relances">
+            {ind.aRelancer.map((a) => (
+              <li key={a.id}>
+                <button className="relance" onClick={() => ouvrir(a.id)}>
+                  <span className="relance-nom">
+                    {a.prenom} {a.nom}
+                  </span>
+                  <span className="relance-raison">{raisonRelance(a)}</span>
+                  <span className="relance-action">
+                    {a.prochaineAction
+                      ? `${a.prochaineAction.libelle} (prévu le ${formatDate(a.prochaineAction.date)})`
+                      : "Aucune action prévue"}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <section className="section-dossiers" aria-labelledby="titre-dossiers">
+        <h2 className="titre-section" id="titre-dossiers">
+          Préparation des dossiers
+        </h2>
+        <p className="lead-section">
+          <strong>
+            {dossiers.prets} apprenant{dossiers.prets > 1 ? "s" : ""} sur {dossiers.base}
+          </strong>{" "}
+          en accompagnement {dossiers.prets > 1 ? "sont prêts" : "est prêt"} à être proposé
+          {dossiers.prets > 1 ? "s" : ""} aux entreprises. Complétude moyenne des dossiers :{" "}
+          {dossiers.completudeMoyenne ?? 0}&nbsp;%.
+        </p>
+        <ul className="etapes-kpi" aria-label="Part des apprenants ayant fait chaque étape">
+          {dossiers.parEtape.map(({ etape, faites, pourcentage }) => (
+            <li key={etape.id}>
+              <span className="etapes-kpi-libelle">{etape.libelle}</span>
+              <span className="etapes-kpi-barre" aria-hidden="true">
+                <span style={{ width: `${pourcentage}%` }} />
+              </span>
+              <span className="etapes-kpi-valeur">
+                {faites}/{dossiers.base}
+              </span>
             </li>
           ))}
         </ul>
-      )}
-
-      <h2 className="titre-section">Préparation des dossiers</h2>
-      <p className="lead-section">
-        <strong>
-          {dossiers.prets} apprenant{dossiers.prets > 1 ? "s" : ""} sur {dossiers.base}
-        </strong>{" "}
-        en accompagnement {dossiers.prets > 1 ? "sont prêts" : "est prêt"} à être proposé
-        {dossiers.prets > 1 ? "s" : ""} aux entreprises. Complétude moyenne des dossiers :{" "}
-        {dossiers.completudeMoyenne ?? 0}&nbsp;%.
-      </p>
-      <ul className="etapes-kpi" aria-label="Part des apprenants ayant fait chaque étape">
-        {dossiers.parEtape.map(({ etape, faites, pourcentage }) => (
-          <li key={etape.id}>
-            <span className="etapes-kpi-libelle">{etape.libelle}</span>
-            <span className="etapes-kpi-barre" aria-hidden="true">
-              <span style={{ width: `${pourcentage}%` }} />
-            </span>
-            <span className="etapes-kpi-valeur">
-              {faites}/{dossiers.base}
-            </span>
-          </li>
-        ))}
-      </ul>
-      <p className="secondaire">L'étape la moins avancée indique où concentrer les ateliers collectifs.</p>
+        <p className="secondaire">L'étape la moins avancée indique où concentrer les ateliers collectifs.</p>
+      </section>
     </section>
   );
 }

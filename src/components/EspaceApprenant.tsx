@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 import type { Apprenant, Entreprise, Statut } from "../types";
 import { STATUTS, changerStatut, estInsere } from "../regles";
-import { aujourdhui, formatDate } from "../dates";
+import { aujourdhui, formatDate, joursEntre } from "../dates";
 import { nouvelId } from "../store";
 import { Pastille } from "./Pastille";
 import { ChecklistDossier, JaugeDossier } from "./ChecklistDossier";
@@ -19,7 +19,8 @@ interface Props {
  * Chaque mise à jour alimente directement le suivi de l'équipe.
  */
 export function EspaceApprenant({ apprenants, entreprises, maj }: Props) {
-  const candidats = apprenants.filter((a) => a.statut !== "formation");
+  // Tous les apprenants non insérés : le dossier se prépare dès la formation.
+  const candidats = apprenants.filter((a) => !estInsere(a));
   const [id, setId] = useState(candidats[0]?.id ?? "");
   const a = apprenants.find((x) => x.id === id);
 
@@ -39,6 +40,7 @@ export function EspaceApprenant({ apprenants, entreprises, maj }: Props) {
           {candidats.map((x) => (
             <option key={x.id} value={x.id}>
               {x.prenom} {x.nom}
+              {x.statut === "formation" ? " (en formation)" : ""}
             </option>
           ))}
         </select>
@@ -47,7 +49,7 @@ export function EspaceApprenant({ apprenants, entreprises, maj }: Props) {
       {a ? (
         <PageApprenant key={a.id} apprenant={a} entreprises={entreprises} maj={(f) => maj(a.id, f)} />
       ) : (
-        <p className="vide">Aucun apprenant sorti de formation pour l'instant.</p>
+        <p className="vide">Aucun apprenant en accompagnement pour l'instant.</p>
       )}
     </section>
   );
@@ -162,48 +164,64 @@ function PageApprenant({
         </div>
 
         <div className="espace-colonne">
-          <form className="espace-carte" onSubmit={envoyer}>
-            <h2>Où en es-tu ?</h2>
-            <fieldset className="choix-statut">
-              <legend className="secondaire">Ta situation aujourd'hui</legend>
-              {STATUTS.filter((s) => s.id !== "formation").map((s) => (
-                <label key={s.id} className="case">
-                  <input
-                    type="radio"
-                    name="statut"
-                    value={s.id}
-                    checked={statut === s.id}
-                    onChange={() => {
-                      setStatut(s.id);
-                      setEnvoye(false);
-                    }}
-                  />
-                  {s.libelle}
-                </label>
-              ))}
-            </fieldset>
-
-            {(statut === "poste" || statut === "freelance") && (
-              <label className="champ">
-                <span>{statut === "freelance" ? "Ton premier client" : "Ton entreprise"}</span>
-                <input value={entreprise} onChange={(e) => setEntreprise(e.target.value)} />
-              </label>
-            )}
-
-            <label className="champ">
-              <span>Un message pour le pôle carrière (facultatif)</span>
-              <textarea rows={3} value={message} onChange={(e) => setMessage(e.target.value)} />
-            </label>
-
-            <button className="bouton" type="submit">
-              Envoyer ma mise à jour
-            </button>
-            {envoye && (
-              <p className="texte-succes" role="status">
-                Mise à jour envoyée. Elle apparaît dans ta fiche côté équipe.
+          {a.statut === "formation" ? (
+            <div className="espace-carte">
+              <h2>Encore en formation</h2>
+              <p>
+                Ta formation se termine le <strong>{formatDate(a.finFormation)}</strong>
+                {joursEntre(aujourdhui(), a.finFormation) > 0 &&
+                  `, dans ${joursEntre(aujourdhui(), a.finFormation)} jours`}
+                .
               </p>
-            )}
-          </form>
+              <p className="secondaire">
+                C'est le bon moment pour avancer ton dossier : un dossier complet à la sortie, c'est une recherche
+                d'emploi qui démarre tout de suite.
+              </p>
+            </div>
+          ) : (
+            <form className="espace-carte" onSubmit={envoyer}>
+              <h2>Où en es-tu ?</h2>
+              <fieldset className="choix-statut">
+                <legend className="secondaire">Ta situation aujourd'hui</legend>
+                {STATUTS.filter((s) => s.id !== "formation").map((s) => (
+                  <label key={s.id} className="case">
+                    <input
+                      type="radio"
+                      name="statut"
+                      value={s.id}
+                      checked={statut === s.id}
+                      onChange={() => {
+                        setStatut(s.id);
+                        setEnvoye(false);
+                      }}
+                    />
+                    {s.libelle}
+                  </label>
+                ))}
+              </fieldset>
+
+              {(statut === "poste" || statut === "freelance") && (
+                <label className="champ">
+                  <span>{statut === "freelance" ? "Ton premier client" : "Ton entreprise"}</span>
+                  <input value={entreprise} onChange={(e) => setEntreprise(e.target.value)} />
+                </label>
+              )}
+
+              <label className="champ">
+                <span>Un message pour le pôle carrière (facultatif)</span>
+                <textarea rows={3} value={message} onChange={(e) => setMessage(e.target.value)} />
+              </label>
+
+              <button className="bouton" type="submit">
+                Envoyer ma mise à jour
+              </button>
+              {envoye && (
+                <p className="texte-succes" role="status">
+                  Mise à jour envoyée. Elle apparaît dans ta fiche côté équipe.
+                </p>
+              )}
+            </form>
+          )}
           <div className="espace-carte">
             <h2>Offres qu'on t'a proposées</h2>
             {offres.length === 0 ? (

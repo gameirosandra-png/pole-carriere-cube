@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Apprenant, Entreprise, Statut } from "../types";
+import type { Apprenant, Entreprise, Note, Statut } from "../types";
 import { STATUTS, changerStatut, estInsere, raisonRelance } from "../regles";
 import { aujourdhui, formatDate } from "../dates";
 import { nouvelId } from "../store";
@@ -13,10 +13,11 @@ interface Props {
   entreprises: Entreprise[];
   maj: (f: (a: Apprenant) => Apprenant) => void;
   supprimer: () => void;
+  supprimerNote: (noteId: string) => void;
   fermer: () => void;
 }
 
-export function FicheApprenant({ apprenant: a, entreprises, maj, supprimer, fermer }: Props) {
+export function FicheApprenant({ apprenant: a, entreprises, maj, supprimer, supprimerNote, fermer }: Props) {
   const [note, setNote] = useState("");
 
   const majStatut = (statut: Statut) => maj((x) => changerStatut(x, statut));
@@ -173,24 +174,87 @@ export function FicheApprenant({ apprenant: a, entreprises, maj, supprimer, ferm
       ) : (
         <ol className="notes">
           {a.notes.map((n) => (
-            <li key={n.id}>
-              <time dateTime={n.date}>{formatDate(n.date)}</time>
-              <p>{n.texte}</p>
-            </li>
+            <NoteSuivi
+              key={n.id}
+              note={n}
+              modifier={(texte) =>
+                maj((x) => ({ ...x, notes: x.notes.map((y) => (y.id === n.id ? { ...y, texte } : y)) }))
+              }
+              supprimer={() => supprimerNote(n.id)}
+            />
           ))}
         </ol>
       )}
 
       <div className="zone-suppression">
-        <button
-          className="bouton-danger"
-          onClick={() => {
-            if (confirm(`Supprimer définitivement la fiche de ${a.prenom} ${a.nom} ?`)) supprimer();
-          }}
-        >
+        <button className="bouton-danger" onClick={supprimer}>
           Supprimer la fiche
         </button>
       </div>
     </Panneau>
+  );
+}
+
+/** Une note de suivi, modifiable sur place et supprimable (avec annulation). */
+function NoteSuivi({
+  note,
+  modifier,
+  supprimer,
+}: {
+  note: Note;
+  modifier: (texte: string) => void;
+  supprimer: () => void;
+}) {
+  const [edition, setEdition] = useState(false);
+  const [texte, setTexte] = useState(note.texte);
+
+  return (
+    <li>
+      <time dateTime={note.date}>{formatDate(note.date)}</time>
+      {edition ? (
+        <div className="note-edition">
+          <textarea
+            rows={3}
+            value={texte}
+            onChange={(e) => setTexte(e.target.value)}
+            aria-label="Modifier la note"
+            autoFocus
+          />
+          <div className="actions">
+            <button
+              className="bouton"
+              disabled={!texte.trim()}
+              onClick={() => {
+                modifier(texte.trim());
+                setEdition(false);
+              }}
+            >
+              Enregistrer
+            </button>
+            <button
+              className="bouton bouton-discret"
+              onClick={() => {
+                setTexte(note.texte);
+                setEdition(false);
+              }}
+            >
+              Annuler
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div>
+          <p>{note.texte}</p>
+          <div className="note-actions">
+            <button className="bouton-texte" onClick={() => setEdition(true)}>
+              Modifier
+            </button>
+            <button className="bouton-texte texte-alerte" onClick={supprimer}>
+              Supprimer
+            </button>
+          </div>
+        </div>
+      )}
+    </li>
   );
 }

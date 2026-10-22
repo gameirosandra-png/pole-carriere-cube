@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { Apprenant, Donnees } from "./types";
 import { creerDonneesDemo } from "./data/seed";
 
@@ -6,6 +6,7 @@ import { creerDonneesDemo } from "./data/seed";
 // La V2 remplacera ce module par une base partagée (Supabase).
 
 const CLE = "pole-carriere-cube:v3";
+const DUREE_ANNULATION_MS = 8000;
 
 function charger(): Donnees {
   try {
@@ -17,8 +18,15 @@ function charger(): Donnees {
   return creerDonneesDemo();
 }
 
+export interface Annulation {
+  message: string;
+  annuler: () => void;
+}
+
 export function useDonnees() {
   const [donnees, setDonnees] = useState<Donnees>(charger);
+  const [annulation, setAnnulation] = useState<Annulation | null>(null);
+  const minuteur = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     try {
@@ -28,24 +36,62 @@ export function useDonnees() {
     }
   }, [donnees]);
 
+  const fermerAnnulation = useCallback(() => {
+    window.clearTimeout(minuteur.current);
+    setAnnulation(null);
+  }, []);
+
+  /**
+   * Applique une modification destructive (suppression) et propose de l'annuler
+   * pendant quelques secondes, en restaurant l'état d'avant.
+   */
+  const modifierAvecAnnulation = (message: string, f: (d: Donnees) => Donnees) => {
+    const avant = donnees;
+    setDonnees(f(donnees));
+    window.clearTimeout(minuteur.current);
+    setAnnulation({
+      message,
+      annuler: () => {
+        setDonnees(avant);
+        fermerAnnulation();
+      },
+    });
+    minuteur.current = window.setTimeout(() => setAnnulation(null), DUREE_ANNULATION_MS);
+  };
+
   const majApprenant = (id: string, maj: (a: Apprenant) => Apprenant) =>
     setDonnees((d) => ({ ...d, apprenants: d.apprenants.map((a) => (a.id === id ? maj(a) : a)) }));
 
   const ajouterApprenant = (a: Apprenant) => setDonnees((d) => ({ ...d, apprenants: [...d.apprenants, a] }));
 
-  /** Supprime l'apprenant et le retire des offres où il était proposé. */
-  const supprimerApprenant = (id: string) =>
-    setDonnees((d) => ({
-      apprenants: d.apprenants.filter((a) => a.id !== id),
+  /** Supprime l'apprenant et le retire des offres où il était proposé (annulable). */
+  const supprimerApprenant = (id: string) => {
+    const a = donnees.apprenants.find((x) => x.id === id);
+    modifierAvecAnnulation(`Fiche de ${a?.prenom ?? ""} ${a?.nom ?? ""} supprimée`.trim(), (d) => ({
+      apprenants: d.apprenants.filter((x) => x.id !== id),
       entreprises: d.entreprises.map((e) => ({
         ...e,
         offres: e.offres.map((o) => ({ ...o, candidats: o.candidats.filter((c) => c !== id) })),
       })),
     }));
+  };
 
-  const reinitialiser = () => setDonnees(creerDonneesDemo());
+  const reinitialiser = () => {
+    fermerAnnulation();
+    setDonnees(creerDonneesDemo());
+  };
 
-  return { donnees, setDonnees, majApprenant, ajouterApprenant, supprimerApprenant, reinitialiser };
+  return {
+    donnees,
+    setDonnees,
+    majApprenant,
+    ajouterApprenant,
+    supprimerApprenant,
+    modifierAvecAnnulation,
+    annulation,
+    fermerAnnulation,
+    reinitialiser,
+  };
 }
 
 export const nouvelId = () =>

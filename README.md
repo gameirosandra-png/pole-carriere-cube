@@ -18,11 +18,14 @@ Après la formation, le suivi des apprenants est souvent dispersé entre tableur
 
 | Écran | Pour qui | Ce qu'on y fait |
 | --- | --- | --- |
-| Tableau de bord | Équipe | Voir chaque promo d'un coup d'œil, le taux d'insertion à 6 mois, le délai moyen, les apprenants à relancer, et l'avancement des dossiers étape par étape. Exporter les indicateurs en CSV. |
+| Tableau de bord | Équipe | Voir chaque promo d'un coup d'œil, le taux d'insertion à 6 mois, le délai moyen, l'entonnoir d'insertion avec son point de décrochage, les apprenants à relancer, et l'avancement des dossiers étape par étape. Exporter les indicateurs en CSV. |
 | Apprenants | Équipe | Rechercher, filtrer (dont « prêts à proposer »), voir l'avancement de chaque dossier, ajouter un apprenant, exporter la liste en CSV (ouvrable dans Excel). |
 | Fiche apprenant | Équipe | Changer le statut, valider les étapes du dossier, planifier la prochaine action, noter les échanges, voir les offres proposées, supprimer la fiche. |
-| Entreprises & offres | Équipe | Suivre les partenaires et leurs offres, proposer des apprenants (dossiers prêts en premier). |
+| Entreprises & offres | Équipe | Suivre les partenaires et leurs offres. **Suggérer des candidats** : les 3 meilleurs profils par offre, avec un score expliqué. Proposer, retirer, supprimer (avec annulation). |
+| Rapport | Direction | Rapport d'insertion d'une page par promo, prêt à imprimer ou à enregistrer en PDF. |
 | Espace apprenant | Apprenant | Son tableau de bord (dossier, prochaine étape, offres), sa checklist de dossier, et un formulaire pour dire où il en est. Sa fiche se met à jour sans relance manuelle. |
+
+Au premier passage, une **visite guidée** de 7 étapes présente l'app ; elle se relance depuis le tableau de bord.
 
 > Toutes les données sont fictives et calculées à partir de la date du jour, pour que la démo reste cohérente quel que soit le jour de visite. Elles sont enregistrées dans le navigateur (localStorage) : aucune donnée personnelle ne quitte l'ordinateur.
 
@@ -37,13 +40,15 @@ Après la formation, le suivi des apprenants est souvent dispersé entre tableur
 | Dossier prêt à proposer | Les 7 étapes faites : rendez-vous objectif, CV envoyé, CV validé, LinkedIn, portfolio, pitch, simulation d'entretien |
 | Qui coche quoi | L'apprenant coche ses étapes (CV envoyé, LinkedIn, portfolio) ; l'équipe valide les autres |
 | KPI de préparation | Part des apprenants en accompagnement (non insérés) ayant fait chaque étape, et nombre de dossiers prêts |
+| Score de matching (sur 100) | Dossier (40, proportionnel aux étapes faites) + poste visé retrouvé dans l'intitulé de l'offre (35) + disponibilité (25 en recherche, 15 en entretiens ailleurs, 25 en formation pour une alternance, 5 sinon) |
+| Entonnoir d'insertion | Sortis de formation → dossier prêt → en entretiens ou au-delà → en poste ou freelance ; niveaux cumulatifs, le plus gros écart signale le goulot |
 | Dernier contact | Mis à jour par une note, un changement de statut, une action faite ou une réponse de l'apprenant |
 
-Ces règles sont des fonctions pures dans [`src/regles.ts`](src/regles.ts) et [`src/dossier.ts`](src/dossier.ts), couvertes par des tests.
+Ces règles sont des fonctions pures dans [`src/regles.ts`](src/regles.ts), [`src/dossier.ts`](src/dossier.ts), [`src/matching.ts`](src/matching.ts) et [`src/rapport.ts`](src/rapport.ts), couvertes par des tests.
 
 ## Qualité
 
-- **Tests** : règles métier, checklist du dossier, calculs de dates (fin de mois, changement d'heure, fuseaux) et export CSV, avec Vitest.
+- **Tests** : règles métier, checklist du dossier, matching, entonnoir, calculs de dates (fin de mois, changement d'heure, fuseaux) et export CSV, avec Vitest.
 - **Intégration continue** : à chaque modification, GitHub vérifie les types TypeScript, lance les tests et le build ([workflow](.github/workflows/ci.yml)).
 - **Accessibilité** : couleurs de statut au contraste WCAG AA (4,5:1), statut toujours écrit en plus de la couleur, panneaux utilisables au clavier (focus piégé, Échap, retour du focus).
 - **Responsive** : utilisable sur mobile.
@@ -67,6 +72,8 @@ src/
   types.ts            modèle de données (Apprenant, Entreprise, Offre)
   regles.ts           règles métier et indicateurs (testés)
   dossier.ts          checklist du dossier et KPI de préparation (testés)
+  matching.ts         suggestion de candidats pour une offre (testé)
+  rapport.ts          entonnoir d'insertion et statistiques par promo (testés)
   dates.ts            calculs de dates sans décalage de fuseau (testés)
   csv.ts              export CSV compatible Excel (testé)
   store.ts            état de l'app et persistance locale
