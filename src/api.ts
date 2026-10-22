@@ -46,7 +46,7 @@ export function envoyerRecap(apprenants: Apprenant[], today = aujourdhui()) {
   });
 }
 
-/** Demande à l'IA un brief de rendez-vous pour cet apprenant. */
+/** V2 : demande à l'IA un brief de rendez-vous (fonction serveur api/brief.ts, prête mais non activée). */
 export function demanderBrief(a: Apprenant, entreprises: Entreprise[]) {
   return appeler<{ brief: string; modele: string }>("/api/brief", donneesPourBrief(a, entreprises));
 }

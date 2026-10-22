@@ -45,11 +45,11 @@ En production : rôles distincts (équipe, apprenant), politiques RLS par rôle,
 | Fonction | Comment ça marche |
 | --- | --- |
 | **Récap par e-mail (Make)** | Le bouton « Envoyer le récap par e-mail » appelle la fonction serveur [`api/recap.ts`](api/recap.ts), qui construit l'e-mail (apprenants à relancer, dossiers prêts, taux d'insertion) et le transmet à un scénario Make : *Webhook → Gmail → Réponse*. Le destinataire est fixé dans Make (l'équipe du pôle), jamais par le visiteur. |
-| **Brief de rendez-vous (IA)** | Dans la fiche, « Préparer le rendez-vous avec l'IA » appelle [`api/brief.ts`](api/brief.ts), qui envoie à Claude (modèle Haiku) une fiche bornée : statut, étapes du dossier, offres, dernières notes. Réponse en 3 rubriques : situation, points à travailler, questions à poser. Si l'IA est indisponible, un brief est calculé à partir des règles du suivi. |
+| **Brief de rendez-vous** | Dans la fiche, « Préparer le rendez-vous » propose une synthèse en 3 rubriques (situation, points à travailler, questions à poser), calculée à partir du suivi ([`src/brief.ts`](src/brief.ts), testé). |
 
-Les deux fonctions limitent le rythme et le volume d'appels, et n'acceptent que des champs structurés et tronqués : elles ne peuvent servir ni de relais d'e-mails ni de chatbot générique.
+Les fonctions serveur limitent le rythme et le volume d'appels, et n'acceptent que des champs structurés et tronqués : elles ne peuvent servir ni de relais d'e-mails ni de chatbot générique.
 
-Variables d'environnement (Vercel) : `MAKE_RECAP_WEBHOOK` (URL du webhook Make) et `ANTHROPIC_API_KEY` (clé API Anthropic). Sans elles, l'app fonctionne et l'indique clairement.
+Variable d'environnement (Vercel) : `MAKE_RECAP_WEBHOOK` (URL du webhook Make). Sans elle, l'app fonctionne et l'indique clairement.
 
 ## Règles métier
 
@@ -102,7 +102,7 @@ src/
   synchro.ts          calcul des changements à envoyer à la base (testé)
 api/
   recap.ts            envoi du récap via Make
-  brief.ts            brief de rendez-vous rédigé par Claude
+  brief.ts            brief de rendez-vous rédigé par Claude (V2, prêt mais non activé)
   dates.ts            calculs de dates sans décalage de fuseau (testés)
   csv.ts              export CSV compatible Excel (testé)
   store.ts            état de l'app et persistance locale
@@ -116,6 +116,7 @@ api/
 2. Lien personnel et sécurisé pour l'espace apprenant, envoyé automatiquement chaque mois.
 3. Récap envoyé automatiquement chaque lundi par Make, à partir de la base partagée.
 4. Import des apprenants depuis l'outil de gestion de l'école.
+5. **Brief de rendez-vous rédigé par l'IA** : la fonction serveur est prête ([`api/brief.ts`](api/brief.ts) : prompt borné, garde-fous de volume, modèle Claude Haiku). Activation = ajouter `ANTHROPIC_API_KEY` sur Vercel et brancher `demanderBrief` dans la fiche.
 
 ---
 

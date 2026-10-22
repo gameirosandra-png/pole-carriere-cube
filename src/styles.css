@@ -1324,9 +1324,6 @@ textarea {
   flex: 1 1 220px;
   margin: 0;
 }
-.bouton-ia::before {
-  content: "✦ ";
-}
 .brief {
   margin-top: 12px;
   padding: 14px 16px;
