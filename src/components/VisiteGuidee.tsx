@@ -291,6 +291,25 @@ export function VisiteGuidee({ changerVue, terminer, auto = false, ouvrirFiche }
 
   useEffect(() => () => narrateur.current?.arreter(), []);
 
+  // Mode film : les commandes s'effacent quand la souris ne bouge plus, pour une capture propre.
+  const [inactif, setInactif] = useState(false);
+  useEffect(() => {
+    if (!auto) return;
+    let minuteur = window.setTimeout(() => setInactif(true), 2500);
+    const bouge = () => {
+      setInactif(false);
+      clearTimeout(minuteur);
+      minuteur = window.setTimeout(() => setInactif(true), 2500);
+    };
+    window.addEventListener("mousemove", bouge);
+    window.addEventListener("keydown", bouge);
+    return () => {
+      clearTimeout(minuteur);
+      window.removeEventListener("mousemove", bouge);
+      window.removeEventListener("keydown", bouge);
+    };
+  }, [auto]);
+
   useEffect(() => {
     window.addEventListener("resize", mesurer);
     window.addEventListener("scroll", mesurer, true);
@@ -298,6 +317,10 @@ export function VisiteGuidee({ changerVue, terminer, auto = false, ouvrirFiche }
       if (e.key === "Escape") terminer();
       if (e.key === "ArrowRight" && !derniere) setIndex((i) => i + 1);
       if (e.key === "ArrowLeft") setIndex((i) => Math.max(0, i - 1));
+      if (auto && e.key === " ") {
+        e.preventDefault();
+        setPause((p) => !p);
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => {
@@ -305,7 +328,7 @@ export function VisiteGuidee({ changerVue, terminer, auto = false, ouvrirFiche }
       window.removeEventListener("scroll", mesurer, true);
       window.removeEventListener("keydown", onKey);
     };
-  }, [mesurer, terminer, derniere]);
+  }, [mesurer, terminer, derniere, auto]);
 
   // Bulle sous la zone s'il y a la place, sinon au-dessus ; collée en bas sur mobile.
   const marge = 12;
@@ -326,6 +349,72 @@ export function VisiteGuidee({ changerVue, terminer, auto = false, ouvrirFiche }
       : { top: Math.max(16, cadre.top - marge - 220), left: gauche, width: largeur };
   }
 
+  if (auto) {
+    // Mode film : un bandeau de sous-titres en bas, l'interface reste visible.
+    // Fiche apprenant ouverte : le bandeau se place à gauche du panneau.
+    const avecFiche = fiche && fiche.left > 480 && window.innerWidth >= 700;
+    const styleBandeau: CSSProperties = avecFiche
+      ? { left: 16, width: fiche.left - 32 }
+      : { left: "50%", transform: "translateX(-50%)", width: Math.min(880, window.innerWidth - 32) };
+    return (
+      <div className={inactif ? "visite film inactif" : "visite film"} aria-live="polite">
+        {cadre && (
+          <div
+            className="visite-projecteur"
+            style={{ top: cadre.top - 6, left: cadre.left - 6, width: cadre.width + 12, height: cadre.height + 12 }}
+          />
+        )}
+        <div
+          className="visite-bulle film-bandeau"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="visite-titre"
+          tabIndex={-1}
+          ref={bulle}
+          style={styleBandeau}
+        >
+          <div className="film-tete">
+            <p className="visite-compteur">
+              Démo · {index + 1} / {etapes.length}
+            </p>
+            {modeVoix && nomVoix && <p className="visite-voix">Commentée par {nomVoix}</p>}
+            <div className="film-commandes">
+              {voixDispo && (
+                <button
+                  className="film-bouton bouton-voix"
+                  aria-pressed={voixActive}
+                  onClick={() => setVoixActive(!voixActive)}
+                  title={voixActive ? "Couper la voix" : "Activer la voix"}
+                >
+                  {voixActive ? "Voix" : "Voix coupée"}
+                </button>
+              )}
+              <button className="film-bouton" onClick={() => setPause(!pause)}>
+                {pause ? "Reprendre" : "Pause"}
+              </button>
+              {index > 0 && (
+                <button className="film-bouton" onClick={() => setIndex(index - 1)}>
+                  Précédent
+                </button>
+              )}
+              <button className="film-bouton" onClick={() => (derniere ? terminer() : setIndex(index + 1))}>
+                {derniere ? "Terminer" : "Suivant"}
+              </button>
+              <button className="film-bouton" onClick={terminer} aria-label="Quitter la démo" title="Quitter la démo">
+                ×
+              </button>
+            </div>
+          </div>
+          <h2 id="visite-titre">{etape.titre}</h2>
+          <p className="film-texte">{etape.texte}</p>
+          <div className="visite-temps" aria-hidden="true">
+            <span style={{ width: `${Math.min(modeVoix ? 98 : 100, (ecoule / duree) * 100)}%` }} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="visite" aria-live="polite">
       {cadre && (
@@ -344,36 +433,15 @@ export function VisiteGuidee({ changerVue, terminer, auto = false, ouvrirFiche }
         style={style}
       >
         <p className="visite-compteur">
-          {auto ? "Démo" : "Visite guidée"} · {index + 1} / {etapes.length}
+          Visite guidée · {index + 1} / {etapes.length}
         </p>
-        {auto && (
-          <div className="visite-temps" aria-hidden="true">
-            <span style={{ width: `${Math.min(modeVoix ? 98 : 100, (ecoule / duree) * 100)}%` }} />
-          </div>
-        )}
-        {modeVoix && nomVoix && <p className="visite-voix">Commentée par {nomVoix}</p>}
         <h2 id="visite-titre">{etape.titre}</h2>
         <p>{etape.texte}</p>
         <div className="visite-actions">
           <button className="bouton-texte" onClick={terminer}>
-            {auto ? "Quitter la démo" : "Passer la visite"}
+            Passer la visite
           </button>
           <span className="visite-nav">
-            {auto && voixDispo && (
-              <button
-                className="bouton bouton-discret bouton-voix"
-                aria-pressed={voixActive}
-                onClick={() => setVoixActive(!voixActive)}
-                title={voixActive ? "Couper la voix" : "Activer la voix"}
-              >
-                {voixActive ? "🔊 Voix" : "🔇 Voix"}
-              </button>
-            )}
-            {auto && (
-              <button className="bouton bouton-discret" onClick={() => setPause(!pause)}>
-                {pause ? "Reprendre" : "Pause"}
-              </button>
-            )}
             {index > 0 && (
               <button className="bouton bouton-discret" onClick={() => setIndex(index - 1)}>
                 Précédent
