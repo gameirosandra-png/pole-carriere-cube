@@ -61,6 +61,8 @@ export default function App() {
   const [vue, setVue] = useState<Vue>("tdb");
   const [ficheId, setFicheId] = useState<string | null>(null);
   const [visite, setVisite] = useState<false | "guidee" | "demo">(false);
+  // Pendant la démo, l'espace apprenant affiche l'apprenant raconté (Hugo) ; ensuite, le choix redevient libre.
+  const [espaceDemo, setEspaceDemo] = useState<string | null>(null);
 
   // Au premier passage, la visite guidée démarre seule.
   useEffect(() => {
@@ -79,6 +81,7 @@ export default function App() {
   }, []);
   const terminerVisite = useCallback(() => {
     setVisite(false);
+    setEspaceDemo(null);
     setFicheId(null);
     setVue("tdb");
     window.scrollTo({ top: 0 });
@@ -194,7 +197,12 @@ export default function App() {
           />
         )}
         {vue === "espace" && (
-          <EspaceApprenant apprenants={donnees.apprenants} entreprises={donnees.entreprises} maj={majApprenant} />
+          <EspaceApprenant
+            apprenants={donnees.apprenants}
+            entreprises={donnees.entreprises}
+            maj={majApprenant}
+            idImpose={visite === "demo" ? espaceDemo : null}
+          />
         )}
         {vue === "rapport" && <Rapport apprenants={donnees.apprenants} />}
       </main>
@@ -238,6 +246,7 @@ export default function App() {
           auto={visite === "demo"}
           changerVue={setVue}
           ouvrirFiche={setFicheId}
+          choisirEspace={setEspaceDemo}
           terminer={terminerVisite}
         />
       )}

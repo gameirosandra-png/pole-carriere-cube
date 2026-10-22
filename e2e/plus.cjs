@@ -108,21 +108,24 @@ const URL = process.env.URL || 'http://127.0.0.1:4173/';
   // --- Démo auto : chaque étape trouve sa zone
   await p.click('nav >> text=Tableau de bord');
   await p.click('.entete-banniere button:has-text("Démo auto")');
-  for (let i = 0; i < 11; i++) {
+  for (let i = 0; i < 14; i++) {
     await p.waitForTimeout(350);
     const titre = await p.textContent('#visite-titre');
-    ok(await p.locator('.visite-projecteur').count() === 1, `démo ${i + 1} : ${titre}`);
-    if (i === 3 || i === 7) await p.screenshot({ path: out + `/p-demo-${i + 1}.png` });
-    if (i < 10) await p.click('.visite-bulle button:has-text("Suivant")');
+    const carton = i === 0 || i === 13;
+    ok(carton ? await p.locator('.film-carton').count() === 1 : await p.locator('.visite-projecteur').count() === 1, `démo ${i + 1} : ${titre}`);
+    if (i === 10) ok((await p.textContent('.espace-bonjour')).includes('Bonjour Hugo'), 'démo : l\'espace apprenant montre Hugo');
+    if ([0, 4, 11, 13].includes(i)) await p.screenshot({ path: out + `/p-demo-${i + 1}.png` });
+    if (i < 13) await p.click('.visite-bulle button:has-text("Suivant")');
   }
+  ok((await p.textContent('.film-carton')).includes('ladoucenaissance@gmail.com'), 'démo : écran de fin avec le contact');
   await p.click('.visite-bulle button:has-text("Terminer")');
   ok(!(await p.locator('.visite').count()) && !(await p.locator('.fiche').count()), 'démo terminée, fiche fermée');
   await p.click('.barre-pied .bouton-demo');
   await p.waitForTimeout(11800);
-  ok((await p.textContent('.visite-compteur')).includes('2 / 11'), 'démo : avance seule après 11 s');
+  ok((await p.textContent('.visite-compteur')).includes('2 / 14'), 'démo : avance seule (ouverture 5 s, puis 11 s par étape)');
   await p.click('.visite-bulle button:has-text("Pause")');
   await p.waitForTimeout(1200);
-  ok((await p.textContent('.visite-compteur')).includes('2 / 11'), 'démo : pause');
+  ok((await p.textContent('.visite-compteur')).includes('2 / 14'), 'démo : pause');
   await p.keyboard.press('Escape');
 
   // --- Mobile

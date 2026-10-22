@@ -18,6 +18,8 @@ interface Props {
   apprenants: Apprenant[];
   entreprises: Entreprise[];
   maj: (id: string, f: (a: Apprenant) => Apprenant) => void;
+  /** Apprenant affiché imposé de l'extérieur (démo automatique). */
+  idImpose?: string | null;
 }
 
 /**
@@ -25,10 +27,11 @@ interface Props {
  * sa prochaine étape, les offres proposées, et un formulaire pour dire où il en est.
  * Chaque mise à jour alimente directement le suivi de l'équipe.
  */
-export function EspaceApprenant({ apprenants, entreprises, maj }: Props) {
+export function EspaceApprenant({ apprenants, entreprises, maj, idImpose }: Props) {
   // Tous les apprenants non insérés : le dossier se prépare dès la formation.
   const candidats = apprenants.filter((a) => !estInsere(a));
-  const [id, setId] = useState(candidats[0]?.id ?? "");
+  const [idChoisi, setId] = useState(candidats[0]?.id ?? "");
+  const id = idImpose ?? idChoisi;
   const a = apprenants.find((x) => x.id === id);
 
   return (

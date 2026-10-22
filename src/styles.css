@@ -2605,3 +2605,70 @@ textarea {
     margin-left: 0;
   }
 }
+
+/* Écrans d'ouverture et de fin de la démo */
+.film-carton {
+  position: fixed;
+  inset: 0;
+  background: var(--violet-nuit);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 32px 24px 160px;
+  gap: 6px;
+}
+.film-carton img {
+  margin-bottom: 12px;
+}
+.film-carton p {
+  margin: 0;
+}
+.film-carton-sur-titre {
+  color: var(--orange);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+.film-carton-titre {
+  font-family: "Outfit", "Inter", sans-serif;
+  font-size: clamp(40px, 6vw, 72px);
+  font-weight: 500;
+  line-height: 1.05;
+}
+.film-carton-sous-titre {
+  font-size: clamp(18px, 2.2vw, 24px);
+  color: #e6defa;
+  max-width: 720px;
+}
+.film-carton-preuve {
+  margin-top: 18px !important;
+  padding: 6px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 999px;
+  font-size: 15px;
+}
+.film-carton-liens {
+  list-style: none;
+  margin: 22px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+  font-size: 17px;
+  text-align: left;
+}
+.film-carton-liens span {
+  display: inline-block;
+  min-width: 84px;
+  color: var(--orange);
+  font-weight: 600;
+}
+.film-carton-pied {
+  margin-top: 26px !important;
+  font-size: 13px;
+  color: #b9acd9;
+}
+.profil {
+  padding: 4px 8px;
+}

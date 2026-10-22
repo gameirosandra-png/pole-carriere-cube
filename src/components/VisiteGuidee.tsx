@@ -24,6 +24,12 @@ interface Etape {
   clic?: string;
   /** Démo : le texte dit par la voix, écrit pour l'oral. */
   voix?: string;
+  /** Démo : apprenant à afficher dans l'espace apprenant. */
+  espace?: string;
+  /** Démo : écran plein (ouverture ou fin de la vidéo) au lieu d'une zone de l'app. */
+  carton?: "ouverture" | "fin";
+  /** Durée sans voix, en ms (11 s par défaut). */
+  duree?: number;
 }
 
 export const ETAPES_VISITE: Etape[] = [
@@ -88,11 +94,22 @@ export const ETAPES_DEMO: Etape[] = [
   {
     vue: "tdb",
     fiche: null,
+    cible: "",
+    carton: "ouverture",
+    duree: 5000,
+    titre: "Le pôle carrière",
+    texte: "Accompagner les apprenants d'une école no-code jusqu'à l'emploi.",
+    voix:
+      "Voici le pôle carrière : un outil pour accompagner les apprenants d'une école no-code jusqu'à l'emploi. Deux minutes pour en faire le tour.",
+  },
+  {
+    vue: "tdb",
+    fiche: null,
     cible: ".semaine",
     titre: "Lundi matin au pôle carrière",
     texte: "La semaine en un coup d'œil : rendez-vous, ateliers collectifs, et ce qui est en retard.",
     voix:
-      "Bienvenue au pôle carrière. Lundi matin, en un coup d'œil : les rendez-vous de la semaine, les ateliers collectifs, et ce qui est en retard.",
+      "Lundi matin, en un coup d'œil : les rendez-vous de la semaine, les ateliers collectifs, et ce qui est en retard.",
   },
   {
     vue: "tdb",
@@ -174,12 +191,23 @@ export const ETAPES_DEMO: Etape[] = [
   },
   {
     vue: "espace",
+    espace: "a10",
     fiche: null,
     cible: ".boite-outils",
     titre: "L'apprenant avance seul",
     texte: "Dans son espace, Hugo retrouve son CV à corriger, son pitch, sa prétention, et s'entraîne à l'oral.",
     voix:
       "Entre deux séances, Hugo avance seul. Dans son espace, il retrouve son CV à corriger, son pitch, sa prétention, et il s'entraîne à l'oral.",
+  },
+  {
+    vue: "espace",
+    fiche: "a14",
+    clic: "#onglet-suivi",
+    cible: ".profil",
+    titre: "Faire connaissance dès l'arrivée",
+    texte: "Un questionnaire avant la séance 1 : objectifs, contraintes et inquiétudes remontent dans la fiche.",
+    voix:
+      "Dès son arrivée, chaque apprenant remplit un questionnaire pour faire connaissance. Ses objectifs et ses inquiétudes remontent dans sa fiche : la première séance démarre sur l'essentiel.",
   },
   {
     vue: "rapport",
@@ -189,6 +217,17 @@ export const ETAPES_DEMO: Etape[] = [
     texte: "Taux d'insertion, délais, promo par promo : un rapport d'une page, prêt à imprimer.",
     voix:
       "Enfin, la direction a ses chiffres : taux d'insertion, délais, promo par promo. Un pôle carrière piloté, de l'accompagnement jusqu'à l'emploi.",
+  },
+  {
+    vue: "rapport",
+    fiche: null,
+    cible: "",
+    carton: "fin",
+    duree: 8000,
+    titre: "Sandra Gameiro",
+    texte: "Product & Operations Builder · No-code et IA",
+    voix:
+      "Ce MVP a été construit en une journée avec Claude, et vérifié par plus de cent soixante-dix tests automatiques. Je suis Sandra Gameiro : je serais ravie de vous le présenter.",
   },
 ];
 
@@ -200,10 +239,11 @@ interface Props {
   /** Démo automatique : les étapes s'enchaînent seules. */
   auto?: boolean;
   ouvrirFiche?: (id: string | null) => void;
+  choisirEspace?: (id: string | null) => void;
 }
 
 /** Visite guidée : met en lumière chaque zone clé de l'app, écran par écran. */
-export function VisiteGuidee({ changerVue, terminer, auto = false, ouvrirFiche }: Props) {
+export function VisiteGuidee({ changerVue, terminer, auto = false, ouvrirFiche, choisirEspace }: Props) {
   const etapes = auto ? ETAPES_DEMO : ETAPES_VISITE;
   const [index, setIndex] = useState(0);
   const [cadre, setCadre] = useState<DOMRect | null>(null);
@@ -235,10 +275,10 @@ export function VisiteGuidee({ changerVue, terminer, auto = false, ouvrirFiche }
   const modeVoix = auto && voixActive && voixDispo;
   const texteVoix = etape.voix ?? etape.texte;
   // Durées exprimées en temps réel : à 1,5×, une étape dure 1,5 fois moins longtemps.
-  const duree = modeVoix ? dureeEstimeeMs(texteVoix) : DUREE_ETAPE_MS;
+  const duree = modeVoix ? dureeEstimeeMs(texteVoix) : (etape.duree ?? DUREE_ETAPE_MS);
 
   const mesurer = useCallback(() => {
-    const el = document.querySelector(etape.cible);
+    const el = etape.cible ? document.querySelector(etape.cible) : null;
     setCadre(el ? el.getBoundingClientRect() : null);
     const panneau = el?.closest(".fiche");
     setFiche(panneau ? panneau.getBoundingClientRect() : null);
@@ -248,6 +288,7 @@ export function VisiteGuidee({ changerVue, terminer, auto = false, ouvrirFiche }
   useLayoutEffect(() => {
     changerVue(etape.vue);
     if (etape.fiche !== undefined) ouvrirFiche?.(etape.fiche);
+    if (etape.espace) choisirEspace?.(etape.espace);
     setEcoule(0);
     let minuteur = 0;
     let image = requestAnimationFrame(() => {
@@ -255,7 +296,7 @@ export function VisiteGuidee({ changerVue, terminer, auto = false, ouvrirFiche }
         if (etape.clic) document.querySelector<HTMLElement>(etape.clic)?.click();
         minuteur = window.setTimeout(
           () => {
-            const el = document.querySelector(etape.cible);
+            const el = etape.cible ? document.querySelector(etape.cible) : null;
             el?.scrollIntoView({ block: "center", behavior: "auto" });
             mesurer();
             bulle.current?.focus();
@@ -268,7 +309,7 @@ export function VisiteGuidee({ changerVue, terminer, auto = false, ouvrirFiche }
       cancelAnimationFrame(image);
       clearTimeout(minuteur);
     };
-  }, [etape, changerVue, mesurer, ouvrirFiche]);
+  }, [etape, changerVue, mesurer, ouvrirFiche, choisirEspace]);
 
   const avancer = useCallback(() => {
     if (derniere) terminer();
@@ -285,27 +326,33 @@ export function VisiteGuidee({ changerVue, terminer, auto = false, ouvrirFiche }
   // Sans voix : on avance au minuteur. Avec voix : à la fin de la phrase (filet de sécurité si elle ne finit jamais).
   useEffect(() => {
     if (!auto) return;
-    if ((!modeVoix && ecoule >= DUREE_ETAPE_MS) || (modeVoix && ecoule >= duree * 2 + 4000)) avancer();
+    if ((!modeVoix && ecoule >= duree) || (modeVoix && ecoule >= duree * 2 + 4000)) avancer();
   }, [auto, modeVoix, ecoule, duree, avancer]);
 
+  // La phrase est finie : on passe à la suite après un court silence, sauf en pause.
+  const [voixFinie, setVoixFinie] = useState(-1);
   useEffect(() => {
     if (!modeVoix) return;
     const n = narrateur.current!;
     let actif = true;
-    let suite = 0;
     n.dire(texteVoix, index, vitesse).then((fin) => {
       if (!actif) return;
       setNomVoix(n.nomVoix);
-      if (fin === "fini") suite = window.setTimeout(avancer, 700 / vitesse);
+      if (fin === "fini") setVoixFinie(index);
       if (fin === "indisponible") setVoixDispo(false);
     });
     setNomVoix(n.nomVoix);
     return () => {
       actif = false;
-      clearTimeout(suite);
       n.arreter();
     };
-  }, [modeVoix, texteVoix, index, avancer, vitesse]);
+  }, [modeVoix, texteVoix, index, vitesse]);
+
+  useEffect(() => {
+    if (!modeVoix || pause || voixFinie !== index) return;
+    const suite = window.setTimeout(avancer, 700 / vitesse);
+    return () => clearTimeout(suite);
+  }, [modeVoix, pause, voixFinie, index, avancer, vitesse]);
 
   useEffect(() => {
     if (pause) narrateur.current?.pause();
@@ -383,7 +430,8 @@ export function VisiteGuidee({ changerVue, terminer, auto = false, ouvrirFiche }
       : { left: "50%", transform: "translateX(-50%)", width: Math.min(880, window.innerWidth - 32) };
     return (
       <div className={inactif ? "visite film inactif" : "visite film"} aria-live="polite">
-        {cadre && (
+        {etape.carton && <Carton type={etape.carton} />}
+        {cadre && !etape.carton && (
           <div
             className="visite-projecteur"
             style={{ top: cadre.top - 6, left: cadre.left - 6, width: cadre.width + 12, height: cadre.height + 12 }}
@@ -438,8 +486,16 @@ export function VisiteGuidee({ changerVue, terminer, auto = false, ouvrirFiche }
               </button>
             </div>
           </div>
-          <h2 id="visite-titre">{etape.titre}</h2>
-          <p className="film-texte">{etape.texte}</p>
+          {etape.carton ? (
+            <h2 id="visite-titre" className="visuellement-cache">
+              {etape.titre}
+            </h2>
+          ) : (
+            <>
+              <h2 id="visite-titre">{etape.titre}</h2>
+              <p className="film-texte">{etape.texte}</p>
+            </>
+          )}
           <div className="visite-temps" aria-hidden="true">
             <span style={{ width: `${Math.min(modeVoix ? 98 : 100, (ecoule / duree) * 100)}%` }} />
           </div>
@@ -486,6 +542,44 @@ export function VisiteGuidee({ changerVue, terminer, auto = false, ouvrirFiche }
           </span>
         </div>
       </div>
+    </div>
+  );
+}
+
+/** Écrans d'ouverture et de fin de la démo : ce qu'il faut savoir quand la vidéo circule sans vous. */
+function Carton({ type }: { type: "ouverture" | "fin" }) {
+  if (type === "ouverture") {
+    return (
+      <div className="film-carton">
+        <img src="/logo.svg" alt="" width="72" height="72" />
+        <p className="film-carton-sur-titre">MVP · démo commentée de 2 minutes</p>
+        <p className="film-carton-titre">Le pôle carrière</p>
+        <p className="film-carton-sous-titre">Accompagner les apprenants d'une école no-code jusqu'à l'emploi</p>
+        <p className="film-carton-pied">Conçu par Sandra Gameiro · données fictives</p>
+      </div>
+    );
+  }
+  return (
+    <div className="film-carton">
+      <img src="/logo.svg" alt="" width="56" height="56" />
+      <p className="film-carton-titre">Sandra Gameiro</p>
+      <p className="film-carton-sous-titre">Product &amp; Operations Builder · No-code et IA</p>
+      <p className="film-carton-preuve">Construit en une journée avec Claude · 170+ vérifications automatiques</p>
+      <ul className="film-carton-liens">
+        <li>
+          <span>Démo</span> pole-carriere-cube.vercel.app
+        </li>
+        <li>
+          <span>Code</span> github.com/gameirosandra-png/pole-carriere-cube
+        </li>
+        <li>
+          <span>Contact</span> ladoucenaissance@gmail.com
+        </li>
+        <li>
+          <span>LinkedIn</span> linkedin.com/in/sandra-gameiro
+        </li>
+      </ul>
+      <p className="film-carton-pied">Démo indépendante, non affiliée à l'École Cube · données fictives</p>
     </div>
   );
 }
