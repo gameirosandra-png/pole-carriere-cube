@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { createPortal } from "react-dom";
 import { envoyerLienMagique, type Session } from "../supabase";
 import type { EtatSynchro } from "../store";
 import { Panneau } from "./Panneau";
@@ -49,7 +50,8 @@ export function ModeEquipe({
       <button className="bouton-mode" onClick={() => setOuvert(true)}>
         Passer en mode équipe
       </button>
-      {ouvert && <Connexion erreurInitiale={erreurLien} fermer={() => setOuvert(false)} />}
+      {/* Rendu hors du menu : sinon le panneau hérite des couleurs claires et de la transparence de la barre violette. */}
+      {ouvert && createPortal(<Connexion erreurInitiale={erreurLien} fermer={() => setOuvert(false)} />, document.body)}
     </>
   );
 }

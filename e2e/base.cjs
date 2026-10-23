@@ -69,6 +69,12 @@ const URL = process.env.URL || 'http://127.0.0.1:4173/';
   await r.addInitScript(SKIP);
   await r.goto(URL); await r.waitForTimeout(400);
   await r.screenshot({ path: '/home/claude/pole-carriere-cube/docs/capture-tableau-de-bord.png' });
+  // Panneau « Mode équipe » lisible : texte foncé, sans la transparence du menu
+  await p.keyboard.press('Escape').catch(() => {});
+  await p.click('.bouton-mode'); await p.waitForTimeout(500);
+  const lisible = await p.evaluate(() => { const h = document.querySelector('#titre-connexion'); let o = 1, e = h; while (e) { o *= Number(getComputedStyle(e).opacity); e = e.parentElement; } return getComputedStyle(h).color === 'rgb(29, 29, 35)' && o === 1; });
+  ok(lisible, 'panneau Mode équipe lisible (texte foncé, opaque)');
+  await p.keyboard.press('Escape');
   console.log('erreurs JS:', JSON.stringify(errs));
   await b.close();
 })();
