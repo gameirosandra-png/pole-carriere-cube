@@ -159,3 +159,40 @@ export function pointsAttentionADN(adn: MethodeADN | undefined): string[] {
   }
   return points;
 }
+
+/* ---------- Vue cohorte : ce que la méthode révèle sur l'ensemble des apprenants ---------- */
+
+/** Dernière météo de chaque apprenant qui en a noté une, les plus fragiles d'abord. */
+export function meteoCohorte(apprenants: Apprenant[]) {
+  return apprenants
+    .flatMap((a) => {
+      const t = tendanceConfiance(a.accompagnement?.adn);
+      return t ? [{ apprenant: a, ...t }] : [];
+    })
+    .sort((x, y) => x.derniere - y.derniere || x.evolution - y.evolution);
+}
+
+/** Les freins les plus fréquents dans la cohorte : de quoi décider du prochain atelier collectif. */
+export function freinsFrequents(apprenants: Apprenant[]) {
+  return FREINS.map((f) => ({
+    frein: f,
+    apprenants: apprenants.filter((a) => a.accompagnement?.adn?.freins?.includes(f.id)),
+  }))
+    .filter((x) => x.apprenants.length > 0)
+    .sort((x, y) => y.apprenants.length - x.apprenants.length);
+}
+
+/** Les dernières victoires de la cohorte, toutes personnes confondues. */
+export function victoiresRecentes(apprenants: Apprenant[], nombre = 6) {
+  return apprenants
+    .flatMap((a) => (a.accompagnement?.adn?.victoires ?? []).map((victoire) => ({ apprenant: a, victoire })))
+    .sort((x, y) => y.victoire.date.localeCompare(x.victoire.date))
+    .slice(0, nombre);
+}
+
+/** Confiance moyenne de la cohorte, de 1 à 5 (null si personne n'a noté sa météo). */
+export function confianceMoyenne(apprenants: Apprenant[]) {
+  const m = meteoCohorte(apprenants);
+  if (!m.length) return null;
+  return Math.round((m.reduce((s, x) => s + x.derniere, 0) / m.length) * 10) / 10;
+}

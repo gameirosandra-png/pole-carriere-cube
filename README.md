@@ -22,6 +22,13 @@ Outil pour accompagner les apprenants jusqu'à l'emploi et piloter le taux d'ins
 | **En combien de temps** | Une journée, en 14 versions successives (voir l'[historique des commits](https://github.com/gameirosandra-png/pole-carriere-cube/commits/main)) |
 | **Comment** | Je spécifie, je construis avec Claude, je vérifie par des tests, je déploie, puis j'itère sur les retours |
 
+## Ce qui fait la différence
+
+Deux choses vont au-delà d'un outil de suivi, et ce sont elles que j'apporte :
+
+1. **La méthode ADN, mon accompagnement signature** (écran « Méthode ADN » dans le menu). Un CV ne suffit pas : il faut aussi y croire, et savoir raconter son histoire. *Ancrer* ses forces, *Diriger* son cap en levant les freins (syndrome de l'imposteur, plafond de verre, peur de gagner de l'argent…), *Narrer* sa reconversion. L'équipe voit d'un coup d'œil la confiance de toute la cohorte, qui écouter en priorité, et quel atelier collectif organiser.
+2. **Le simulateur freelance** (« Simulateur freelance » dans le menu). « Je veux 3 000 € net par mois » : le TJM à facturer, les jours et les missions nécessaires, chiffres 2026 sourcés. Complété par le module « Se lancer » : statuts, démarches, facturation.
+
 ## Le problème
 
 Après la formation, le suivi des apprenants est souvent dispersé entre tableurs, messages et mémoire. On perd de vue ceux qui décrochent, et le taux d'insertion, demandé pour le reporting RNCP et Qualiopi, est long à calculer.
@@ -54,7 +61,7 @@ Je suis apprenante Product Builder No-Code à l'École Cube, donc je connais ce 
 
 ## Ce que j'ai appris
 
-- **Construire avec l'IA, c'est surtout spécifier et vérifier.** Claude écrit vite ; mon travail est de dire précisément quoi construire, de relire, et de prouver que ça marche : 79 tests unitaires, plus de 160 vérifications de bout en bout et une intégration continue.
+- **Construire avec l'IA, c'est surtout spécifier et vérifier.** Claude écrit vite ; mon travail est de dire précisément quoi construire, de relire, et de prouver que ça marche : 80 tests unitaires, plus de 160 vérifications de bout en bout et une intégration continue.
 - **Le retour d'un expert vaut plus qu'une fonctionnalité de plus.** La V1 était juste techniquement mais à côté du vrai besoin.
 - **Un MVP, c'est aussi savoir s'arrêter.** Rôles, temps réel, import des données de l'école : listés en V2, pas improvisés.
 
@@ -114,7 +121,9 @@ Et pour aller jusqu'à l'emploi :
 
 | Écran | Pour qui | Ce qu'on y fait |
 | --- | --- | --- |
-| Tableau de bord | Équipe | La semaine du pôle (rendez-vous, ateliers, retards), les relances automatiques prêtes à partir, les questions des apprenants en attente, puis chaque promo d'un coup d'œil, le taux d'insertion à 6 mois, le délai moyen, l'effet de l'accompagnement (gain moyen de score CV), l'entonnoir d'insertion avec son point de décrochage, les apprenants à relancer, et l'avancement des dossiers étape par étape. Exporter les indicateurs en CSV. |
+| Méthode ADN | Équipe | La méthode signature, et la cohorte vue par elle : confiance moyenne, qui écouter en priorité, freins les plus fréquents avec l'atelier collectif à proposer, dernières victoires. |
+| Simulateur freelance | Apprenant, équipe | Le simulateur de revenus freelance, en séance ou en autonomie. |
+| Tableau de bord | Équipe | Un encart Méthode ADN (confiance de la cohorte, qui écouter), la semaine du pôle (rendez-vous, ateliers, retards), les relances automatiques prêtes à partir, les questions des apprenants en attente, puis chaque promo d'un coup d'œil, le taux d'insertion à 6 mois, le délai moyen, l'effet de l'accompagnement (gain moyen de score CV), l'entonnoir d'insertion avec son point de décrochage, les apprenants à relancer, et l'avancement des dossiers étape par étape. Exporter les indicateurs en CSV. |
 | Apprenants | Équipe | Rechercher, filtrer (dont « prêts à proposer »), voir l'avancement de chaque dossier, ajouter un apprenant, exporter la liste en CSV (ouvrable dans Excel). |
 | Fiche apprenant | Équipe | 6 onglets : Suivi (ce que l'apprenant a dit dans le questionnaire, ses questions, la courbe de progression), CV, Portfolio, Salaire, Convaincre (avec le mode entraînement), Fiche candidat. Changer le statut, valider les séances, planifier la prochaine action, noter les échanges, voir les offres proposées, supprimer la fiche. |
 | Entreprises & offres | Équipe | Suivre les partenaires et leurs offres. **Suggérer des candidats** : les 3 meilleurs profils par offre, avec un score expliqué. Proposer, retirer, supprimer (avec annulation). **Envoyer la shortlist** à l'entreprise par e-mail. |
@@ -170,8 +179,8 @@ Ces règles sont des fonctions pures dans [`src/regles.ts`](src/regles.ts), [`sr
 
 ## Qualité
 
-- **Tests** : 79 tests unitaires sur les règles métier, parcours et ateliers d'accompagnement, matching, entonnoir, calculs de dates (fin de mois, changement d'heure, fuseaux) et export CSV, avec Vitest.
-- **Bout en bout** : 204 vérifications Playwright dans [`e2e/`](e2e) (parcours complets dans un vrai navigateur, sur ordinateur et mobile), lancées avant chaque version avec `npm run e2e` ; pas encore dans la CI.
+- **Tests** : 80 tests unitaires sur les règles métier, parcours et ateliers d'accompagnement, matching, entonnoir, calculs de dates (fin de mois, changement d'heure, fuseaux) et export CSV, avec Vitest.
+- **Bout en bout** : 209 vérifications Playwright dans [`e2e/`](e2e) (parcours complets dans un vrai navigateur, sur ordinateur et mobile), lancées avant chaque version avec `npm run e2e` ; pas encore dans la CI.
 - **Intégration continue** : à chaque modification, GitHub vérifie les types TypeScript, lance les tests et le build ([workflow](.github/workflows/ci.yml)).
 - **Accessibilité** : couleurs de statut au contraste WCAG AA (4,5:1), statut toujours écrit en plus de la couleur, panneaux utilisables au clavier (focus piégé, Échap, retour du focus).
 - **Responsive** : utilisable sur mobile.

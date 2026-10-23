@@ -166,6 +166,12 @@ function PageApprenant({
 
       <QuestionnaireApprenant apprenant={a} maj={maj} />
 
+      <section className="espace-adn" aria-labelledby="titre-adn">
+        <h2 id="titre-adn">Ma méthode ADN</h2>
+        <p className="secondaire">Ancrer, Diriger, Narrer : la confiance et le récit, en plus des outils.</p>
+        <AtelierADN apprenant={a} maj={maj} mode="apprenant" />
+      </section>
+
       <div className="espace">
         <div className="espace-carte">
           <h2>Ton parcours en 7 séances</h2>
@@ -256,11 +262,6 @@ function PageApprenant({
         </div>
       </div>
 
-      <section className="espace-adn" aria-labelledby="titre-adn">
-        <h2 id="titre-adn">Ma méthode ADN</h2>
-        <p className="secondaire">Ancrer, Diriger, Narrer : la confiance et le récit, en plus des outils.</p>
-        <AtelierADN apprenant={a} maj={maj} mode="apprenant" />
-      </section>
       <BoiteOutils apprenant={a} />
       <VoletFreelance key={`freelance-${a.id}`} apprenant={a} maj={maj} />
     </div>

@@ -10,6 +10,8 @@ import { VisiteGuidee, type VueVisite } from "./components/VisiteGuidee";
 import { ModeEquipe } from "./components/ModeEquipe";
 import { AteliersCollectifs } from "./components/AteliersCollectifs";
 import { amorcerVoix } from "./narration";
+import { PageMethodeADN } from "./components/PageMethodeADN";
+import { PageSimulateur } from "./components/SimulateurFreelance";
 import {
   deconnecter,
   lireErreurLienMagique,
@@ -20,12 +22,14 @@ import {
 
 type Vue = VueVisite;
 
-const VUES: { id: Vue; libelle: string }[] = [
+const VUES: { id: Vue; libelle: string; signature?: boolean }[] = [
   { id: "tdb", libelle: "Tableau de bord" },
+  { id: "adn", libelle: "Méthode ADN", signature: true },
   { id: "apprenants", libelle: "Apprenants" },
   { id: "ateliers", libelle: "Ateliers" },
   { id: "entreprises", libelle: "Entreprises & offres" },
   { id: "espace", libelle: "Espace apprenant" },
+  { id: "simulateur", libelle: "Simulateur freelance", signature: true },
   { id: "rapport", libelle: "Rapport" },
 ];
 
@@ -108,7 +112,7 @@ export default function App() {
           {VUES.map((v) => (
             <button
               key={v.id}
-              className={vue === v.id ? "nav-lien actif" : "nav-lien"}
+              className={`nav-lien${vue === v.id ? " actif" : ""}${v.signature ? " nav-signature" : ""}`}
               aria-current={vue === v.id ? "page" : undefined}
               onClick={() => setVue(v.id)}
             >
@@ -175,8 +179,11 @@ export default function App() {
             lancerVisite={lancerVisite}
             lancerDemo={lancerDemo}
             voirAteliers={() => setVue("ateliers")}
+            voirADN={() => setVue("adn")}
           />
         )}
+        {vue === "adn" && <PageMethodeADN apprenants={donnees.apprenants} ouvrir={setFicheId} />}
+        {vue === "simulateur" && <PageSimulateur />}
         {vue === "apprenants" && (
           <Apprenants apprenants={donnees.apprenants} ouvrir={setFicheId} ajouter={ajouterApprenant} />
         )}

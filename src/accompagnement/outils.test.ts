@@ -8,7 +8,7 @@ import { formatChrono, QUESTIONS_ENTRAINEMENT, tirerQuestions } from "./convainc
 import { dureeEstimeeMs, libelleVitesse, scoreVoix, vitesseSuivante } from "../narration";
 import { appliquerQuestionnaire, pointsAttention, poserQuestion, questionsEnAttente, repondreQuestion, resumeQuestionnaire } from "./questionnaire";
 import { scorer } from "../matching";
-import { avancementADN, noterMeteo, pointsAttentionADN, tendanceConfiance } from "./adn";
+import { avancementADN, confianceMoyenne, freinsFrequents, meteoCohorte, noterMeteo, pointsAttentionADN, tendanceConfiance, victoiresRecentes } from "./adn";
 import { avancementLancement, cocherLancement, viseFreelance } from "./seLancer";
 import { HYPOTHESES_DEFAUT, joursFacturablesAn, positionMarche, simulerDepuisRevenu, simulerDepuisTjm } from "./freelance";
 
@@ -259,5 +259,18 @@ describe("se lancer en freelance", () => {
   it("repère qui vise le freelance", () => {
     expect(viseFreelance(hugo)).toBe(false);
     expect(viseFreelance({ ...hugo, questionnaire: { rempliLe: TODAY, contrat: "freelance" } })).toBe(true);
+  });
+});
+
+describe("méthode ADN à l'échelle de la cohorte", () => {
+  it("repère qui écouter, les freins fréquents et les victoires récentes", () => {
+    const m = meteoCohorte(demo.apprenants);
+    expect(m[0].apprenant.id).toBe("a8"); // tempête
+    expect(m.filter((x) => x.alerte).map((x) => x.apprenant.id).join(",")).toBe("a8,a4");
+    const f = freinsFrequents(demo.apprenants);
+    expect(f[0].frein.id).toBe("argent");
+    expect(f[0].apprenants.length).toBe(4);
+    expect(victoiresRecentes(demo.apprenants, 3)[0].victoire.date).toBe("2026-10-20");
+    expect(confianceMoyenne(demo.apprenants)).toBe(2.8);
   });
 });

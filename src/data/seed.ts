@@ -437,6 +437,47 @@ export function creerDonneesDemo(today = aujourdhui()): Donnees {
     ],
   };
 
+  // Méthode ADN des autres apprenants : de quoi donner vie à la vue cohorte.
+  const adnCohorte: Record<string, NonNullable<Apprenant["accompagnement"]>["adn"]> = {
+    a4: {
+      forces: "Rigueur, sens de l'organisation",
+      valeurs: ["Sécurité", "Utilité"],
+      meteo: [
+        { date: j(-24), note: 3 },
+        { date: j(-9), note: 2 },
+      ],
+      freins: ["imposteur", "rejet"],
+      victoires: [{ id: "v4", date: j(-9), texte: "Premier projet ajouté au portfolio" }],
+    },
+    a8: {
+      meteo: [
+        { date: j(-30), note: 3 },
+        { date: j(-6), note: 1 },
+      ],
+      freins: ["comparaison", "imposteur"],
+    },
+    a14: {
+      forces: "Pédagogie, patience, expliquer simplement",
+      valeurs: ["Transmission", "Utilité", "Apprentissage"],
+      meteo: [
+        { date: j(-10), note: 2 },
+        { date: j(-2), note: 3 },
+      ],
+      freins: ["legitimite", "plafondVerre", "argent"],
+      victoires: [{ id: "v5", date: j(-2), texte: "J'ai présenté mon projet edtech devant la promo" }],
+    },
+    a15: {
+      valeurs: ["Collectif", "Exigence"],
+      meteo: [{ date: j(-4), note: 4 }],
+      freins: ["perfectionnisme", "argent"],
+      victoires: [{ id: "v6", date: j(-4), texte: "Portfolio mis en ligne malgré mes doutes" }],
+    },
+    a16: {
+      meteo: [{ date: j(-8), note: 3 }],
+      freins: ["argent"],
+    },
+  };
+
   const enrichir = (a: Apprenant): Apprenant => {
     // Les apprenants insérés ont un parcours complet, bouclé avant leur embauche.
     const faites = a.dateInsertion ? TOUTES : (etapes[a.id] ?? []);
@@ -444,10 +485,11 @@ export function creerDonneesDemo(today = aujourdhui()): Donnees {
     return {
       ...a,
       ...profils[a.id],
-      accompagnement:
-        a.id === "a14"
-          ? { convaincre: { motivation: questionnaires.a14?.motivation } }
-          : accompagnements[a.id],
+      accompagnement: (() => {
+        const base =
+          a.id === "a14" ? { convaincre: { motivation: questionnaires.a14?.motivation } } : accompagnements[a.id];
+        return adnCohorte[a.id] ? { ...base, adn: adnCohorte[a.id] } : base;
+      })(),
       questionnaire: questionnaires[a.id],
       questions: questionsPole[a.id],
       dossier: Object.fromEntries(faites.map((e, i) => [e, ajouterJours(debut, i * 5)])),

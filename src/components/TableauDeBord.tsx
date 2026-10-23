@@ -9,6 +9,7 @@ import { CetteSemaine } from "./CetteSemaine";
 import { RelancesAuto } from "./RelancesAuto";
 import { QuestionsATraiter } from "./QuestionsATraiter";
 import { gainMoyenCV } from "../accompagnement/progression";
+import { EncartADN } from "./EncartADN";
 
 interface Props {
   apprenants: Apprenant[];
@@ -17,9 +18,10 @@ interface Props {
   lancerVisite: () => void;
   lancerDemo: () => void;
   voirAteliers: () => void;
+  voirADN: () => void;
 }
 
-export function TableauDeBord({ apprenants, ateliers, ouvrir, lancerVisite, lancerDemo, voirAteliers }: Props) {
+export function TableauDeBord({ apprenants, ateliers, ouvrir, lancerVisite, lancerDemo, voirAteliers, voirADN }: Props) {
   const today = aujourdhui();
   const ind = calculerIndicateurs(apprenants, today);
   const dossiers = indicateursDossier(apprenants);
@@ -61,6 +63,7 @@ export function TableauDeBord({ apprenants, ateliers, ouvrir, lancerVisite, lanc
         </div>
       </header>
 
+      <EncartADN apprenants={apprenants} ouvrir={ouvrir} voirADN={voirADN} />
       <CetteSemaine apprenants={apprenants} ateliers={ateliers} ouvrir={ouvrir} voirAteliers={voirAteliers} />
       <RelancesAuto apprenants={apprenants} ateliers={ateliers} ouvrir={ouvrir} />
 

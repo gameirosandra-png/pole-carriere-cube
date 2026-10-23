@@ -11,7 +11,7 @@ const vitesseEnregistree = () => {
   }
 };
 
-export type VueVisite = "tdb" | "apprenants" | "ateliers" | "entreprises" | "espace" | "rapport";
+export type VueVisite = "tdb" | "adn" | "apprenants" | "ateliers" | "entreprises" | "espace" | "simulateur" | "rapport";
 
 interface Etape {
   vue: VueVisite;
@@ -121,13 +121,13 @@ export const ETAPES_DEMO: Etape[] = [
       "Les relances sont déjà écrites : rappels d'atelier, et messages aux apprenants sans nouvelles depuis deux semaines. Un clic, et elles partent.",
   },
   {
-    vue: "tdb",
+    vue: "adn",
     fiche: null,
-    cible: ".promos",
-    titre: "Chaque carré est un apprenant",
-    texte: "Une couleur par situation, un point rouge pour qui relancer. Suivons Hugo, en recherche d'emploi.",
+    cible: ".adn-cohorte",
+    titre: "Ma méthode signature : ADN",
+    texte: "Ancrer ses forces, Diriger son cap, Narrer sa reconversion. La météo de confiance de la cohorte et les freins à lever.",
     voix:
-      "Ici, chaque carré est un apprenant, avec une couleur par situation. Le point rouge signale qui relancer. Suivons Hugo, en recherche d'emploi.",
+      "Au cœur de l'accompagnement, ma méthode signature, ADN : ancrer ses forces, diriger son cap, narrer sa reconversion. Ici, la confiance de toute la cohorte, et les freins à lever : syndrome de l'imposteur, plafond de verre, peur d'annoncer son prix.",
   },
   {
     vue: "tdb",
@@ -138,17 +138,7 @@ export const ETAPES_DEMO: Etape[] = [
     texte:
       "Les scores CV et entretien sont relevés à chaque séance : la courbe montre ce que l'accompagnement a changé pour Hugo.",
     voix:
-      "À chaque séance, ses scores de CV et d'entretien sont relevés. La courbe le montre : l'accompagnement a un effet mesurable.",
-  },
-  {
-    vue: "tdb",
-    fiche: "a10",
-    clic: "#onglet-adn",
-    cible: ".adn section:nth-of-type(2)",
-    titre: "La méthode ADN, au-delà du CV",
-    texte: "Ancrer ses forces, Diriger son cap, Narrer sa reconversion : la confiance et les freins se travaillent aussi.",
-    voix:
-      "Au cœur de l'accompagnement, ma méthode signature, ADN : ancrer ses forces, diriger son cap, narrer sa reconversion. On y lève aussi les freins : syndrome de l'imposteur, plafond de verre, peur d'annoncer son prix.",
+      "Suivons Hugo, en recherche d'emploi. À chaque séance, ses scores de CV et d'entretien sont relevés : l'accompagnement a un effet mesurable.",
   },
   {
     vue: "tdb",
@@ -205,9 +195,18 @@ export const ETAPES_DEMO: Etape[] = [
     fiche: null,
     cible: ".boite-outils",
     titre: "L'apprenant avance seul",
-    texte: "Dans son espace, Hugo retrouve son CV à corriger, son pitch, sa prétention, et s'entraîne à l'oral.",
+    texte: "Dans son espace, Hugo retrouve sa méthode ADN, son CV à corriger, son pitch, et s'entraîne à l'oral.",
     voix:
-      "Entre deux séances, Hugo avance seul. Dans son espace, il retrouve son CV à corriger, son pitch, sa prétention, et il s'entraîne à l'oral.",
+      "Entre deux séances, Hugo avance seul. Dans son espace, il retrouve sa méthode ADN, son CV à corriger, son pitch, et il s'entraîne à l'oral.",
+  },
+  {
+    vue: "simulateur",
+    fiche: null,
+    cible: ".simulateur-resultats",
+    titre: "Et pour se lancer en freelance",
+    texte: "« Je veux 3 000 € net par mois » : le TJM à facturer, les jours et les missions nécessaires, chiffres 2026 sourcés.",
+    voix:
+      "Et pour ceux qui se lancent en freelance, un simulateur : je veux trois mille euros net par mois. Il donne le TJM à facturer, les jours et les missions nécessaires, chiffres 2026 à l'appui.",
   },
   {
     vue: "espace",

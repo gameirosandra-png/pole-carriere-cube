@@ -11,6 +11,18 @@ const URL = process.env.URL || 'http://127.0.0.1:4173/';
   p.on('pageerror', e => errs.push(e.message));
   await p.goto(URL); await p.waitForTimeout(400);
 
+  // Mise en avant : encart sur le tableau de bord, écran dédié dans le menu
+  ok((await p.textContent('.encart-adn')).includes('Yanis Lambert'), 'tableau de bord : encart ADN avec qui écouter');
+  await p.screenshot({ path: out + '/adn-tdb.png' });
+  await p.click('.encart-adn button:has-text("Ouvrir la méthode ADN")');
+  ok((await p.textContent('h1')) === 'Méthode ADN', 'écran Méthode ADN ouvert depuis l\'encart');
+  ok((await p.locator('.meteo-ligne').count()) === 6 && (await p.locator('.meteo-ligne.alerte').count()) === 2, 'météo de la cohorte : 6 apprenants, 2 à écouter');
+  ok((await p.textContent('.adn-conseil')).includes('Peur de gagner de l\'argent'), 'atelier collectif proposé sur le frein n°1');
+  await p.screenshot({ path: out + '/adn-page.png', fullPage: true });
+  await p.click('nav >> text=Simulateur freelance');
+  ok((await p.locator('.simulateur').count()) === 1, 'simulateur dans le menu');
+  await p.click('nav >> text=Tableau de bord');
+
   // Fiche d'Hugo : onglet Méthode ADN
   await p.click('.carre[title="Hugo Martin"]');
   await p.click('#onglet-adn');

@@ -250,3 +250,20 @@ export function SimulateurFreelance({ posteVise = "Product Builder" }: { posteVi
     </div>
   );
 }
+
+/** Page « Simulateur freelance » : dans le menu de l'outil, ou seule (#simulateur-freelance) pour être intégrée ailleurs. */
+export function PageSimulateur({ autonome = false }: { autonome?: boolean }) {
+  return (
+    <section className={autonome ? "page-simulateur" : undefined} aria-labelledby="titre-simulateur">
+      <header className="entete-page">
+        <p className="fc-sur-titre">Outil apprenant · à faire en séance ou en autonomie</p>
+        <h1 id="titre-simulateur">Simulateur freelance</h1>
+        <p className="sous-titre">
+          « Je veux 3 000 € dans ma poche chaque mois : quel TJM, combien de jours, combien de missions ? » Chacun fait
+          ses propres essais, chiffres 2026 sourcés à l'appui.
+        </p>
+      </header>
+      <SimulateurFreelance />
+    </section>
+  );
+}

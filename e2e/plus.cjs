@@ -113,7 +113,7 @@ const URL = process.env.URL || 'http://127.0.0.1:4173/';
     const titre = await p.textContent('#visite-titre');
     const carton = i === 0 || i === 14;
     ok(carton ? await p.locator('.film-carton').count() === 1 : await p.locator('.visite-projecteur').count() === 1, `démo ${i + 1} : ${titre}`);
-    if (i === 11) ok((await p.textContent('.espace-bonjour')).includes('Bonjour Hugo'), 'démo : l\'espace apprenant montre Hugo');
+    if (i === 10) ok((await p.textContent('.espace-bonjour')).includes('Bonjour Hugo'), 'démo : l\'espace apprenant montre Hugo');
     if ([0, 5, 12, 14].includes(i)) await p.screenshot({ path: out + `/p-demo-${i + 1}.png` });
     if (i < 14) await p.click('.visite-bulle button:has-text("Suivant")');
   }
