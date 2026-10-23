@@ -17,6 +17,7 @@ import {
   lireErreurLienMagique,
   lireRetourLienMagique,
   sessionEnregistree,
+  CLE_SESSION,
   type Session,
 } from "./supabase";
 
@@ -50,6 +51,16 @@ const erreurLienInitiale = lireErreurLienMagique();
 export default function App() {
   const [session, setSession] = useState<Session | null>(sessionInitiale);
   const sessionPerdue = useCallback(() => setSession(null), []);
+
+  // Connexion ou déconnexion dans un autre onglet (le lien magique ouvre souvent un nouvel onglet) :
+  // cet onglet suit, pour ne jamais modifier la démo locale en croyant écrire dans la base partagée.
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === CLE_SESSION) setSession(sessionEnregistree());
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
   const {
     donnees,
     setDonnees,

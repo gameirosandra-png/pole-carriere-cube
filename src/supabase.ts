@@ -7,7 +7,7 @@ import type { Apprenant, AtelierCollectif, Entreprise } from "./types";
 export const SUPABASE_URL = "https://yxnvgytdjxtqxqhoxbth.supabase.co";
 export const SUPABASE_CLE_PUBLIQUE = "sb_publishable_YnWosDgrboegfPruuv6xqA_Gh5xn-09";
 
-const CLE_SESSION = "pole-carriere-cube:session";
+export const CLE_SESSION = "pole-carriere-cube:session";
 
 export interface Session {
   accessToken: string;
