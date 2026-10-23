@@ -236,7 +236,7 @@ export const ETAPES_DEMO: Etape[] = [
     titre: "Sandra Gameiro",
     texte: "Product & Operations Builder · No-code et IA",
     voix:
-      "Ce MVP a été construit en une journée avec Claude, et vérifié par plus de cent soixante-dix tests automatiques. Je suis Sandra Gameiro : je serais ravie de vous le présenter.",
+      "Ce MVP a été construit en une journée avec Claude, et vérifié par plus de cent soixante-dix tests automatiques. Je suis Sandra Gameiro : je serais ravie de te le présenter.",
   },
 ];
 
