@@ -34,7 +34,7 @@ const URL = process.env.URL || 'http://127.0.0.1:4173/';
   ok((await p.textContent('.visite-voix') || '').includes('Microsoft Denise Online (Natural)'), 'voix : la voix neuronale française est choisie');
   await p.screenshot({ path: out + '/v-demo-voix.png' });
   await p.waitForTimeout(1800);
-  ok((await p.textContent('.visite-compteur')).includes('2 / 14'), 'voix : la démo avance à la fin de la phrase (pas au minuteur)');
+  ok((await p.textContent('.visite-compteur')).includes('2 / 15'), 'voix : la démo avance à la fin de la phrase (pas au minuteur)');
   const dits = await p.evaluate(() => window.__dits);
   ok(dits[0].texte.startsWith('Voici le pôle carrière'), 'voix : texte écrit pour l\'oral');
   // Pause
@@ -73,9 +73,9 @@ const URL = process.env.URL || 'http://127.0.0.1:4173/';
   ok((await p.textContent('.bouton-vitesse')) === '0,75×', 'vitesse : 0,75× après 1,5×');
   await p.click('.bouton-vitesse');
   // Aller jusqu'au bout seul
-  await p.waitForTimeout(19000);
+  await p.waitForTimeout(21000);
   ok(!(await p.locator('.visite').count()), 'la démo commentée se termine seule');
-  ok(new Set((await p.evaluate(() => window.__dits)).map(d => d.texte)).size === 14, 'les 14 étapes ont été commentées');
+  ok(new Set((await p.evaluate(() => window.__dits)).map(d => d.texte)).size === 15, 'les 15 étapes ont été commentées');
   // Échap coupe la voix
   await p.click('.barre-pied .bouton-demo'); await p.waitForTimeout(300);
   await p.keyboard.press('Escape'); await p.waitForTimeout(200);

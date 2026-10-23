@@ -73,6 +73,59 @@ export interface AtelierConvaincre {
   simulation?: Partial<Record<CritereEntretien, 1 | 2 | 3 | 4>>;
 }
 
+/* ---------- Méthode ADN : Ancrer, Diriger, Narrer (accompagnement signature) ---------- */
+
+export type FreinId =
+  | "imposteur"
+  | "plafondVerre"
+  | "argent"
+  | "legitimite"
+  | "perfectionnisme"
+  | "rejet"
+  | "comparaison";
+
+export interface CroyanceRecadree {
+  id: string;
+  croyance: string;
+  recadrage?: string;
+}
+
+export interface MethodeADN {
+  /** A · Ancrer */
+  forces?: string;
+  valeurs?: string[];
+  heritage?: string;
+  /** Météo de confiance, de 1 (tempête) à 5 (grand soleil), une par jour. */
+  meteo?: { date: string; note: 1 | 2 | 3 | 4 | 5 }[];
+  /** D · Diriger */
+  cap?: string;
+  freins?: FreinId[];
+  croyances?: CroyanceRecadree[];
+  /** N · Narrer */
+  victoires?: { id: string; date: string; texte: string }[];
+}
+
+/* ---------- Se lancer en freelance ---------- */
+
+export type StatutJuridique = "micro" | "eiReel" | "eurl" | "sasu";
+
+export type EtapeLancement =
+  | "statut"
+  | "immatriculation"
+  | "acre"
+  | "banque"
+  | "rcpro"
+  | "facturation"
+  | "devis"
+  | "plateformes"
+  | "premiereMission";
+
+export interface SeLancer {
+  statut?: StatutJuridique;
+  /** Pour chaque étape faite : sa date. */
+  etapes?: Partial<Record<EtapeLancement, string>>;
+}
+
 /** Scores relevés au fil des séances, pour mesurer la progression. */
 export interface PointProgression {
   date: string; // ISO
@@ -86,6 +139,8 @@ export interface Accompagnement {
   salaire?: AtelierSalaire;
   convaincre?: AtelierConvaincre;
   historique?: PointProgression[];
+  adn?: MethodeADN;
+  seLancer?: SeLancer;
 }
 
 /* ---------- Questionnaire « Faisons connaissance » et questions au pôle ---------- */

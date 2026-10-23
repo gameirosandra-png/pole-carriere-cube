@@ -27,8 +27,9 @@ describe("brief de rendez-vous", () => {
     const r = briefSansIA(hugo, demo.entreprises, TODAY);
     expect(r.map((x) => x.titre).join(",")).toBe("Situation,Points à travailler,Questions à poser");
     expect(r[0].points.some((p) => p.includes("action en retard"))).toBe(true);
-    // Les inquiétudes du questionnaire passent en premier, puis les séances à faire.
-    expect(r[1].points[0]).toBe("Inquiet·e : les entretiens. Proposer un entretien blanc.");
+    // Les freins de la méthode ADN et les inquiétudes du questionnaire passent en premier, puis les séances à faire.
+    expect(r[1].points[0].startsWith("Frein : peur de gagner de l'argent")).toBe(true);
+    expect(r[1].points.includes("Inquiet·e : les entretiens. Proposer un entretien blanc.")).toBe(true);
     expect(r[1].points.includes("Avancer sur : simulation d'entretien")).toBe(true);
   });
 });

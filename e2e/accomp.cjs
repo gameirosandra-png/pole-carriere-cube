@@ -16,7 +16,7 @@ const out = process.argv[2] || require('os').tmpdir();
 
   // Fiche Hugo : onglets
   await p.click('.carre[title="Hugo Martin"]');
-  ok((await p.locator('.onglet').count()) === 6, '6 onglets dans la fiche');
+  ok((await p.locator('.fiche .onglet').count()) === 7, '7 onglets dans la fiche');
   await p.click('.onglet:has-text("CV")');
   ok((await p.textContent('.atelier-score')).trim() === '67', 'CV : score 67');
   ok((await p.locator('.plan-action li').count()) === 3, 'CV : 3 priorités');

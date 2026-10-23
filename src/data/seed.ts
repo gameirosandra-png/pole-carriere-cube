@@ -334,6 +334,31 @@ export function creerDonneesDemo(today = aujourdhui()): Donnees {
         motivation: "dans le retail, pour outiller les équipes terrain que je connais bien.",
         simulation: { clarte: 3, star: 2, exemples: 3, posture: 3, questions: 2 },
       },
+      adn: {
+        forces: "Calme sous pression, sens du client, animer une équipe",
+        valeurs: ["Utilité", "Collectif", "Équilibre de vie"],
+        heritage: "La connaissance du terrain : je sais ce qui fait perdre du temps à une équipe en magasin",
+        meteo: [
+          { date: j(-30), note: 2 },
+          { date: j(-16), note: 3 },
+          { date: j(-3), note: 4 },
+        ],
+        cap: "travailler comme product builder dans le retail, en hybride",
+        freins: ["argent", "legitimite"],
+        croyances: [
+          {
+            id: "c1",
+            croyance: "À 34 ans, c'est trop tard pour la tech",
+            recadrage: "Mes 8 ans de terrain sont exactement ce qui manque aux outils que je construis",
+          },
+          { id: "c2", croyance: "Demander 42 k€, c'est trop pour un junior" },
+        ],
+        victoires: [
+          { id: "v3", date: j(-3), texte: "Simulation d'entretien : 65/100, +20 points" },
+          { id: "v2", date: j(-10), texte: "Premier projet mis en ligne et montré à mon ancien manager" },
+          { id: "v1", date: j(-20), texte: "J'ai osé publier mon premier post LinkedIn sur ma reconversion" },
+        ],
+      },
       historique: [
         { date: j(-30), cv: 33, simulation: null },
         { date: j(-16), cv: 50, simulation: 45 },

@@ -143,6 +143,16 @@ export const ETAPES_DEMO: Etape[] = [
   {
     vue: "tdb",
     fiche: "a10",
+    clic: "#onglet-adn",
+    cible: ".adn section:nth-of-type(2)",
+    titre: "La méthode ADN, au-delà du CV",
+    texte: "Ancrer ses forces, Diriger son cap, Narrer sa reconversion : la confiance et les freins se travaillent aussi.",
+    voix:
+      "Au cœur de l'accompagnement, ma méthode signature, ADN : ancrer ses forces, diriger son cap, narrer sa reconversion. On y lève aussi les freins : syndrome de l'imposteur, plafond de verre, peur d'annoncer son prix.",
+  },
+  {
+    vue: "tdb",
+    fiche: "a10",
     clic: "#onglet-cv",
     cible: ".atelier-resultat",
     titre: "Atelier CV",

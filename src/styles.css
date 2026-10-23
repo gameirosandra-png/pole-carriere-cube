@@ -2858,3 +2858,259 @@ textarea {
     grid-template-columns: 1fr;
   }
 }
+
+/* ---------- Méthode ADN ---------- */
+.adn-tete {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--violet-nuit);
+  color: #fff;
+  border-radius: var(--rayon);
+  margin-bottom: 6px;
+}
+.adn-tete p {
+  margin: 0;
+}
+.adn-tete .secondaire {
+  color: #d9ccff;
+}
+.adn-lettres {
+  display: flex;
+  gap: 4px;
+}
+.adn-lettres span {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  border: 1.5px solid rgba(255, 255, 255, 0.5);
+  font-family: "Outfit", "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+}
+.adn-lettres span.fait {
+  background: var(--orange);
+  border-color: var(--orange);
+  color: var(--encre);
+}
+.adn-pilier {
+  border-top: 1px solid var(--trait);
+  padding-top: 4px;
+  margin-top: 12px;
+}
+.adn-pilier h4 {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.adn-pilier h4 .secondaire {
+  font-family: "Inter", sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+}
+.adn-lettre {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 5px;
+  background: var(--violet);
+  color: #fff;
+  font-size: 15px;
+}
+.adn-question {
+  margin: 12px 0 2px;
+  font-weight: 500;
+  font-size: 14px;
+}
+.adn-historique {
+  list-style: none;
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  margin: 10px 0 0;
+  padding: 0;
+  height: 64px;
+}
+.adn-historique li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+  height: 100%;
+}
+.adn-barre {
+  width: 18px;
+  border-radius: 3px 3px 0 0;
+  background: var(--violet);
+}
+.adn-historique small {
+  font-size: 11px;
+  color: var(--encre-douce);
+  white-space: nowrap;
+}
+.adn-alerte {
+  margin: 8px 0 0;
+  padding: 8px 12px;
+  border-left: 4px solid var(--orange);
+  background: #fff4ec;
+  border-radius: var(--rayon);
+}
+.adn-freins {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.adn-freins li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  background: var(--violet-pale);
+  border-radius: var(--rayon);
+  font-size: 14px;
+}
+.adn-freins em {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--violet-nuit);
+}
+.adn-croyances {
+  list-style: none;
+  margin: 6px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.adn-croyances li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) auto;
+  gap: 10px;
+  align-items: center;
+}
+.adn-croyances .champ {
+  margin: 0;
+}
+.adn-croyance {
+  font-style: italic;
+}
+.adn-ajout {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  margin-top: 8px;
+}
+.adn-ajout .champ {
+  flex: 1;
+  margin: 0;
+}
+.adn-victoires {
+  list-style: none;
+  margin: 10px 0 6px;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+.adn-victoires li {
+  padding: 6px 10px;
+  border-left: 3px solid var(--s-poste);
+  background: #f3faf6;
+}
+.adn-victoires time {
+  font-size: 12px;
+  color: var(--encre-douce);
+  margin-right: 6px;
+}
+.espace-adn {
+  margin-top: 28px;
+}
+.espace-adn > .secondaire {
+  margin: 2px 0 10px;
+}
+
+/* ---------- Se lancer ---------- */
+.se-lancer-tete {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 8px 0 4px;
+}
+.se-lancer-tete .etapes-kpi-barre {
+  flex: 1 1 160px;
+}
+.statuts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.statut {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 1px solid var(--trait);
+  border-radius: var(--rayon);
+  font-size: 14px;
+  cursor: pointer;
+}
+.statut.choisi {
+  border-color: var(--violet);
+  background: var(--violet-pale);
+}
+.statut-tete {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+}
+.statut-tete input {
+  accent-color: var(--violet);
+  margin: 0;
+}
+.statut-pour {
+  color: var(--encre-douce);
+}
+.statut em {
+  font-style: normal;
+  font-weight: 600;
+}
+.checklist-lancement {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+.checklist-lancement li {
+  padding: 8px 10px;
+  border: 1px solid var(--trait);
+  border-radius: var(--rayon);
+}
+.checklist-lancement li.fait {
+  background: #f3faf6;
+  border-color: #cfe8db;
+}
+.checklist-lancement .case {
+  align-items: flex-start;
+}
+.etape-aide {
+  display: block;
+  font-size: 13px;
+  margin-top: 2px;
+}
+@media (max-width: 820px) {
+  .statuts {
+    grid-template-columns: 1fr;
+  }
+  .adn-croyances li {
+    grid-template-columns: 1fr;
+  }
+}

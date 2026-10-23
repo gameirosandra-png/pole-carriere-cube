@@ -6,6 +6,7 @@ import { aujourdhui, formatDate, joursEntre } from "./dates";
 import { ETAPES_DOSSIER, etapeFaite } from "./dossier";
 import { libelleStatut, raisonRelance } from "./regles";
 import { pointsAttention } from "./accompagnement/questionnaire";
+import { pointsAttentionADN } from "./accompagnement/adn";
 
 export interface RubriqueBrief {
   titre: string;
@@ -27,7 +28,7 @@ export function donneesPourBrief(a: Apprenant, entreprises: Entreprise[], today 
       e.offres.filter((o) => o.candidats.includes(a.id)).map((o) => `${o.titre} chez ${e.nom}`),
     ),
     notes: a.notes.slice(0, 3).map((n) => n.texte),
-    inquietudes: pointsAttention(a.questionnaire).map((p) => p.texte),
+    inquietudes: [...pointsAttentionADN(a.accompagnement?.adn), ...pointsAttention(a.questionnaire).map((p) => p.texte)],
     questionsEnAttente: (a.questions ?? []).filter((q) => !q.reponse).map((q) => q.texte),
   };
 }

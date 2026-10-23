@@ -54,7 +54,7 @@ Je suis apprenante Product Builder No-Code à l'École Cube, donc je connais ce 
 
 ## Ce que j'ai appris
 
-- **Construire avec l'IA, c'est surtout spécifier et vérifier.** Claude écrit vite ; mon travail est de dire précisément quoi construire, de relire, et de prouver que ça marche : 74 tests unitaires, plus de 160 vérifications de bout en bout et une intégration continue.
+- **Construire avec l'IA, c'est surtout spécifier et vérifier.** Claude écrit vite ; mon travail est de dire précisément quoi construire, de relire, et de prouver que ça marche : 79 tests unitaires, plus de 160 vérifications de bout en bout et une intégration continue.
 - **Le retour d'un expert vaut plus qu'une fonctionnalité de plus.** La V1 était juste techniquement mais à côté du vrai besoin.
 - **Un MVP, c'est aussi savoir s'arrêter.** Rôles, temps réel, import des données de l'école : listés en V2, pas improvisés.
 
@@ -85,6 +85,18 @@ Le cœur du pôle carrière, c'est l'accompagnement : faire progresser chaque ap
 
 En collectif, l'écran **Ateliers** planifie les ateliers par thème et propose d'inviter les apprenants dont la séance n'est pas encore faite. L'accueil montre **la semaine du pôle** : rendez-vous individuels, ateliers, actions en retard.
 
+### L'accompagnement signature : la méthode ADN
+
+Au-delà des outils, l'accompagnement travaille la confiance et le récit de la reconversion, entre coaching et développement personnel. Un onglet « Méthode ADN » dans la fiche, la même méthode au tutoiement dans l'espace apprenant :
+
+| Pilier | Ce qu'on y travaille |
+| --- | --- |
+| **A · Ancrer** | Forces, 3 valeurs essentielles, ce que l'on garde de son métier d'avant, et une **météo de confiance** notée à chaque séance (alerte quand elle baisse) |
+| **D · Diriger** | Un cap à 6 mois, les **freins** à lever (syndrome de l'imposteur, plafond de verre, peur de gagner de l'argent, « trop vieux, pas assez tech », perfectionnisme, peur du rejet, comparaison), chacun avec un exercice et une reformulation, et les **croyances à recadrer** |
+| **N · Narrer** | Le **journal des victoires**, qui nourrit le pitch et la fiche candidat |
+
+Les freins et une confiance en baisse remontent dans la préparation du rendez-vous.
+
 Et pour aller jusqu'à l'emploi :
 
 - **Fiche candidat** : une page propre à envoyer aux entreprises (pitch, projets, préparation), sans notes internes ni salaire. Partageable par lien ou en PDF. Le lien contient les données de la fiche après le `#` : rien n'est stocké en ligne.
@@ -94,6 +106,7 @@ Et pour aller jusqu'à l'emploi :
 - **Relances automatiques** : rappels d'atelier (48 h avant) et messages aux apprenants sans contact depuis 14 jours, écrits par l'app et envoyés via Make en un clic.
 - **Questionnaire « Faisons connaissance »** : rempli par l'apprenant avant la séance 1 (parcours, poste et secteurs visés, contrat, mobilité, inquiétudes, motivation). Les réponses remplissent la fiche, le pitch et l'atelier salaire, affinent le matching (contrat souhaité) et font remonter les points d'attention dans la fiche et le brief de rendez-vous.
 - **Boîte à questions** : l'apprenant pose une question au pôle depuis son espace ; elle apparaît dans « Questions des apprenants » au tableau de bord, l'équipe répond depuis la fiche, et la réponse s'affiche chez l'apprenant.
+- **Se lancer en freelance** : comparatif des statuts (micro-entreprise, EI au réel, EURL, SASU), les 9 démarches dans l'ordre (guichet unique, ACRE, compte dédié, RC Pro, facturation électronique, devis et CGV, plateformes, première mission) et les mentions obligatoires d'une facture. Règles vérifiées et sourcées ; l'avancement est visible par l'équipe dans la fiche.
 - **Simulateur freelance** : « je veux 3 000 € net par mois » → le TJM à facturer, les jours facturés, le nombre de missions, le taux horaire, la part des cotisations et des frais ; ou l'inverse, à partir d'un TJM. Le résultat est situé sur le marché junior du poste visé, avec des alertes sur la TVA et le plafond de la micro-entreprise. Taux et seuils 2026 sourcés et datés, taux modifiable. Ouvert d'office pour un apprenant qui vise le freelance, et utilisable seul comme module à intégrer : [`/#simulateur-freelance`](https://pole-carriere-cube.vercel.app/#simulateur-freelance).
 - **Boîte à outils de l'apprenant** : dans son espace, il retrouve son CV à corriger, son pitch, sa prétention et sa progression.
 
@@ -157,8 +170,8 @@ Ces règles sont des fonctions pures dans [`src/regles.ts`](src/regles.ts), [`sr
 
 ## Qualité
 
-- **Tests** : 74 tests unitaires sur les règles métier, parcours et ateliers d'accompagnement, matching, entonnoir, calculs de dates (fin de mois, changement d'heure, fuseaux) et export CSV, avec Vitest.
-- **Bout en bout** : 188 vérifications Playwright dans [`e2e/`](e2e) (parcours complets dans un vrai navigateur, sur ordinateur et mobile), lancées avant chaque version avec `npm run e2e` ; pas encore dans la CI.
+- **Tests** : 79 tests unitaires sur les règles métier, parcours et ateliers d'accompagnement, matching, entonnoir, calculs de dates (fin de mois, changement d'heure, fuseaux) et export CSV, avec Vitest.
+- **Bout en bout** : 204 vérifications Playwright dans [`e2e/`](e2e) (parcours complets dans un vrai navigateur, sur ordinateur et mobile), lancées avant chaque version avec `npm run e2e` ; pas encore dans la CI.
 - **Intégration continue** : à chaque modification, GitHub vérifie les types TypeScript, lance les tests et le build ([workflow](.github/workflows/ci.yml)).
 - **Accessibilité** : couleurs de statut au contraste WCAG AA (4,5:1), statut toujours écrit en plus de la couleur, panneaux utilisables au clavier (focus piégé, Échap, retour du focus).
 - **Responsive** : utilisable sur mobile.
@@ -187,7 +200,7 @@ src/
   matching.ts         suggestion de candidats pour une offre (testé)
   accompagnement/     ateliers CV, portfolio, salaire (référentiel sourcé), pitch, ateliers collectifs,
                       progression, fiche candidat, shortlist, relances, entraînement, questionnaire,
-                      simulateur freelance (testés)
+                      simulateur freelance, se lancer, méthode ADN (testés)
   rapport.ts          entonnoir d'insertion et statistiques par promo (testés)
   narration.ts        voix de la démo : fichiers IA, sinon meilleure voix française du navigateur
   brief.ts            préparation de rendez-vous : données pour l'IA, brief de secours (testés)
@@ -212,7 +225,7 @@ api/
 2. Lien personnel et sécurisé pour l'espace apprenant, envoyé automatiquement chaque mois.
 3. Récap et relances envoyés automatiquement par Make (chaque lundi, chaque matin), à partir de la base partagée, et aux vrais destinataires.
 4. Import des apprenants depuis l'outil de gestion de l'école.
-5. **Parcours freelance** : quand l'apprenant vise le freelance, les séances 6 et 7 deviennent « Se lancer » (comparatif des statuts, checklist de création, modèles de devis et factures) et « Fixer son TJM et décrocher sa première mission » (plateformes, pitch client).
+5. **Parcours freelance intégré aux 7 séances** : quand l'apprenant vise le freelance, les séances 6 et 7 deviennent « Se lancer » et « Fixer son TJM et décrocher sa première mission », avec des modèles de devis et de factures à télécharger.
 6. **Brief de rendez-vous rédigé par l'IA** : la fonction serveur est prête ([`api/brief.ts`](api/brief.ts) : prompt borné, garde-fous de volume, modèle Claude Haiku). Activation = ajouter `ANTHROPIC_API_KEY` sur Vercel et brancher `demanderBrief` dans la fiche.
 
 ---

@@ -8,6 +8,8 @@ import { formatChrono, QUESTIONS_ENTRAINEMENT, tirerQuestions } from "./convainc
 import { dureeEstimeeMs, libelleVitesse, scoreVoix, vitesseSuivante } from "../narration";
 import { appliquerQuestionnaire, pointsAttention, poserQuestion, questionsEnAttente, repondreQuestion, resumeQuestionnaire } from "./questionnaire";
 import { scorer } from "../matching";
+import { avancementADN, noterMeteo, pointsAttentionADN, tendanceConfiance } from "./adn";
+import { avancementLancement, cocherLancement, viseFreelance } from "./seLancer";
 import { HYPOTHESES_DEFAUT, joursFacturablesAn, positionMarche, simulerDepuisRevenu, simulerDepuisTjm } from "./freelance";
 
 const TODAY = "2026-10-22";
@@ -216,5 +218,46 @@ describe("simulateur freelance", () => {
     expect(simulerDepuisRevenu({ ...h, netMensuel: 6000 }).depassePlafond).toBe(true);
     expect(positionMarche(330, "productBuilder").position).toBe("dans");
     expect(positionMarche(600, "productBuilder").position).toBe("au-dessus");
+  });
+});
+
+describe("méthode ADN", () => {
+  const adn = hugo.accompagnement!.adn!;
+
+  it("mesure l'avancement des trois piliers", () => {
+    const av = avancementADN(adn);
+    expect(av.ancrer).toBe(true);
+    expect(av.diriger).toBe(true);
+    expect(av.narrer).toBe(true);
+    expect(avancementADN(undefined).faits).toBe(0);
+  });
+
+  it("garde une météo par jour et alerte quand la confiance chute", () => {
+    const m = noterMeteo(noterMeteo(adn, 5, TODAY), 2, TODAY);
+    expect(m.meteo?.length).toBe(4);
+    expect(m.meteo?.[3].note).toBe(2);
+    expect(tendanceConfiance(m)?.alerte).toBe(true);
+    expect(tendanceConfiance(adn)?.alerte).toBe(false);
+  });
+
+  it("fait remonter les freins avec leur exercice", () => {
+    const p = pointsAttentionADN(adn);
+    expect(p.length).toBe(2);
+    expect(p[0].includes("Exercice")).toBe(true);
+  });
+});
+
+describe("se lancer en freelance", () => {
+  it("coche les démarches et donne la prochaine", () => {
+    const l = cocherLancement(cocherLancement({}, "statut", true, TODAY), "immatriculation", true, TODAY);
+    const av = avancementLancement(l);
+    expect(av.faites).toBe(2);
+    expect(av.prochaine?.id).toBe("acre");
+    expect(avancementLancement(cocherLancement(l, "statut", false)).faites).toBe(1);
+  });
+
+  it("repère qui vise le freelance", () => {
+    expect(viseFreelance(hugo)).toBe(false);
+    expect(viseFreelance({ ...hugo, questionnaire: { rempliLe: TODAY, contrat: "freelance" } })).toBe(true);
   });
 });

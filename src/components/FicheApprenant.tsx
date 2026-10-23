@@ -13,14 +13,18 @@ import { AtelierPortfolio } from "./ateliers/AtelierPortfolio";
 import { AtelierSalaire } from "./ateliers/AtelierSalaire";
 import { AtelierConvaincre } from "./ateliers/AtelierConvaincre";
 import { OngletFicheCandidat } from "./FicheCandidat";
+import { AtelierADN } from "./ateliers/AtelierADN";
+import { SeLancerModule } from "./SeLancerModule";
+import { viseFreelance } from "../accompagnement/seLancer";
 import { Progression } from "./Progression";
 import { ProfilApprenant, QuestionsApprenant } from "./ProfilApprenant";
 import { enregistrerPoint } from "../accompagnement/progression";
 
-type Onglet = "suivi" | "cv" | "portfolio" | "salaire" | "convaincre" | "candidat";
+type Onglet = "suivi" | "adn" | "cv" | "portfolio" | "salaire" | "convaincre" | "candidat";
 
 const ONGLETS: { id: Onglet; libelle: string }[] = [
   { id: "suivi", libelle: "Suivi" },
+  { id: "adn", libelle: "Méthode ADN" },
   { id: "cv", libelle: "CV" },
   { id: "portfolio", libelle: "Portfolio" },
   { id: "salaire", libelle: "Salaire" },
@@ -121,6 +125,11 @@ export function FicheApprenant({ apprenant: a, entreprises, maj, supprimer, supp
         </div>
       )}
 
+      {onglet === "adn" && (
+        <div role="tabpanel" id="panneau-adn" aria-labelledby="onglet-adn">
+          <AtelierADN apprenant={a} maj={maj} />
+        </div>
+      )}
       {onglet === "candidat" && (
         <div role="tabpanel" id="panneau-candidat" aria-labelledby="onglet-candidat">
           <OngletFicheCandidat apprenant={a} />
@@ -244,6 +253,13 @@ export function FicheApprenant({ apprenant: a, entreprises, maj, supprimer, supp
 
           <h3 className="fiche-titre">Parcours d'accompagnement</h3>
           <ChecklistDossier apprenant={a} mode="equipe" cocher={(id, faite) => maj((x) => cocherEtape(x, id, faite))} />
+
+          {viseFreelance(a) && (
+            <>
+              <h3 className="fiche-titre">Se lancer en freelance</h3>
+              <SeLancerModule apprenant={a} maj={maj} />
+            </>
+          )}
 
           <h3 className="fiche-titre">Mises en relation</h3>
           {misesEnRelation.length === 0 ? (

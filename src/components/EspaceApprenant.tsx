@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import type { Apprenant, Entreprise, Statut } from "../types";
 import { STATUTS, changerStatut, estInsere } from "../regles";
 import { aujourdhui, formatDate, joursEntre } from "../dates";
@@ -14,6 +14,9 @@ import { Progression } from "./Progression";
 import { Entrainement } from "./Entrainement";
 import { BoiteQuestions, QuestionnaireApprenant } from "./QuestionnaireApprenant";
 import { SimulateurFreelance } from "./SimulateurFreelance";
+import { SeLancerModule } from "./SeLancerModule";
+import { AtelierADN } from "./ateliers/AtelierADN";
+import { viseFreelance } from "../accompagnement/seLancer";
 
 interface Props {
   apprenants: Apprenant[];
@@ -253,16 +256,32 @@ function PageApprenant({
         </div>
       </div>
 
+      <section className="espace-adn" aria-labelledby="titre-adn">
+        <h2 id="titre-adn">Ma méthode ADN</h2>
+        <p className="secondaire">Ancrer, Diriger, Narrer : la confiance et le récit, en plus des outils.</p>
+        <AtelierADN apprenant={a} maj={maj} mode="apprenant" />
+      </section>
       <BoiteOutils apprenant={a} />
-      <VoletFreelance key={`freelance-${a.id}`} apprenant={a} />
+      <VoletFreelance key={`freelance-${a.id}`} apprenant={a} maj={maj} />
     </div>
   );
 }
 
 /** Et en freelance ? Ouvert d'office si l'apprenant vise le freelance. */
-function VoletFreelance({ apprenant: a }: { apprenant: Apprenant }) {
-  const vise = a.questionnaire?.contrat === "freelance" || a.statut === "freelance";
+function VoletFreelance({
+  apprenant: a,
+  maj,
+}: {
+  apprenant: Apprenant;
+  maj: (f: (a: Apprenant) => Apprenant) => void;
+}) {
+  const vise = viseFreelance(a);
   const [ouvert, setOuvert] = useState(vise);
+  const [vue, setVue] = useState<"tjm" | "lancer">("tjm");
+  // Il vient de cocher « freelance » dans son questionnaire : le volet s'ouvre de lui-même.
+  useEffect(() => {
+    if (vise) setOuvert(true);
+  }, [vise]);
   return (
     <section className="volet-freelance" aria-labelledby="titre-freelance">
       <div className="boite-tete">
@@ -283,7 +302,24 @@ function VoletFreelance({ apprenant: a }: { apprenant: Apprenant }) {
           </a>
         </div>
       </div>
-      {ouvert && <SimulateurFreelance posteVise={a.posteVise} />}
+      {ouvert && (
+        <>
+          <div className="onglets" role="tablist" aria-label="Projet freelance">
+            <button role="tab" aria-selected={vue === "tjm"} className={vue === "tjm" ? "onglet actif" : "onglet"} onClick={() => setVue("tjm")}>
+              Simuler mon TJM
+            </button>
+            <button
+              role="tab"
+              aria-selected={vue === "lancer"}
+              className={vue === "lancer" ? "onglet actif" : "onglet"}
+              onClick={() => setVue("lancer")}
+            >
+              Se lancer
+            </button>
+          </div>
+          {vue === "tjm" ? <SimulateurFreelance posteVise={a.posteVise} /> : <SeLancerModule apprenant={a} maj={maj} />}
+        </>
+      )}
     </section>
   );
 }
