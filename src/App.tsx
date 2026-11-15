@@ -12,6 +12,7 @@ import { AteliersCollectifs } from "./components/AteliersCollectifs";
 import { amorcerVoix } from "./narration";
 import { PageMethodeADN } from "./components/PageMethodeADN";
 import { PageSimulateur } from "./components/SimulateurFreelance";
+import { MODULES_A_VENIR, PageAVenir } from "./components/AVenir";
 import {
   deconnecter,
   lireErreurLienMagique,
@@ -21,7 +22,7 @@ import {
   type Session,
 } from "./supabase";
 
-type Vue = VueVisite;
+type Vue = VueVisite | "prospection" | "mentors";
 
 const VUES: { id: Vue; libelle: string; signature?: boolean }[] = [
   { id: "tdb", libelle: "Tableau de bord" },
@@ -32,6 +33,12 @@ const VUES: { id: Vue; libelle: string; signature?: boolean }[] = [
   { id: "espace", libelle: "Espace apprenant" },
   { id: "simulateur", libelle: "Simulateur freelance", signature: true },
   { id: "rapport", libelle: "Rapport" },
+];
+
+// Modules de la feuille de route : visibles dans le menu, pas encore construits.
+const VUES_A_VENIR: { id: Vue; libelle: string }[] = [
+  { id: "prospection", libelle: "Prospection entreprises" },
+  { id: "mentors", libelle: "Mentors" },
 ];
 
 const CLE_VISITE = "pole-carriere-cube:visite-vue";
@@ -124,6 +131,17 @@ export default function App() {
             <button
               key={v.id}
               className={`nav-lien${vue === v.id ? " actif" : ""}${v.signature ? " nav-signature" : ""}`}
+              aria-current={vue === v.id ? "page" : undefined}
+              onClick={() => setVue(v.id)}
+            >
+              {v.libelle}
+            </button>
+          ))}
+          <p className="nav-groupe">À venir</p>
+          {VUES_A_VENIR.map((v) => (
+            <button
+              key={v.id}
+              className={`nav-lien nav-a-venir${vue === v.id ? " actif" : ""}`}
               aria-current={vue === v.id ? "page" : undefined}
               onClick={() => setVue(v.id)}
             >
@@ -223,6 +241,8 @@ export default function App() {
           />
         )}
         {vue === "rapport" && <Rapport apprenants={donnees.apprenants} />}
+        {vue === "prospection" && <PageAVenir module={MODULES_A_VENIR.prospection} />}
+        {vue === "mentors" && <PageAVenir module={MODULES_A_VENIR.mentors} />}
       </main>
 
       {ouverte && (

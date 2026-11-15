@@ -3335,3 +3335,74 @@ textarea {
     grid-column: 1;
   }
 }
+
+/* ---------- Modules « à venir » (feuille de route) ---------- */
+.nav-groupe {
+  margin: 14px 12px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #a995d6;
+}
+.nav-a-venir {
+  color: #b9a9e0;
+}
+.nav-a-venir::after {
+  content: "bientôt";
+  margin-left: 8px;
+  padding: 1px 6px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 500;
+  vertical-align: 1px;
+}
+.a-venir-etiquette {
+  display: inline-block;
+  margin: 0 0 8px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--violet-pale);
+  color: var(--violet);
+  font-size: 13px;
+  font-weight: 600;
+}
+.a-venir-bloc {
+  margin-top: 20px;
+  padding: 18px 22px;
+  border: 1px solid var(--trait);
+  border-radius: var(--rayon);
+  background: var(--papier);
+}
+.a-venir-bloc h2 {
+  margin: 0 0 8px;
+  font-size: 17px;
+}
+.a-venir-bloc p {
+  margin: 0;
+}
+.a-venir-bloc ul {
+  margin: 0;
+  padding-left: 20px;
+}
+.a-venir-bloc li + li {
+  margin-top: 6px;
+}
+.a-venir-grille {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 0 20px;
+}
+.a-venir-note {
+  margin-top: 18px;
+  font-size: 14px;
+}
+@media (max-width: 900px) {
+  .a-venir-grille {
+    grid-template-columns: 1fr;
+  }
+  .nav-groupe {
+    grid-column: 1 / -1;
+  }
+}
