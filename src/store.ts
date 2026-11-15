@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Apprenant, AtelierCollectif, Donnees, Entreprise } from "./types";
 import { creerDonneesDemo } from "./data/seed";
+import { recalerDonnees } from "./recaler";
+import { aujourdhui } from "./dates";
 import { changementsDonnees } from "./synchro";
 import { ecrire, lireTable, sessionValide, supprimer, type Session } from "./supabase";
 
@@ -9,6 +11,8 @@ import { ecrire, lireTable, sessionValide, supprimer, type Session } from "./sup
 // - équipe : données partagées dans Supabase, après connexion par lien magique.
 
 const CLE = "pole-carriere-cube:v4";
+/** Jour du dernier enregistrement local, pour recaler les dates de la démo au retour du visiteur. */
+const CLE_DATE = "pole-carriere-cube:enregistre-le";
 const DUREE_ANNULATION_MS = 8000;
 const DELAI_ENREGISTREMENT_MS = 600;
 const INTERVALLE_ACTUALISATION_MS = 20_000;
@@ -16,7 +20,12 @@ const INTERVALLE_ACTUALISATION_MS = 20_000;
 function charger(): Donnees {
   try {
     const brut = localStorage.getItem(CLE);
-    if (brut) return JSON.parse(brut) as Donnees;
+    if (brut) {
+      const enregistreLe = localStorage.getItem(CLE_DATE);
+      // Données enregistrées avant le recalage automatique : on repart d'une démo à jour.
+      if (!enregistreLe) return creerDonneesDemo();
+      return recalerDonnees(JSON.parse(brut) as Donnees, enregistreLe, aujourdhui());
+    }
   } catch {
     /* stockage indisponible ou corrompu : on repart des données de démo */
   }
@@ -89,6 +98,7 @@ export function useDonnees(session: Session | null, sessionPerdue: () => void) {
     if (connecte) return;
     try {
       localStorage.setItem(CLE, JSON.stringify(donnees));
+      localStorage.setItem(CLE_DATE, aujourdhui());
     } catch {
       /* navigation privée : les modifications restent en mémoire */
     }
